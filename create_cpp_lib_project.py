@@ -51,7 +51,7 @@ test_dir = "test"
 example_dir = "example"
 subdirs = [project_include_dir, src_dir, test_dir, example_dir]
 for subdir in subdirs:
-    path = "{}/{}".format(project_name, subdir)
+    path = "{proot}/{sub}".format(proot=project_name, sub=subdir)
     print("Create dir '{}'".format(path))
     os.makedirs(path)
 
@@ -60,7 +60,7 @@ with open(project_name + "/README.md", "w") as readme_file:
     readme_file.write(project_name + "\n")
 
 # Write project header
-header_path = "{1}/{0}/{1}.hpp".format(project_include_dir, project_name)
+header_path = "{pname}/{include}/{pname}.hpp".format(include=project_include_dir, pname=project_name)
 with open(header_path, "w") as header_file:
     content = "#pragma once \n\
 \n\
@@ -70,33 +70,33 @@ std::string libname();\n".format(project_name)
     header_file.write(content)
 
 # Write project source
-source_path = "{1}/{0}/{1}.cpp".format(src_dir, project_name)
+source_path = "{pname}/{src}/{pname}.cpp".format(src=src_dir, pname=project_name)
 with open(source_path, "w") as source_file:
-    content = "#include <{0}/{0}.hpp> \n\
+    content = "#include <{pname}/{pname}.hpp> \n\
 \n\
 std::string libname()\n\
 {{\n\
-    return \"{0}\";\n\
-}}\n".format(project_name)
+    return \"{pname}\";\n\
+}}\n".format(pname=project_name)
     source_file.write(content)
 
 # Write test CMakeLists.txt
-test_cmakelists_path = "{0}/{1}/CMakeLists.txt".format(project_name, test_dir)
+test_cmakelists_path = "{proot}/{sub}/CMakeLists.txt".format(proot=project_name, sub=test_dir)
 with open(test_cmakelists_path, "w") as test_cmakelists_file:
     content = "\nadd_public_cpp_library_tests(${PROJECT_NAME})\n"
     test_cmakelists_file.write(content)
 
 # Write test CMakeLists.txt
-example_cmakelists_path = "{0}/{1}/CMakeLists.txt".format(project_name, example_dir)
+example_cmakelists_path = "{proot}/{sub}/CMakeLists.txt".format(proot=project_name, sub=example_dir)
 with open(example_cmakelists_path, "w") as example_cmakelists_file:
     content = "\nadd_public_cpp_library_examples(${PROJECT_NAME})\n"
     example_cmakelists_file.write(content)
 
 # Write project CMakeLists.txt
-project_cmakelists_path = "{0}/CMakeLists.txt".format(project_name)
+project_cmakelists_path = "{}/CMakeLists.txt".format(project_name)
 with open(project_cmakelists_path, "w") as project_cmakelists_file:
     content = "\n\
-cmake_minimum_required(VERSION {1}.{2})\n\
+cmake_minimum_required(VERSION {cmake_major}.{cmake_minor})\n\
 \n\
 list(PREPEND CMAKE_MODULE_PATH ${{CMAKE_SOURCE_DIR}}/cmake/modules)\n\
 \n\
@@ -114,7 +114,7 @@ set_build_type_if_undefined()\n\
 #-----\n\
 # C++ PROJECT\n\
 \n\
-project({0}\n\
+project({pname}\n\
         VERSION 0.1.0\n\
 #        DESCRIPTION \"\"\n\
 #        HOMEPAGE_URL \"\"\n\
@@ -125,15 +125,15 @@ include(CTest)\n\
 add_public_cpp_library(VERSION_HEADER \"version.hpp\"\n\
                        VERBOSE_PACKAGE_CONFIG_FILE)\n\
 \n\
-#-----\n".format(project_name, cmake_major, cmake_minor)
+#-----\n".format(pname=project_name, cmake_major=cmake_major, cmake_minor=cmake_minor)
     project_cmakelists_file.write(content)
 
 # Write cmake_quick_install.cmake
-cmake_quick_install_path = "{0}/cmake_quick_install.cmake".format(project_name)
+cmake_quick_install_path = "{}/cmake_quick_install.cmake".format(project_name)
 with open(cmake_quick_install_path, "w") as cmake_quick_install_file:
     content="# cmake -P cmake_quick_install.cmake\n\
 \n\
-set(project \"{}\")\n\
+set(project \"{project_name}\")\n\
 \n\
 if(WIN32)\n\
     set(temp_dir $ENV{{TEMP}})\n\
@@ -171,7 +171,7 @@ message(STATUS \"*  INSTALL\")\n\
 execute_process(COMMAND ${{CMAKE_COMMAND}} --install ${{build_dir}})\n\
 if(NOT cmd_res EQUAL 0)\n\
     file(TOUCH ${{error_file}})\n\
-endif()\n".format(project_name)
+endif()\n".format(project_name=project_name)
     cmake_quick_install_file.write(content)
 
 print("EXIT SUCCESS")
