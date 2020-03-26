@@ -128,4 +128,50 @@ add_public_cpp_library(VERSION_HEADER \"version.hpp\"\n\
 #-----\n".format(project_name, cmake_major, cmake_minor)
     project_cmakelists_file.write(content)
 
+# Write cmake_quick_install.cmake
+cmake_quick_install_path = "{0}/cmake_quick_install.cmake".format(project_name)
+with open(cmake_quick_install_path, "w") as cmake_quick_install_file:
+    content="# cmake -P cmake_quick_install.cmake\n\
+\n\
+set(project \"{}\")\n\
+\n\
+if(WIN32)\n\
+    set(temp_dir $ENV{{TEMP}})\n\
+elseif(UNIX)\n\
+    set(temp_dir /tmp)\n\
+else()\n\
+    message(FATAL_ERROR \"No temporary directory found!\")\n\
+endif()\n\
+\n\
+file(TO_NATIVE_PATH \"/\" path_sep)\n\
+set(src_dir ${{CMAKE_CURRENT_LIST_DIR}})\n\
+set(build_dir ${{temp_dir}}${{path_sep}}${{project}}-build)\n\
+set(error_file ${{build_dir}}${{path_sep}}quick_install_error)\n\
+\n\
+if(EXISTS ${{error_file}})\n\
+    message(STATUS \"Previous call to quick_install.cmake failed. Cleaning...\")\n\
+    file(REMOVE_RECURSE ${{build_dir}})\n\
+endif()\n\
+\n\
+message(STATUS \"*  CONFIGURATION\")\n\
+execute_process(COMMAND ${{CMAKE_COMMAND}} -DCMAKE_BUILD_TYPE=${{CMAKE_BUILD_TYPE}} -S ${{src_dir}} -B ${{build_dir}}  RESULT_VARIABLE cmd_res)\n\
+if(NOT cmd_res EQUAL 0)\n\
+    file(TOUCH ${{error_file}})\n\
+    return()\n\
+endif()\n\
+\n\
+message(STATUS \"*  BUILD\")\n\
+execute_process(COMMAND ${{CMAKE_COMMAND}} --build ${{build_dir}}  RESULT_VARIABLE cmd_res)\n\
+if(NOT cmd_res EQUAL 0)\n\
+    file(TOUCH ${{error_file}})\n\
+    return()\n\
+endif()\n\
+\n\
+message(STATUS \"*  INSTALL\")\n\
+execute_process(COMMAND ${{CMAKE_COMMAND}} --install ${{build_dir}})\n\
+if(NOT cmd_res EQUAL 0)\n\
+    file(TOUCH ${{error_file}})\n\
+endif()\n".format(project_name)
+    cmake_quick_install_file.write(content)
+
 print("EXIT SUCCESS")
