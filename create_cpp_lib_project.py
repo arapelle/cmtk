@@ -98,7 +98,7 @@ with open(project_cmakelists_path, "w") as project_cmakelists_file:
     content = "\n\
 cmake_minimum_required(VERSION {cmake_major}.{cmake_minor})\n\
 \n\
-list(PREPEND CMAKE_MODULE_PATH ${{CMAKE_SOURCE_DIR}}/cmake/modules)\n\
+list(PREPEND CMAKE_MODULE_PATH ${{CMAKE_SOURCE_DIR}}/cmake/include)\n\
 \n\
 # Standard includes\n\
 include(CMakePrintHelpers)\n\
