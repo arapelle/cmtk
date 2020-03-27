@@ -40,6 +40,8 @@ if cmake_major < 3 or cmake_minor < 13:
 project_name = pargs.project_name
 while not project_name:
     project_name = simpledialog.askstring("Project Name", "Project name: ")
+    if project_name is None:
+        exit(0)
 
 print("Project name: '{}'".format(project_name))
 
