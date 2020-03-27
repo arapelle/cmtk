@@ -105,6 +105,7 @@ with open(example_cmakelists_path, "w") as example_cmakelists_file:
 project_cmakelists_path = "{}/CMakeLists.txt".format(project_name)
 with open(project_cmakelists_path, "w") as project_cmakelists_file:
     check_cmake_binary_dir_code = "check_cmake_binary_dir()\n" if messagebox.askyesno("Question","Allowing build in source tree?") else ""
+    create_version_header_code = "    VERSION_HEADER \"version.hpp\"\n" if messagebox.askyesno("Question","Do you want a version header file?") else ""
     content = "\n\
 cmake_minimum_required(VERSION {cmake_major}.{cmake_minor})\n\
 \n\
@@ -132,11 +133,14 @@ project({pname}\n\
 \n\
 include(CTest)\n\
 \n\
-add_public_cpp_library(VERSION_HEADER \"version.hpp\"\n\
-                       VERBOSE_PACKAGE_CONFIG_FILE)\n\
+add_public_cpp_library(\n\
+{create_version_header_code}\
+    VERBOSE_PACKAGE_CONFIG_FILE\n\
+)\n\
 \n\
 #-----\n".format(pname=project_name, cmake_major=cmake_major, cmake_minor=cmake_minor, \
-                 check_cmake_binary_dir_code=check_cmake_binary_dir_code)
+                 check_cmake_binary_dir_code=check_cmake_binary_dir_code, \
+                 create_version_header_code=create_version_header_code)
     project_cmakelists_file.write(content)
 
 # Write cmake_quick_install.cmake
