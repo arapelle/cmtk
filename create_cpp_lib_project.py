@@ -104,6 +104,7 @@ with open(example_cmakelists_path, "w") as example_cmakelists_file:
 # Write project CMakeLists.txt
 project_cmakelists_path = "{}/CMakeLists.txt".format(project_name)
 with open(project_cmakelists_path, "w") as project_cmakelists_file:
+    check_cmake_binary_dir_code = "check_cmake_binary_dir()\n" if messagebox.askyesno("Question","Allowing build in source tree?") else ""
     content = "\n\
 cmake_minimum_required(VERSION {cmake_major}.{cmake_minor})\n\
 \n\
@@ -117,7 +118,7 @@ include(cmtk/CppLibraryProject)\n\
 #-----\n\
 # PROJECT\n\
 \n\
-check_cmake_binary_dir()\n\
+{check_cmake_binary_dir_code}\
 set_build_type_if_undefined()\n\
 \n\
 #-----\n\
@@ -134,7 +135,8 @@ include(CTest)\n\
 add_public_cpp_library(VERSION_HEADER \"version.hpp\"\n\
                        VERBOSE_PACKAGE_CONFIG_FILE)\n\
 \n\
-#-----\n".format(pname=project_name, cmake_major=cmake_major, cmake_minor=cmake_minor)
+#-----\n".format(pname=project_name, cmake_major=cmake_major, cmake_minor=cmake_minor, \
+                 check_cmake_binary_dir_code=check_cmake_binary_dir_code)
     project_cmakelists_file.write(content)
 
 # Write cmake_quick_install.cmake
