@@ -7,16 +7,25 @@ import tkinter as tk
 from tkinter import messagebox
 from tkinter import simpledialog
 
+# python current dir
 python_current_dir = os.path.dirname(os.path.realpath(__file__))
 
+# hide main window
+root = tk.Tk()
+root.withdraw()
+
+# Parse args
 argparser = argparse.ArgumentParser()
-argparser.add_argument('-p', '--project-name', metavar='name', type=str, default="", help='Project name')
-argparser.add_argument('--cmake', metavar='cmake-path', type=str, default="cmake", help='Path or alias to call cmake')
+argparser.add_argument('-p', '--project-name', metavar='project-name', type=str, default="", help='Project name')
+argparser.add_argument('--cmake', metavar='cmake-path', type=str, default="cmake", help='Path or alias to CMake')
 pargs = argparser.parse_args()
 
 # CMake Metadata
 import subprocess
 import json
+if not pargs.cmake or not shutil.which(pargs.cmake):
+    messagebox.showerror("CMake not found!", "CMake cannot be found.\nUse option --cmake.\n\n{}".format(argparser.format_usage()))
+    exit(-1)
 result = subprocess.run("{} -E capabilities".format(pargs.cmake).split(), stdout=subprocess.PIPE)
 cmake_metadata = result.stdout.decode('utf-8')
 cmake_metadata = json.loads(cmake_metadata)
@@ -24,11 +33,9 @@ cmake_metadata = json.loads(cmake_metadata)
 cmake_version = cmake_metadata["version"]
 cmake_major = cmake_version["major"]
 cmake_minor = cmake_version["minor"]
+if cmake_major < 3 or cmake_minor < 13:
+    messagebox.showerror("Update your CMake!", "Your CMake version is too low: {}.{}.\nUse CMake 3.13 or later!".format(cmake_major, cmake_minor))
 #---
-
-# hide main window
-root = tk.Tk()
-root.withdraw()
 
 project_name = pargs.project_name
 while not project_name:
