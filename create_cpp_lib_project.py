@@ -14,13 +14,22 @@ python_current_dir = os.path.dirname(os.path.realpath(__file__))
 root = tk.Tk()
 root.withdraw()
 
+#-----------
 # Parse args
+#-----------
 argparser = argparse.ArgumentParser()
-argparser.add_argument('-p', '--project-name', metavar='project-name', type=str, default="", help='Project name')
+argparser.add_argument('project_name', nargs='?', type=str, help='Project name')
+argparser.add_argument('--project-version', metavar='project-version', type=str, default="", help='Project version')
+argparser.add_argument('--cpp-version', metavar='cpp-version', type=str, default="", help='C++ standard version')
+argparser.add_argument('--enable-build-in-tree', action='store_true', help='Disable build-in tree')
+argparser.add_argument('--project-config-type', metavar='BASIC|VERBOSE|CUSTOM', type=str, default="", help='Type of CMake project config file')
+argparser.add_argument('-D', '--default-parameters', action='store_true', help='Create a project with default parameters')
 argparser.add_argument('--cmake', metavar='cmake-path', type=str, default="cmake", help='Path or alias to CMake')
 pargs = argparser.parse_args()
 
+#---------------
 # CMake Metadata
+#---------------
 import subprocess
 import json
 if not pargs.cmake or not shutil.which(pargs.cmake):
@@ -44,6 +53,10 @@ while not project_name:
         exit(0)
 
 print("Project name: '{}'".format(project_name))
+
+#-----------------
+# Create file tree
+#-----------------
 
 if os.path.exists(project_name):
     print("Remove dir '{}'".format(project_name))
