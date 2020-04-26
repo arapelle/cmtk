@@ -3,6 +3,7 @@
 import os
 import shutil
 import argparse
+import re
 import tkinter as tk
 from tkinter import messagebox
 from tkinter import simpledialog
@@ -21,9 +22,12 @@ argparser = argparse.ArgumentParser()
 argparser.add_argument('project_name', nargs='?', type=str, help='Project name')
 argparser.add_argument('--project-version', metavar='project-version', type=str, default="", help='Project version')
 argparser.add_argument('--cpp-version', metavar='cpp-version', type=str, default="", help='C++ standard version')
-argparser.add_argument('--enable-build-in-tree', action='store_true', help='Disable build-in tree')
+argparser.add_argument('--build-in-tree', type=bool, default=None, help='Enable build-in tree')
 argparser.add_argument('--project-config-type', metavar='BASIC|VERBOSE|CUSTOM', type=str, default="", help='Type of CMake project config file')
-argparser.add_argument('-D', '--default-parameters', action='store_true', help='Create a project with default parameters')
+argparser.add_argument('--gitignore', action='store_true', help='Create .gitignore file')
+argparser.add_argument('--license-type', metavar='type', type=str, default="", help='License type (ex: MIT)')
+argparser.add_argument('--license-copyright-holders', metavar='holders', type=str, default="", help='License copyright holders')
+argparser.add_argument('-i', '--interactive', action='store_true', help='Parameters not set on command line will be asked through GUI dialogs')
 argparser.add_argument('--cmake', metavar='cmake-path', type=str, default="cmake", help='Path or alias to CMake')
 pargs = argparser.parse_args()
 
@@ -46,13 +50,79 @@ if cmake_major < 3 or cmake_minor < 13:
     messagebox.showerror("Update your CMake!", "Your CMake version is too low: {}.{}.\nUse CMake 3.13 or later!".format(cmake_major, cmake_minor))
 #---
 
-project_name = pargs.project_name
-while not project_name:
-    project_name = simpledialog.askstring("Project Name", "Project name: ")
-    if project_name is None:
-        exit(0)
+#---------------
+# Default values
+#---------------
+default_project_version = "0.1.0"
+default_cpp_version = "17"
+default_cmake_build_in_tree = False
+default_cmake_project_config_type = "VERBOSE"
+default_gitignore = True
+default_license_type = "MIT"
+default_license_copyright_holders = "<copyright holders>"
 
-print("Project name: '{}'".format(project_name))
+#-------------------------
+# Check and set parameters
+#-------------------------
+
+def cancel_project_creation(res = 0):
+    print("Project creation canceled.")
+    exit(res)
+
+def ask_parameter(label:str):
+    return simpledialog.askstring(label, label + ": ")
+
+def ask_bool_parameter(label:str):
+    return messagebox.askyesnocancel(label, label + ": ")
+
+def init_parameter(label:str, arg_value, default_value, interactive, check_fn, ask_fn=None):
+    parameter_is_bool = type(default_value) == type(True)
+    if ask_fn is None:
+        if parameter_is_bool:
+            ask_fn = lambda: ask_bool_parameter(label)
+        else:
+            ask_fn = lambda: ask_parameter(label)
+    param = default_value.__new__(type(default_value)) if parameter_is_bool else None
+    if arg_value:
+        param = arg_value
+    elif not interactive:
+        param = default_value
+    if param is None or not check_fn(param):
+        if interactive:
+            while True:
+                param = ask_fn()
+                if param is None:
+                    cancel_project_creation()
+                if check_fn(param):
+                    break
+        else:
+            messagebox.showerror("Wrong parameter", "{} is incorrect ({}).".format(label, param))
+            cancel_project_creation(-1)
+    print("Parameter '{}': '{}'".format(label, param))
+    return param
+
+# Project name
+project_name = init_parameter("Project name", pargs.project_name, "", pargs.interactive, lambda pname: len(pname)>0)
+
+# Project version
+def check_project_version(project_version):
+    regexp = re.compile('[0-9]+.[0-9]+.[0-9]+')
+    return regexp.fullmatch(project_version) != None
+project_version = init_parameter("Project version", pargs.project_version, default_project_version, pargs.interactive, check_project_version)
+
+# C++ version
+cpp_version = init_parameter("C++ version", pargs.cpp_version, default_cpp_version, pargs.interactive, lambda version: version in ["11","14","17","20"])
+
+# Build in tree
+print("debug: {}".format(pargs.build_in_tree))
+build_in_tree = init_parameter("Allowing build-in tree", pargs.build_in_tree, default_cmake_build_in_tree, pargs.interactive, lambda option: option != None)
+
+# cmake_project_config_type = "VERBOSE" # BASIC | VERBOSE (| CUSTOM (in version 0.2.0))
+cmake_project_config_type = init_parameter("Project config type (BASIC | VERBOSE)", pargs.project_config_type, default_cmake_project_config_type, pargs.interactive, lambda type: type in ["BASIC", "VERBOSE"])
+
+# gitignore = True
+# license_type = "MIT"
+# license_copyright_holders = "<copyright holders>"
 
 #-----------------
 # Create file tree
@@ -108,7 +178,7 @@ with open(test_cmakelists_path, "w") as test_cmakelists_file:
     content = "\nadd_public_cpp_library_tests(${PROJECT_NAME})\n"
     test_cmakelists_file.write(content)
 
-# Write test CMakeLists.txt
+# Write example CMakeLists.txt
 example_cmakelists_path = "{proot}/{sub}/CMakeLists.txt".format(proot=project_name, sub=example_dir)
 with open(example_cmakelists_path, "w") as example_cmakelists_file:
     content = "\nadd_public_cpp_library_examples(${PROJECT_NAME})\n"
@@ -117,7 +187,6 @@ with open(example_cmakelists_path, "w") as example_cmakelists_file:
 # Write project CMakeLists.txt
 project_cmakelists_path = "{}/CMakeLists.txt".format(project_name)
 with open(project_cmakelists_path, "w") as project_cmakelists_file:
-    check_cmake_binary_dir_code = "check_cmake_binary_dir()\n" if messagebox.askyesno("Question","Allowing build in source tree?") else ""
     create_version_header_code = "    VERSION_HEADER \"version.hpp\"\n" if messagebox.askyesno("Question","Do you want a version header file?") else ""
     content = "\n\
 cmake_minimum_required(VERSION {cmake_major}.{cmake_minor})\n\
@@ -148,12 +217,13 @@ include(CTest)\n\
 \n\
 add_public_cpp_library(\n\
 {create_version_header_code}\
-    VERBOSE_PACKAGE_CONFIG_FILE\n\
+    {cmake_project_config_type}_PACKAGE_CONFIG_FILE\n\
 )\n\
 \n\
 #-----\n".format(pname=project_name, cmake_major=cmake_major, cmake_minor=cmake_minor, \
-                 check_cmake_binary_dir_code=check_cmake_binary_dir_code, \
-                 create_version_header_code=create_version_header_code)
+                 check_cmake_binary_dir_code=build_in_tree, \
+                 create_version_header_code=create_version_header_code, \
+                 cmake_project_config_type=cmake_project_config_type)
     project_cmakelists_file.write(content)
 
 # Write cmake_quick_install.cmake
