@@ -84,32 +84,45 @@ def init_parameter(label:str, default_value, check_fn, input_value=None, ask_fn=
     print("Parameter '{}': '{}'".format(label, param))
     return param
 
-# Project name
+# Project: Project name
 project_name = init_parameter("Project name", "", lambda pname: len(pname) > 0, pargs.project_name)
 
-# Project version
+# Project: Project version
 def check_project_version(project_version):
     regexp = re.compile('[0-9]+.[0-9]+.[0-9]+')
     return regexp.fullmatch(project_version) != None
 project_version = init_parameter("Project version", default_project_version, check_project_version)
 
-# C++ version
-cpp_version = init_parameter("C++ version", default_cpp_version, lambda version: version in ["11","14","17","20"])
+# CMakeLists.txt: C++ version
+cml_cpp_version = init_parameter("C++ version", default_cpp_version, lambda version: version in ["11","14","17","20"])
 
-# Build in tree
-build_in_tree = init_parameter("Allowing build-in tree", False, lambda option: option != None)
-build_in_tree = "check_cmake_binary_dir()\n" if build_in_tree else ""
+# CMakeLists.txt: Build in tree
+cml_build_in_tree = init_parameter("Allowing build-in tree", False, lambda option: option != None)
+cml_build_in_tree = "check_cmake_binary_dir()\n" if cml_build_in_tree else ""
 
-# Create version header
-create_version_header_code = init_parameter("Do you want a version header file?", False, lambda option: option != None)
-create_version_header_code = "    VERSION_HEADER \"version.hpp\"\n" if create_version_header_code else ""
+# CMakeLists.txt: Create version header
+cml_create_version_header_code = init_parameter("Do you want a version header file?", False, lambda option: option != None)
+cml_create_version_header_code = "    VERSION_HEADER \"version.hpp\"\n" if cml_create_version_header_code else ""
 
-# cmake_project_config_type = "VERBOSE" # BASIC | VERBOSE (| CUSTOM (in version 0.2.0))
-cmake_project_config_type = init_parameter("Project config type (BASIC | VERBOSE)", default_cmake_project_config_type, lambda type: type in ["BASIC", "VERBOSE"])
+# CMakeLists.txt: cmake_project_config_type = "VERBOSE" # BASIC | VERBOSE (| CUSTOM (in version 0.2.0))
+cml_cmake_project_config_type = init_parameter("Project config type (BASIC | VERBOSE)", default_cmake_project_config_type, lambda type: type in ["BASIC", "VERBOSE"])
 
-# gitignore = True
-# license_type = "MIT"
-# license_copyright_holders = "<copyright holders>"
+# Git: gitignore
+git_create_gitignore = init_parameter("Do you want a .gitignore file?", False, lambda option: option != None)
+
+# License: (only MIT available for the moment)
+license_create_license_file = init_parameter("Do you want a license file?", False, lambda option: option != None)
+license_file_name = ""
+license_copyright_holders = ""
+if license_create_license_file:
+    license_file_name = init_parameter("License file name?", "LICENSE.md", lambda pname: len(pname) > 0)
+    license_copyright_holders = init_parameter("Who are the copyright holders?", "", lambda pname: len(pname) > 0)
+
+# Readme: file name
+readme_create_readme_file = init_parameter("Do you want a readme file?", False, lambda option: option != None)
+readme_file_name = ""
+if readme_create_readme_file:
+    readme_file_name = init_parameter("Readme file name?", "README.md", lambda pname: len(pname) > 0)
 
 #-----------------
 # Create file tree
@@ -207,9 +220,9 @@ add_public_cpp_library(\n\
 )\n\
 \n\
 #-----\n".format(pname=project_name, pversion=project_version, cmake_major=cmake_major, cmake_minor=cmake_minor, \
-                 check_cmake_binary_dir_code=build_in_tree, \
-                 create_version_header_code=create_version_header_code, \
-                 cmake_project_config_type=cmake_project_config_type)
+                 check_cmake_binary_dir_code=cml_build_in_tree, \
+                 create_version_header_code=cml_create_version_header_code, \
+                 cmake_project_config_type=cml_cmake_project_config_type)
     project_cmakelists_file.write(content)
 
 # Write cmake_quick_install.cmake
