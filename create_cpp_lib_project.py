@@ -84,6 +84,10 @@ def init_parameter(label:str, default_value, check_fn, input_value=None, ask_fn=
     print("Parameter '{}': '{}'".format(label, param))
     return param
 
+def init_bool_parameter(label:str, input_value=None):
+    check_fn = lambda option: option != None and type(option) == type(True)
+    return init_parameter(label, False, check_fn, input_value, ask_bool_parameter)
+
 # Project: Project name
 project_name = init_parameter("Project name", "", lambda pname: len(pname) > 0, pargs.project_name)
 
@@ -101,17 +105,17 @@ cml_build_in_tree = init_parameter("Allowing build-in tree", False, lambda optio
 cml_build_in_tree = "check_cmake_binary_dir()\n" if cml_build_in_tree else ""
 
 # CMakeLists.txt: Create version header
-cml_create_version_header_code = init_parameter("Do you want a version header file?", False, lambda option: option != None)
+cml_create_version_header_code = init_bool_parameter("Do you want a version header file?")
 cml_create_version_header_code = "    VERSION_HEADER \"version.hpp\"\n" if cml_create_version_header_code else ""
 
 # CMakeLists.txt: cmake_project_config_type = "VERBOSE" # BASIC | VERBOSE (| CUSTOM (in version 0.2.0))
 cml_cmake_project_config_type = init_parameter("Project config type (BASIC | VERBOSE)", default_cmake_project_config_type, lambda type: type in ["BASIC", "VERBOSE"])
 
 # Git: gitignore
-git_create_gitignore = init_parameter("Do you want a .gitignore file?", False, lambda option: option != None)
+git_create_gitignore = init_bool_parameter("Do you want a .gitignore file?")
 
 # License: (only MIT available for the moment)
-license_create_license_file = init_parameter("Do you want a license file?", False, lambda option: option != None)
+license_create_license_file = init_bool_parameter("Do you want a license file?")
 license_file_name = ""
 license_copyright_holders = ""
 if license_create_license_file:
@@ -119,7 +123,7 @@ if license_create_license_file:
     license_copyright_holders = init_parameter("Who are the copyright holders?", "", lambda pname: len(pname) > 0)
 
 # Readme: file name
-readme_create_readme_file = init_parameter("Do you want a readme file?", False, lambda option: option != None)
+readme_create_readme_file = init_bool_parameter("Do you want a readme file?")
 readme_file_name = ""
 if readme_create_readme_file:
     readme_file_name = init_parameter("Readme file name?", "README.md", lambda pname: len(pname) > 0)
