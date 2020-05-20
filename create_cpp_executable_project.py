@@ -106,7 +106,7 @@ list(PREPEND CMAKE_MODULE_PATH ${{CMAKE_SOURCE_DIR}}/cmake/include)\n\
 # Standard includes\n\
 include(CMakePrintHelpers)\n\
 # Custom include\n\
-include(cmtk/CppBinaryProject)\n\
+include(cmtk/CppExecutableProject)\n\
 \n\
 #-----\n\
 # PROJECT\n\
@@ -123,7 +123,7 @@ project({pname}\n\
 #        HOMEPAGE_URL \"\"\n\
         LANGUAGES CXX)\n\
 \n\
-add_public_cpp_binary(\n\
+add_public_cpp_executable(\n\
 {create_version_header_code}\n\
 )\n\
 \n\

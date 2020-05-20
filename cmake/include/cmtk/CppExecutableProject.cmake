@@ -1,7 +1,7 @@
 
 include(${CMAKE_CURRENT_LIST_DIR}/Project.cmake)
 
-function(add_public_cpp_binary)
+function(add_public_cpp_executable)
     #-----
     # Args
     set(options "")
