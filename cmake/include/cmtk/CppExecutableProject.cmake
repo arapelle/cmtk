@@ -1,5 +1,5 @@
 
-include(${CMAKE_CURRENT_LIST_DIR}/Project.cmake)
+include(${CMAKE_CURRENT_LIST_DIR}/CppProject.cmake)
 
 function(add_public_cpp_executable)
     #-----

@@ -1,5 +1,5 @@
 
-include(${CMAKE_CURRENT_LIST_DIR}/Project.cmake)
+include(${CMAKE_CURRENT_LIST_DIR}/CppProject.cmake)
 
 function(add_public_cpp_library_examples cpp_lib)
     set(example_output_dir ${CMAKE_BUILD_TYPE})
@@ -21,7 +21,9 @@ function(add_public_cpp_library_examples cpp_lib)
         target_include_directories(${example_prog} PRIVATE
             $<TARGET_PROPERTY:${cpp_lib},INCLUDE_DIRECTORIES>
             $<TARGET_PROPERTY:${cpp_lib_object},INCLUDE_DIRECTORIES>)
-        target_link_libraries(${example_prog} PRIVATE $<TARGET_NAME:${cpp_lib}>)
+        target_link_libraries(${example_prog} PRIVATE
+            $<TARGET_NAME:${cpp_lib}>
+            $<TARGET_PROPERTY:${cpp_lib},LINK_LIBRARIES>)
     endforeach()
 endfunction()
 
@@ -50,7 +52,10 @@ function(add_public_cpp_library_tests cpp_lib)
         target_include_directories(${test_prog} PRIVATE
             $<TARGET_PROPERTY:${cpp_lib},INCLUDE_DIRECTORIES>
             $<TARGET_PROPERTY:${cpp_lib_object},INCLUDE_DIRECTORIES>)
-        target_link_libraries(${test_prog} PRIVATE $<TARGET_NAME:${cpp_lib}> GTest::GTest)
+        target_link_libraries(${test_prog} PRIVATE
+            $<TARGET_NAME:${cpp_lib}>
+            $<TARGET_PROPERTY:${cpp_lib},LINK_LIBRARIES>
+            GTest::GTest)
         gtest_discover_tests(${test_prog} TEST_PREFIX ${cpp_lib}::)
     endforeach()
 endfunction()
