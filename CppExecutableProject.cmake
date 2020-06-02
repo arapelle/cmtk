@@ -26,11 +26,6 @@ function(add_public_cpp_executable)
     #-----
 
     #-----
-    # Configure C++ standard
-    set(CMAKE_CXX_STANDARD ${FARG_CXX_STANDARD})
-    set(CMAKE_CXX_STANDARD_REQUIRED ON)
-
-    #-----
     # Project options
     #-----
     # Output paths
@@ -69,6 +64,7 @@ function(add_public_cpp_executable)
     target_include_directories(${project_object_target} PUBLIC
         $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/${include_dir}>
         $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/include>)
+    target_compile_features(${project_object_target} PUBLIC cxx_std_${FARG_CXX_STANDARD})
     set_property(TARGET ${project_object_target} PROPERTY POSITION_INDEPENDENT_CODE 1)
     if(MSVC)
         target_compile_options(${project_object_target} PRIVATE /Wall)
@@ -78,6 +74,7 @@ function(add_public_cpp_executable)
 
     # Binary target
     add_executable(${project_target} $<TARGET_OBJECTS:${project_object_target}>)
+    target_compile_features(${project_shared_target} PUBLIC cxx_std_${FARG_CXX_STANDARD})
     set_target_properties(${project_target} PROPERTIES DEBUG_POSTFIX "-d")
     set(project_targets ${project_targets} ${project_target})
     #-----
