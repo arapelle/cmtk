@@ -74,7 +74,7 @@ function(add_public_cpp_executable)
 
     # Binary target
     add_executable(${project_target} $<TARGET_OBJECTS:${project_object_target}>)
-    target_compile_features(${project_shared_target} PUBLIC cxx_std_${FARG_CXX_STANDARD})
+    target_compile_features(${project_target} PUBLIC cxx_std_${FARG_CXX_STANDARD})
     set_target_properties(${project_target} PROPERTIES DEBUG_POSTFIX "-d")
     set(project_targets ${project_targets} ${project_target})
     #-----
