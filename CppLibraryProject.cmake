@@ -60,7 +60,7 @@ function(add_public_cpp_library_tests cpp_lib)
     endforeach()
 endfunction()
 
-function(generate_verbose_public_library_config_file package_config_file)
+function(generate_verbose_library_config_file package_config_file)
     generate_basic_package_config_file(${package_config_file})
     file(APPEND ${package_config_file}
          "
@@ -79,164 +79,186 @@ endif()
 ")
 endfunction()
 
-function(add_public_cpp_library)
-    #-----
-    # Args
-    set(options "BASIC_PACKAGE_CONFIG_FILE;VERBOSE_PACKAGE_CONFIG_FILE")
-    set(params "CXX_STANDARD;INPUT_VERSION_HEADER;VERSION_HEADER;INPUT_PACKAGE_CONFIG_FILE;INCLUDE_DIR;SRC_DIR;EXAMPLE_DIR;TEST_DIR")
+function(library_build_options library_name)
+    # Args:
+    set(options "STATIC;SHARED;EXAMPLE;TEST")
+    set(params "TEST_DIR;EXAMPLE_DIR")
     set(lists "")
-
-    # Parse args
-    cmake_parse_arguments(PARSE_ARGV 0 "FARG" "${options}" "${params}" "${lists}")
-
-    # Set default value if needed
-    if(NOT FARG_CXX_STANDARD)
-        set(FARG_CXX_STANDARD 17)
+    # Parse args:
+    cmake_parse_arguments(PARSE_ARGV 1 "ARG" "${options}" "${params}" "${lists}")
+    # Set default value if needed:
+    if(NOT ARG_TEST_DIR)
+        set(test_dir "test")
+    else()
+        set(test_dir "${ARG_TEST_DIR}")
     endif()
-    foreach(idir include src example test)
-        string(TOUPPER ${idir} uidir)
-        if(FARG_${uidir}_DIR)
-            set(${idir}_dir ${FARG_${uidir}_DIR})
-        else()
-            set(${idir}_dir ${idir})
-        endif()
-    endforeach()
-
-    # Check args values
-    if(NOT FARG_BASIC_PACKAGE_CONFIG_FILE AND NOT FARG_VERBOSE_PACKAGE_CONFIG_FILE AND NOT FARG_INPUT_PACKAGE_CONFIG_FILE)
-        message(FATAL_ERROR "Package config file argument is missing. [BASIC_PACKAGE_CONFIG_FILE|VERBOSE_PACKAGE_CONFIG_FILE|INPUT_PACKAGE_CONFIG_FILE]")
+    if(NOT ARG_EXAMPLE_DIR)
+        set(example_dir "example")
+    else()
+        set(example_dir "${ARG_EXAMPLE_DIR}")
     endif()
-    #-----
-
-    #-----
-    # Project options
-    option(${PROJECT_NAME}_BUILD_SHARED_LIB "Indicates if we build a SHARED library." ON)
-    option(${PROJECT_NAME}_BUILD_STATIC_LIB "Indicates if we build a STATIC library." ON)
-    if(EXISTS "${PROJECT_SOURCE_DIR}/test/CMakeLists.txt")
-        option(${PROJECT_NAME}_BUILD_TESTS "Indicates if we build the tests or not." OFF)
+    # Options:
+    if(${ARG_STATIC})
+        option(${library_name}_BUILD_STATIC_LIB "Indicates if we build a STATIC library." ON)
     endif()
-    if(EXISTS "${PROJECT_SOURCE_DIR}/example/CMakeLists.txt")
-        option(${PROJECT_NAME}_BUILD_EXAMPLES "Indicates if we build the examples or not." OFF)
+    if(${ARG_SHARED})
+        option(${library_name}_BUILD_SHARED_LIB "Indicates if we build a SHARED library." ON)
     endif()
-
-    #-----
-    # Output paths
-    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BUILD_TYPE}/bin)
-    set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BUILD_TYPE}/lib)
-    set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BUILD_TYPE}/lib)
-
-    #-----
-    # Status
-    message(STATUS "PROJECT : ${PROJECT_NAME} v${PROJECT_VERSION}")
-    message(STATUS "BUILD   : ${CMAKE_BUILD_TYPE}")
-    message(STATUS "CPPCOMP : ${CMAKE_CXX_COMPILER} ${CMAKE_CXX_COMPILER_VERSION}")
-
-    if(NOT ${${PROJECT_NAME}_BUILD_SHARED_LIB} AND NOT ${${PROJECT_NAME}_BUILD_STATIC_LIB})
+    if(${ARG_EXAMPLE} AND EXISTS "${PROJECT_SOURCE_DIR}/${example_dir}/CMakeLists.txt")
+        option(${library_name}_BUILD_EXAMPLES "Indicates if we build the examples or not." OFF)
+    endif()
+    if(${ARG_TEST} AND EXISTS "${PROJECT_SOURCE_DIR}/${test_dir}/CMakeLists.txt")
+        option(${library_name}_BUILD_TESTS "Indicates if we build the tests or not." OFF)
+    endif()
+    # Check static or shared:
+    if(NOT ${${library_name}_BUILD_SHARED_LIB} AND NOT ${${library_name}_BUILD_STATIC_LIB})
         message(FATAL_ERROR "You did not choose which target(s) to build (SHARED, STATIC).")
     endif()
-    #-----
+endfunction()
 
-    #-----
-    # Add target library
+function(add_cpp_library library_name build_shared build_static)
     include(GNUInstallDirs)
-
-    set(project_object_target ${PROJECT_NAME}-object)
-    set(project_shared_target ${PROJECT_NAME})
-    set(project_static_target ${PROJECT_NAME}-static)
-    set(export_name ${PROJECT_NAME})
-
-    # Generate header version file, if wanted
-    if(FARG_VERSION_HEADER)
-        if(IS_ABSOLUTE ${FARG_VERSION_HEADER})
-            message(FATAL_ERROR "Provide a relative path for generated version file!")
-        endif()
-        generate_version_header(INPUT_VERSION_HEADER ${FARG_INPUT_VERSION_HEADER}
-                                VERSION_HEADER ${PROJECT_BINARY_DIR}/include/${PROJECT_NAME}/${FARG_VERSION_HEADER})
+    # Args:
+    set(options "")
+    set(params "CXX_STANDARD;INCLUDE_DIRECTORIES;INPUT_VERSION_HEADER;OUTPUT_VERSION_HEADER;"
+                "OBJECT;SHARED;STATIC;BUILT_TARGETS;"
+                "LIBRARY_OUTPUT_DIRECTORY;ARCHIVE_OUTPUT_DIRECTORY")
+    set(lists "HEADERS;SOURCES")
+    # Parse args:
+    cmake_parse_arguments(PARSE_ARGV 3 "ARG" "${options}" "${params}" "${lists}")
+    # Check args:
+    if(NOT ${build_shared} AND NOT ${build_static})
+        message(FATAL_ERROR "You did not choose which target(s) to build (build_shared, build_static).")
     endif()
-
-    # Object target
-    file(GLOB_RECURSE target_header_files ${include_dir}/*)
-    file(GLOB_RECURSE target_src_files ${src_dir}/*)
-    add_library(${project_object_target} OBJECT ${target_header_files} ${target_src_files})
-    target_include_directories(${project_object_target} PUBLIC
-        $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/${include_dir}>
-        $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/include>)
-    target_compile_features(${project_object_target} PUBLIC cxx_std_${FARG_CXX_STANDARD})
-    set_property(TARGET ${project_object_target} PROPERTY POSITION_INDEPENDENT_CODE 1)
+    if(${build_shared} AND NOT ARG_SHARED)
+        message(FATAL_ERROR "You want to build a shared library but you did not provide the shared target name (SHARED).")
+    endif()
+    if(${build_static} AND NOT ARG_STATIC)
+        message(FATAL_ERROR "You want to build a static library but you did not provide the static target name (STATIC).")
+    endif()
+    if(NOT ARG_OBJECT)
+        set(ARG_OBJECT "${library_name}-object")
+    endif()
+    if(NOT ARG_HEADERS)
+        message(FATAL_ERROR "You must provide header files (HEADERS).")
+    endif()
+    if(NOT ARG_SOURCES)
+        message(FATAL_ERROR "You must provide source files (SOURCES).")
+    endif()
+    # Set target name variables:
+    set(object_target ${ARG_OBJECT})
+    set(shared_target ${ARG_SHARED})
+    set(static_target ${ARG_STATIC})
+    # Generate header version file, if wanted:
+    if(ARG_OUTPUT_VERSION_HEADER)
+        generate_version_header(INPUT_VERSION_HEADER ${ARG_INPUT_VERSION_HEADER}
+                                OUTPUT_VERSION_HEADER ${PROJECT_BINARY_DIR}/include/${library_name}/${ARG_OUTPUT_VERSION_HEADER})
+    endif()
+    # Object target:
+    add_library(${object_target} OBJECT ${ARG_HEADERS} ${ARG_SOURCES})
+    foreach(include_dir ${ARG_INCLUDE_DIRECTORIES})
+        target_include_directories(${object_target} PUBLIC $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/${include_dir}>)
+    endforeach()
+    target_include_directories(${object_target} PUBLIC $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/include>)
+    target_compile_features(${object_target} PUBLIC cxx_std_${ARG_CXX_STANDARD})
+    set_property(TARGET ${object_target} PROPERTY POSITION_INDEPENDENT_CODE 1)
     if(MSVC)
-        target_compile_options(${project_object_target} PRIVATE /Wall)
+        target_compile_options(${object_target} PRIVATE /Wall)
     elseif(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
-        target_compile_options(${project_object_target} PRIVATE -Wall -Wextra -pedantic)
+        target_compile_options(${object_target} PRIVATE -Wall -Wextra -pedantic)
     endif()
-
-    # Shared target
-    if(${${PROJECT_NAME}_BUILD_SHARED_LIB})
-        add_library(${project_shared_target} SHARED $<TARGET_OBJECTS:${project_object_target}>)
-        target_compile_features(${project_shared_target} PUBLIC cxx_std_${FARG_CXX_STANDARD})
-        target_include_directories(${project_shared_target} PUBLIC $<INSTALL_INTERFACE:include>)
-        set_target_properties(${project_shared_target} PROPERTIES DEBUG_POSTFIX "-d" SOVERSION ${PROJECT_VERSION})
-        set(project_targets ${project_targets} ${project_shared_target})
+    # Shared target:
+    if(${build_shared})
+        add_library(${shared_target} SHARED $<TARGET_OBJECTS:${object_target}>)
+        target_compile_features(${shared_target} PUBLIC cxx_std_${ARG_CXX_STANDARD})
+        target_include_directories(${shared_target} PUBLIC $<INSTALL_INTERFACE:include>)
+        foreach(include_dir ${ARG_INCLUDE_DIRECTORIES})
+            target_include_directories(${shared_target} PUBLIC $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/${include_dir}>)
+        endforeach()
+        target_include_directories(${shared_target} INTERFACE $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/include>)
+        set_target_properties(${shared_target} PROPERTIES DEBUG_POSTFIX "-d" SOVERSION ${PROJECT_VERSION})
+        set(library_targets ${library_targets} ${shared_target})
+        if(ARG_SHARED_TARGET)
+            set(${ARG_SHARED_TARGET} ${shared_target} PARENT_SCOPE)
+        endif()
+        if(ARG_LIBRARY_OUTPUT_DIRECTORY)
+            set_target_properties(${shared_target} PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${ARG_LIBRARY_OUTPUT_DIRECTORY})
+        endif()
     endif()
-
-    # Static target
-    if(${${PROJECT_NAME}_BUILD_STATIC_LIB})
-        add_library(${project_static_target} STATIC $<TARGET_OBJECTS:${project_object_target}>)
-        target_compile_features(${project_static_target} PUBLIC cxx_std_${FARG_CXX_STANDARD})
-        target_include_directories(${project_static_target} PUBLIC $<INSTALL_INTERFACE:include>)
-        set_target_properties(${project_static_target} PROPERTIES DEBUG_POSTFIX "-d")
-        set(project_targets ${project_targets} ${project_static_target})
+    # Static target:
+    if(${build_static})
+        add_library(${static_target} STATIC $<TARGET_OBJECTS:${object_target}>)
+        target_compile_features(${static_target} PUBLIC cxx_std_${ARG_CXX_STANDARD})
+        target_include_directories(${static_target} PUBLIC $<INSTALL_INTERFACE:include>)
+        foreach(include_dir ${ARG_INCLUDE_DIRECTORIES})
+            target_include_directories(${static_target} PUBLIC $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/${include_dir}>)
+        endforeach()
+        target_include_directories(${static_target} INTERFACE $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/include>)
+        set_target_properties(${static_target} PROPERTIES DEBUG_POSTFIX "-d")
+        set(library_targets ${library_targets} ${static_target})
+        if(ARG_STATIC_TARGET)
+            set(${ARG_STATIC_TARGET} ${static_target} PARENT_SCOPE)
+        endif()
+        if(ARG_ARCHIVE_OUTPUT_DIRECTORY)
+            set_target_properties(${static_target} PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${ARG_ARCHIVE_OUTPUT_DIRECTORY})
+        endif()
     endif()
-    #-----
-
-    #-----
-    # Examples
-    if(EXISTS "${PROJECT_SOURCE_DIR}/${example_dir}/CMakeLists.txt" AND ${${PROJECT_NAME}_BUILD_EXAMPLES})
-        add_subdirectory(${example_dir})
+    # Returns built targets:
+    if(ARG_BUILT_TARGETS)
+        set(${ARG_BUILT_TARGETS} ${${ARG_BUILT_TARGETS}} ${library_targets} PARENT_SCOPE)
     endif()
+endfunction()
 
-    #-----
-    # Tests
-    if(EXISTS "${PROJECT_SOURCE_DIR}/${test_dir}/CMakeLists.txt" AND BUILD_TESTING AND ${${PROJECT_NAME}_BUILD_TESTS})
-        add_subdirectory(${test_dir})
-    endif()
-    #-----
-
-    #-----
-    # Install
+function(install_cpp_library export_name targets)
+    include(GNUInstallDirs)
     include(CMakePackageConfigHelpers)
-
-    set(relative_install_cmake_package_dir "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}")
-    set(install_cmake_package_dir "${CMAKE_INSTALL_PREFIX}/${relative_install_cmake_package_dir}")
-
-    install(TARGETS ${project_targets} EXPORT ${export_name})
-    install(DIRECTORY ${include_dir}/${PROJECT_NAME} DESTINATION include)
-    install(DIRECTORY ${PROJECT_BINARY_DIR}/include/${PROJECT_NAME} DESTINATION include)
-    install(EXPORT ${export_name} DESTINATION ${relative_install_cmake_package_dir})
-
-    # Package config file
-    if(FARG_BASIC_PACKAGE_CONFIG_FILE)
-        generate_basic_package_config_file(${PROJECT_BINARY_DIR}/${PROJECT_NAME}-config.cmake)
-    elseif(FARG_VERBOSE_PACKAGE_CONFIG_FILE)
-        generate_verbose_public_library_config_file(${PROJECT_BINARY_DIR}/${PROJECT_NAME}-config.cmake)
-    elseif(FARG_INPUT_PACKAGE_CONFIG_FILE)
-        configure_package_config_file(${FARG_INPUT_PACKAGE_CONFIG_FILE}
-            "${PROJECT_BINARY_DIR}/${PROJECT_NAME}-config.cmake"
-            INSTALL_DESTINATION ${relative_install_cmake_package_dir}
-            NO_SET_AND_CHECK_MACRO
-            NO_CHECK_REQUIRED_COMPONENTS_MACRO)
+    # Args:
+    set(options "NO_UNINSTALL_SCRIPT;BASIC_PACKAGE_CONFIG_FILE;VERBOSE_PACKAGE_CONFIG_FILE;INPUT_PACKAGE_CONFIG_FILE")
+    set(params "INCLUDE_DIRECTORY;VERSION;VERSION_COMPATIBILITY")
+    set(lists "")
+    # Parse args:
+    cmake_parse_arguments(PARSE_ARGV 2 "ARG" "${options}" "${params}" "${lists}")
+    # Check and set args:
+    if(NOT ARG_INCLUDE_DIRECTORY)
+        message(FATAL_ERROR "Provide INCLUDE_DIRECTORY!")
     endif()
-
-    # Package version file
-    write_basic_package_version_file("${PROJECT_BINARY_DIR}/${PROJECT_NAME}-config-version.cmake"
-        VERSION ${PROJECT_VERSION}
-        COMPATIBILITY SameMajorVersion)
-
+    if(NOT ARG_VERSION)
+        set(ARG_VERSION ${PROJECT_VERSION})
+    endif()
+    if(NOT ARG_VERSION_COMPATIBILITY)
+        set(ARG_VERSION_COMPATIBILITY SameMajorVersion)
+    endif()
+    # Set install directory paths:
+    set(relative_install_cmake_package_dir "${CMAKE_INSTALL_LIBDIR}/cmake/${export_name}")
+    set(install_cmake_package_dir "${CMAKE_INSTALL_PREFIX}/${relative_install_cmake_package_dir}")
+    # Install targets:
+    install(TARGETS ${targets} EXPORT ${export_name})
+    install(DIRECTORY ${ARG_INCLUDE_DIRECTORY}/${export_name} DESTINATION include)
+    install(DIRECTORY ${PROJECT_BINARY_DIR}/include/${export_name} DESTINATION include)
+    install(EXPORT ${export_name} DESTINATION ${relative_install_cmake_package_dir})
+    # Create package config file:
+    if(ARG_BASIC_PACKAGE_CONFIG_FILE)
+        generate_basic_package_config_file(${PROJECT_BINARY_DIR}/${export_name}-config.cmake)
+    elseif(ARG_VERBOSE_PACKAGE_CONFIG_FILE)
+        generate_verbose_library_config_file(${PROJECT_BINARY_DIR}/${export_name}-config.cmake)
+    elseif(ARG_INPUT_PACKAGE_CONFIG_FILE)
+        configure_package_config_file(${ARG_INPUT_PACKAGE_CONFIG_FILE}
+            "${PROJECT_BINARY_DIR}/${export_name}-config.cmake"
+            INSTALL_DESTINATION ${relative_install_cmake_package_dir}
+            NO_SET_AND_CHECK_MACRO # ??
+            NO_CHECK_REQUIRED_COMPONENTS_MACRO) # ??
+    endif()
+    # Create package version file:
+    write_basic_package_version_file("${PROJECT_BINARY_DIR}/${export_name}-config-version.cmake"
+        VERSION ${ARG_VERSION}
+        COMPATIBILITY ${ARG_VERSION_COMPATIBILITY})
+    # Install package files:
     install(FILES
-        ${PROJECT_BINARY_DIR}/${PROJECT_NAME}-config.cmake
-        ${PROJECT_BINARY_DIR}/${PROJECT_NAME}-config-version.cmake
+        ${PROJECT_BINARY_DIR}/${export_name}-config.cmake
+        ${PROJECT_BINARY_DIR}/${export_name}-config-version.cmake
         DESTINATION ${install_cmake_package_dir})
-
     # Uninstall script
-    install_cmake_uninstall_script(${install_cmake_package_dir})
-    #-----
+    if(NOT NO_UNINSTALL_SCRIPT)
+        install_cmake_uninstall_script(${install_cmake_package_dir})
+    endif()
 endfunction()

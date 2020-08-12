@@ -54,7 +54,7 @@ function(add_public_cpp_executable)
             message(FATAL_ERROR "Provide a relative path for generated version file!")
         endif()
         generate_version_header(INPUT_VERSION_HEADER ${FARG_INPUT_VERSION_HEADER}
-                                VERSION_HEADER ${PROJECT_BINARY_DIR}/include/${PROJECT_NAME}/${FARG_VERSION_HEADER})
+                                OUTPUT_VERSION_HEADER ${PROJECT_BINARY_DIR}/include/${PROJECT_NAME}/${FARG_VERSION_HEADER})
     endif()
 
     # Object target
