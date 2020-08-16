@@ -27,34 +27,34 @@ function(add_cpp_library_examples)
     endforeach()
 endfunction()
 
-function(add_public_cpp_library_tests cpp_lib)
-    set(test_output_dir ${CMAKE_BUILD_TYPE})
-    set(cpp_lib_object ${cpp_lib}-object)
-    set(cpp_lib_shared ${cpp_lib})
-    set(cpp_lib_static ${cpp_lib}-static)
-    if(TARGET ${cpp_lib_shared})
-        set(cpp_lib ${cpp_lib_shared})
-    else()
-        set(cpp_lib ${cpp_lib_static})
+function(add_cpp_library_tests)
+    # Args:
+    set(options "")
+    set(params "STATIC;SHARED")
+    set(lists "SOURCES;DEPENDENCIES")
+    # Parse args:
+    cmake_parse_arguments(PARSE_ARGV 0 "ARG" "${options}" "${params}" "${lists}")
+    # Check args:
+    if(NOT ARG_STATIC AND NOT ARG_SHARED)
+        message(FATAL_ERROR "Provide SHARED or STATIC library target!")
+    elseif(ARG_SHARED AND TARGET ${ARG_SHARED})
+        set(library_name ${ARG_SHARED})
+    elseif(ARG_STATIC AND TARGET ${ARG_STATIC})
+        set(library_name ${ARG_STATIC})
     endif()
-
+    if(NOT ARG_SOURCES)
+        message(FATAL_ERROR "You must provide a list of test source files.")
+    endif()
+    # Find GTest:
     if(NOT GTest_FOUND)
         include(GoogleTest)
         find_package(GTest REQUIRED)
     endif()
-
-    file(GLOB cpp_program_files "*.cpp")
-    foreach(filename ${cpp_program_files})
+    #
+    foreach(filename ${ARG_SOURCES})
         get_filename_component(test_prog ${filename} NAME_WE)
         add_executable(${test_prog} ${filename})
-        set_target_properties(${test_prog} PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${test_output_dir})
-        target_compile_features(${test_prog} PRIVATE cxx_std_17)
-        target_include_directories(${test_prog} PRIVATE
-            $<TARGET_PROPERTY:${cpp_lib},INCLUDE_DIRECTORIES>
-            $<TARGET_PROPERTY:${cpp_lib_object},INCLUDE_DIRECTORIES>)
-        target_link_libraries(${test_prog} PRIVATE
-            $<TARGET_NAME:${cpp_lib}>
-            $<TARGET_PROPERTY:${cpp_lib},LINK_LIBRARIES>
+        target_link_libraries(${test_prog} PRIVATE ${library_name} ${ARG_DEPENDENCIES}
             GTest::GTest)
         gtest_discover_tests(${test_prog} TEST_PREFIX ${cpp_lib}::)
     endforeach()
