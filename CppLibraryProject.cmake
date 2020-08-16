@@ -1,29 +1,29 @@
 
 include(${CMAKE_CURRENT_LIST_DIR}/CppProject.cmake)
 
-function(add_public_cpp_library_examples cpp_lib)
-    set(example_output_dir ${CMAKE_BUILD_TYPE})
-    set(cpp_lib_object ${cpp_lib}-object)
-    set(cpp_lib_shared ${cpp_lib})
-    set(cpp_lib_static ${cpp_lib}-static)
-    if(TARGET ${cpp_lib_shared})
-        set(cpp_lib ${cpp_lib_shared})
-    else()
-        set(cpp_lib ${cpp_lib_static})
+function(add_cpp_library_examples)
+    # Args:
+    set(options "")
+    set(params "STATIC;SHARED")
+    set(lists "SOURCES;DEPENDENCIES")
+    # Parse args:
+    cmake_parse_arguments(PARSE_ARGV 0 "ARG" "${options}" "${params}" "${lists}")
+    # Check args:
+    if(NOT ARG_STATIC AND NOT ARG_SHARED)
+        message(FATAL_ERROR "Provide SHARED or STATIC library target!")
+    elseif(ARG_SHARED AND TARGET ${ARG_SHARED})
+        set(library_name ${ARG_SHARED})
+    elseif(ARG_STATIC AND TARGET ${ARG_STATIC})
+        set(library_name ${ARG_STATIC})
     endif()
-
-    file(GLOB cpp_program_files "*.cpp")
-    foreach(filename ${cpp_program_files})
+    if(NOT ARG_SOURCES)
+        message(FATAL_ERROR "You must provide a list of example source files.")
+    endif()
+    #
+    foreach(filename ${ARG_SOURCES})
         get_filename_component(example_prog ${filename} NAME_WE)
         add_executable(${example_prog} ${filename})
-        set_target_properties(${example_prog} PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${example_output_dir})
-        target_compile_features(${example_prog} PRIVATE cxx_std_17)
-        target_include_directories(${example_prog} PRIVATE
-            $<TARGET_PROPERTY:${cpp_lib},INCLUDE_DIRECTORIES>
-            $<TARGET_PROPERTY:${cpp_lib_object},INCLUDE_DIRECTORIES>)
-        target_link_libraries(${example_prog} PRIVATE
-            $<TARGET_NAME:${cpp_lib}>
-            $<TARGET_PROPERTY:${cpp_lib},LINK_LIBRARIES>)
+        target_link_libraries(${example_prog} PRIVATE ${library_name} ${ARG_DEPENDENCIES})
     endforeach()
 endfunction()
 
