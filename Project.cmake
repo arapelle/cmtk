@@ -27,10 +27,13 @@ function(set_build_type_if_undefined)
     endif()
 endfunction()
 
-function(generate_basic_package_config_file package_config_file)
-    file(WRITE ${package_config_file}
-         "include(\${CMAKE_CURRENT_LIST_DIR}/${PROJECT_NAME}.cmake)
+function(generate_basic_package_config_file package_config_file export_names)
+    set(content "")
+    foreach(export_name ${export_names})
+        string(APPEND content "include(\${CMAKE_CURRENT_LIST_DIR}/${export_name}.cmake)
 ")
+    endforeach()
+    file(WRITE ${package_config_file} ${content})
 endfunction()
 
 function(install_cmake_uninstall_script install_cmake_package_dir)

@@ -60,23 +60,26 @@ function(add_cpp_library_tests)
     endforeach()
 endfunction()
 
-function(generate_verbose_library_config_file package_config_file)
-    generate_basic_package_config_file(${package_config_file})
-    file(APPEND ${package_config_file}
-         "
-get_target_property(project_confs ${PROJECT_NAME} IMPORTED_CONFIGURATIONS)
+function(generate_verbose_library_config_file package_config_file version export_names)
+    generate_basic_package_config_file(${package_config_file} ${export_names})
+    set(content "")
+    foreach(export_name ${export_names})
+        string(APPEND content "
+get_target_property(project_confs ${export_name} IMPORTED_CONFIGURATIONS)
 if(project_confs)
     foreach(project_conf \${project_confs})
         # Get shared
-        get_target_property(shared-path ${PROJECT_NAME} IMPORTED_LOCATION_\${project_conf})
+        get_target_property(shared-path ${export_name} IMPORTED_LOCATION_\${project_conf})
         get_filename_component(shared-name \${shared-path} NAME)
         # Get static
-        get_target_property(static-path ${PROJECT_NAME}-static IMPORTED_LOCATION_\${project_conf})
+        get_target_property(static-path ${export_name}-static IMPORTED_LOCATION_\${project_conf})
         get_filename_component(static-name \${static-path} NAME)
-        message(STATUS \"Found ${PROJECT_NAME} \${project_conf}: (found version \\\"${PROJECT_VERSION}\\\"): \${shared-name} \${static-name}\")
+        message(STATUS \"Found ${export_name} \${project_conf}: (found version \\\"${version}\\\"): \${shared-name} \${static-name}\")
     endforeach()
 endif()
 ")
+    endforeach()
+    file(APPEND ${package_config_file} ${content})
 endfunction()
 
 function(library_build_options library_name)
@@ -228,56 +231,63 @@ function(add_cpp_honly_library library_name)
     endif()
 endfunction()
 
-function(install_cpp_library export_name targets)
+function(install_cpp_library_targets export_name include_dir targets)
+    include(GNUInstallDirs)
+    # Set install directory paths:
+    set(relative_install_cmake_package_dir "${CMAKE_INSTALL_LIBDIR}/cmake/${export_name}")
+    # Install targets:
+    install(TARGETS ${targets} EXPORT ${export_name})
+    install(DIRECTORY ${include_dir}/${export_name} DESTINATION include)
+    install(DIRECTORY ${PROJECT_BINARY_DIR}/include/${export_name} DESTINATION include)
+    install(EXPORT ${export_name} DESTINATION ${relative_install_cmake_package_dir})
+endfunction()
+
+function(install_package package_name)
     include(GNUInstallDirs)
     include(CMakePackageConfigHelpers)
     # Args:
     set(options "NO_UNINSTALL_SCRIPT;BASIC_PACKAGE_CONFIG_FILE;VERBOSE_PACKAGE_CONFIG_FILE;INPUT_PACKAGE_CONFIG_FILE")
-    set(params "INCLUDE_DIRECTORY;VERSION;VERSION_COMPATIBILITY")
-    set(lists "")
+    set(params "VERSION;VERSION_COMPATIBILITY")
+    set(lists "EXPORT_NAMES")
     # Parse args:
-    cmake_parse_arguments(PARSE_ARGV 2 "ARG" "${options}" "${params}" "${lists}")
+    cmake_parse_arguments(PARSE_ARGV 1 "ARG" "${options}" "${params}" "${lists}")
     # Check and set args:
-    if(NOT ARG_INCLUDE_DIRECTORY)
-        message(FATAL_ERROR "Provide INCLUDE_DIRECTORY!")
-    endif()
     if(NOT ARG_VERSION)
         set(ARG_VERSION ${PROJECT_VERSION})
     endif()
     if(NOT ARG_VERSION_COMPATIBILITY)
         set(ARG_VERSION_COMPATIBILITY SameMajorVersion)
     endif()
+    if(ARG_BASIC_PACKAGE_CONFIG_FILE OR ARG_VERBOSE_PACKAGE_CONFIG_FILE)
+        if(NOT ARG_EXPORT_NAMES)
+            message(FATAL_ERROR "You have to provide EXPORT_NAMES when you use BASIC_PACKAGE_CONFIG_FILE or VERBOSE_PACKAGE_CONFIG_FILE!")
+        endif()
+    endif()
     # Set install directory paths:
-    set(relative_install_cmake_package_dir "${CMAKE_INSTALL_LIBDIR}/cmake/${export_name}")
-    set(install_cmake_package_dir "${CMAKE_INSTALL_PREFIX}/${relative_install_cmake_package_dir}")
-    # Install targets:
-    install(TARGETS ${targets} EXPORT ${export_name})
-    install(DIRECTORY ${ARG_INCLUDE_DIRECTORY}/${export_name} DESTINATION include)
-    install(DIRECTORY ${PROJECT_BINARY_DIR}/include/${export_name} DESTINATION include)
-    install(EXPORT ${export_name} DESTINATION ${relative_install_cmake_package_dir})
+    set(relative_install_cmake_package_dir "${CMAKE_INSTALL_LIBDIR}/cmake/${package_name}")
     # Create package config file:
     if(ARG_BASIC_PACKAGE_CONFIG_FILE)
-        generate_basic_package_config_file(${PROJECT_BINARY_DIR}/${export_name}-config.cmake)
+        generate_basic_package_config_file(${PROJECT_BINARY_DIR}/${package_name}-config.cmake ${ARG_EXPORT_NAMES})
     elseif(ARG_VERBOSE_PACKAGE_CONFIG_FILE)
-        generate_verbose_library_config_file(${PROJECT_BINARY_DIR}/${export_name}-config.cmake)
+        generate_verbose_library_config_file(${PROJECT_BINARY_DIR}/${package_name}-config.cmake ${ARG_VERSION} ${ARG_EXPORT_NAMES})
     elseif(ARG_INPUT_PACKAGE_CONFIG_FILE)
         configure_package_config_file(${ARG_INPUT_PACKAGE_CONFIG_FILE}
-            "${PROJECT_BINARY_DIR}/${export_name}-config.cmake"
+            "${PROJECT_BINARY_DIR}/${package_name}-config.cmake"
             INSTALL_DESTINATION ${relative_install_cmake_package_dir}
             NO_SET_AND_CHECK_MACRO # ??
             NO_CHECK_REQUIRED_COMPONENTS_MACRO) # ??
     endif()
     # Create package version file:
-    write_basic_package_version_file("${PROJECT_BINARY_DIR}/${export_name}-config-version.cmake"
+    write_basic_package_version_file("${PROJECT_BINARY_DIR}/${package_name}-config-version.cmake"
         VERSION ${ARG_VERSION}
         COMPATIBILITY ${ARG_VERSION_COMPATIBILITY})
     # Install package files:
     install(FILES
-        ${PROJECT_BINARY_DIR}/${export_name}-config.cmake
-        ${PROJECT_BINARY_DIR}/${export_name}-config-version.cmake
-        DESTINATION ${install_cmake_package_dir})
+        ${PROJECT_BINARY_DIR}/${package_name}-config.cmake
+        ${PROJECT_BINARY_DIR}/${package_name}-config-version.cmake
+        DESTINATION ${relative_install_cmake_package_dir})
     # Uninstall script
     if(NOT NO_UNINSTALL_SCRIPT)
-        install_cmake_uninstall_script(${install_cmake_package_dir})
+        install_cmake_uninstall_script("${CMAKE_INSTALL_PREFIX}/${relative_install_cmake_package_dir}")
     endif()
 endfunction()
