@@ -203,6 +203,31 @@ function(add_cpp_library library_name build_shared build_static)
     endif()
 endfunction()
 
+function(add_cpp_honly_library library_name)
+    include(GNUInstallDirs)
+    # Args:
+    set(options "")
+    set(params "INCLUDE_DIRECTORIES;INPUT_VERSION_HEADER;OUTPUT_VERSION_HEADER;")
+    set(lists "")
+    # Parse args:
+    cmake_parse_arguments(PARSE_ARGV 1 "ARG" "${options}" "${params}" "${lists}")
+    # Generate header version file, if wanted:
+    if(ARG_OUTPUT_VERSION_HEADER)
+        generate_version_header(INPUT_VERSION_HEADER ${ARG_INPUT_VERSION_HEADER}
+                                OUTPUT_VERSION_HEADER ${PROJECT_BINARY_DIR}/include/${library_name}/${ARG_OUTPUT_VERSION_HEADER})
+    endif()
+    # Interface target:
+    add_library(${library_name} INTERFACE)
+    target_include_directories(${library_name} INTERFACE $<INSTALL_INTERFACE:include>)
+    foreach(include_dir ${ARG_INCLUDE_DIRECTORIES})
+        target_include_directories(${library_name} INTERFACE $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/${include_dir}>)
+    endforeach()
+    target_include_directories(${library_name} INTERFACE $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/include>)
+    if(ARG_CXX_STANDARD)
+        target_compile_features(${library_name} INTERFACE cxx_std_${ARG_CXX_STANDARD})
+    endif()
+endfunction()
+
 function(install_cpp_library export_name targets)
     include(GNUInstallDirs)
     include(CMakePackageConfigHelpers)
