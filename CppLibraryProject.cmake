@@ -60,8 +60,8 @@ function(add_cpp_library_tests)
     endforeach()
 endfunction()
 
-function(generate_verbose_library_config_file package_config_file version export_names)
-    generate_basic_package_config_file(${package_config_file} ${export_names})
+function(generate_verbose_library_config_file package_config_file package_name version export_names)
+    generate_package_config_file_beginning(${package_config_file} ${export_names})
     set(content "")
     foreach(export_name ${export_names})
         string(APPEND content "
@@ -80,6 +80,7 @@ endif()
 ")
     endforeach()
     file(APPEND ${package_config_file} ${content})
+    generate_package_config_file_end(${package_config_file} ${package_name})
 endfunction()
 
 function(library_build_options library_name)
@@ -245,7 +246,7 @@ function(install_cpp_library_targets library targets)
     include(GNUInstallDirs)
     # Args:
     set(options "")
-    set(params "NAMESPACE;EXPORT")
+    set(params "NAMESPACE;EXPORT;COMPONENT")
     set(lists "INCLUDE_DIRECTORIES")
     # Parse args:
     cmake_parse_arguments(PARSE_ARGV 2 "ARG" "${options}" "${params}" "${lists}")
@@ -260,18 +261,26 @@ function(install_cpp_library_targets library targets)
     set(relative_install_cmake_package_dir "${CMAKE_INSTALL_LIBDIR}/cmake/${library}")
     # Install targets:
     if(ARG_EXPORT)
-        install(TARGETS ${targets} EXPORT ${ARG_EXPORT})
-    else()
-        install(TARGETS ${targets})
+        set(install_targets_args EXPORT ${ARG_EXPORT})
     endif()
+    if(ARG_COMPONENT)
+        list(APPEND install_targets_args COMPONENT ${ARG_COMPONENT})
+    endif()
+    install(TARGETS ${targets} ${install_targets_args})
+    # Install includes:
     foreach(include_dir ${ARG_INCLUDE_DIRECTORIES})
         install(DIRECTORY ${include_dir} DESTINATION include)
     endforeach()
     install(DIRECTORY ${PROJECT_BINARY_DIR}/include/${library} DESTINATION include)
-    if(ARG_EXPORT AND ARG_NAMESPACE)
-        install(EXPORT ${ARG_EXPORT} DESTINATION ${relative_install_cmake_package_dir} NAMESPACE ${ARG_NAMESPACE})
-    elseif(ARG_EXPORT)
-        install(EXPORT ${ARG_EXPORT} DESTINATION ${relative_install_cmake_package_dir})
+    # Install export:
+    if(ARG_EXPORT)
+        if(ARG_NAMESPACE)
+            set(install_export_args NAMESPACE ${ARG_NAMESPACE})
+        endif()
+        if(ARG_COMPONENT)
+            list(APPEND install_export_args COMPONENT ${ARG_COMPONENT})
+        endif()
+        install(EXPORT ${ARG_EXPORT} DESTINATION ${relative_install_cmake_package_dir} ${install_export_args})
     endif()
 endfunction()
 
@@ -299,15 +308,17 @@ function(install_package package_name)
     # Set install directory paths:
     set(relative_install_cmake_package_dir "${CMAKE_INSTALL_LIBDIR}/cmake/${package_name}")
     # Create package config file:
+    set(config_cmake_in ${PROJECT_BINARY_DIR}/${package_name}-config.cmake.in)
     if(ARG_BASIC_PACKAGE_CONFIG_FILE)
-        generate_basic_package_config_file(${PROJECT_BINARY_DIR}/${package_name}-config.cmake ${ARG_EXPORT_NAMES})
+        generate_basic_package_config_file(${PROJECT_BINARY_DIR}/${package_name}-config.cmake.in ${package_name} ${ARG_EXPORT_NAMES})
     elseif(ARG_VERBOSE_PACKAGE_CONFIG_FILE)
-        generate_verbose_library_config_file(${PROJECT_BINARY_DIR}/${package_name}-config.cmake ${ARG_VERSION} ${ARG_EXPORT_NAMES})
+        generate_verbose_library_config_file(${PROJECT_BINARY_DIR}/${package_name}-config.cmake.in  ${package_name} ${ARG_VERSION} ${ARG_EXPORT_NAMES})
     elseif(ARG_INPUT_PACKAGE_CONFIG_FILE)
-        configure_package_config_file(${ARG_INPUT_PACKAGE_CONFIG_FILE}
-            "${PROJECT_BINARY_DIR}/${package_name}-config.cmake"
-            INSTALL_DESTINATION ${relative_install_cmake_package_dir})
+        set(config_cmake_in ${ARG_INPUT_PACKAGE_CONFIG_FILE})
     endif()
+    configure_package_config_file(${config_cmake_in}
+        "${PROJECT_BINARY_DIR}/${package_name}-config.cmake"
+        INSTALL_DESTINATION ${relative_install_cmake_package_dir})
     # Create package version file:
     write_basic_package_version_file("${PROJECT_BINARY_DIR}/${package_name}-config-version.cmake"
         VERSION ${ARG_VERSION}

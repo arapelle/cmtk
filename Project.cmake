@@ -27,13 +27,25 @@ function(set_build_type_if_undefined)
     endif()
 endfunction()
 
-function(generate_basic_package_config_file package_config_file export_names)
-    set(content "")
+function(generate_package_config_file_beginning package_config_file export_names)
+    set(content "@PACKAGE_INIT@
+
+")
     foreach(export_name ${export_names})
         string(APPEND content "include(\${CMAKE_CURRENT_LIST_DIR}/${export_name}.cmake)
 ")
     endforeach()
     file(WRITE ${package_config_file} ${content})
+endfunction()
+
+function(generate_package_config_file_end package_config_file package_name)
+    file(APPEND ${package_config_file} "check_required_components(${package_name})
+")
+endfunction()
+
+function(generate_basic_package_config_file package_config_file package_name export_names)
+    generate_package_config_file_beginning(${package_config_file} ${export_names})
+    generate_package_config_file_end(${package_config_file} ${package_name})
 endfunction()
 
 function(install_cmake_uninstall_script install_cmake_package_dir)
