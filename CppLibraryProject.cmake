@@ -231,15 +231,38 @@ function(add_cpp_honly_library library_name)
     endif()
 endfunction()
 
-function(install_cpp_library_targets export_name include_dir targets)
+function(install_cpp_library_targets library targets)
     include(GNUInstallDirs)
+    # Args:
+    set(options "")
+    set(params "NAMESPACE;EXPORT")
+    set(lists "INCLUDE_DIRECTORIES")
+    # Parse args:
+    cmake_parse_arguments(PARSE_ARGV 2 "ARG" "${options}" "${params}" "${lists}")
+    # Check and set args:
+    if(NOT ARG_EXPORT)
+        set(ARG_EXPORT "${library}")
+    endif()
+    if(NOT ARG_INCLUDE_DIRECTORIES)
+        message(FATAL_ERROR "You must provide INCLUDE_DIRECTORIES")
+    endif()
     # Set install directory paths:
-    set(relative_install_cmake_package_dir "${CMAKE_INSTALL_LIBDIR}/cmake/${export_name}")
+    set(relative_install_cmake_package_dir "${CMAKE_INSTALL_LIBDIR}/cmake/${library}")
     # Install targets:
-    install(TARGETS ${targets} EXPORT ${export_name})
-    install(DIRECTORY ${include_dir}/${export_name} DESTINATION include)
-    install(DIRECTORY ${PROJECT_BINARY_DIR}/include/${export_name} DESTINATION include)
-    install(EXPORT ${export_name} DESTINATION ${relative_install_cmake_package_dir})
+    if(ARG_EXPORT)
+        install(TARGETS ${targets} EXPORT ${ARG_EXPORT})
+    else()
+        install(TARGETS ${targets})
+    endif()
+    foreach(include_dir ${ARG_INCLUDE_DIRECTORIES})
+        install(DIRECTORY ${include_dir} DESTINATION include)
+    endforeach()
+    install(DIRECTORY ${PROJECT_BINARY_DIR}/include/${library} DESTINATION include)
+    if(ARG_EXPORT AND ARG_NAMESPACE)
+        install(EXPORT ${ARG_EXPORT} DESTINATION ${relative_install_cmake_package_dir} NAMESPACE ${ARG_NAMESPACE})
+    elseif(ARG_EXPORT)
+        install(EXPORT ${ARG_EXPORT} DESTINATION ${relative_install_cmake_package_dir})
+    endif()
 endfunction()
 
 function(install_package package_name)
@@ -273,9 +296,7 @@ function(install_package package_name)
     elseif(ARG_INPUT_PACKAGE_CONFIG_FILE)
         configure_package_config_file(${ARG_INPUT_PACKAGE_CONFIG_FILE}
             "${PROJECT_BINARY_DIR}/${package_name}-config.cmake"
-            INSTALL_DESTINATION ${relative_install_cmake_package_dir}
-            NO_SET_AND_CHECK_MACRO # ??
-            NO_CHECK_REQUIRED_COMPONENTS_MACRO) # ??
+            INSTALL_DESTINATION ${relative_install_cmake_package_dir})
     endif()
     # Create package version file:
     write_basic_package_version_file("${PROJECT_BINARY_DIR}/${package_name}-config-version.cmake"
