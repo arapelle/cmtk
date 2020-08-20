@@ -255,7 +255,7 @@ function(install_cpp_library_targets library)
         set(install_targets_args EXPORT ${ARG_EXPORT})
     endif()
     if(ARG_COMPONENT)
-        list(APPEND install_targets_args COMPONENT ${ARG_COMPONENT})
+        list(APPEND install_targets_args LIBRARY COMPONENT ${ARG_COMPONENT})
     endif()
     install(TARGETS ${ARG_TARGETS} ${install_targets_args})
     # Install includes:
