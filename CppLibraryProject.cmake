@@ -62,25 +62,13 @@ endfunction()
 
 function(generate_verbose_library_config_file package_config_file package_name version export_names)
     generate_package_config_file_beginning(${package_config_file} ${export_names})
-    set(content "")
-    foreach(export_name ${export_names})
-        string(APPEND content "
-get_target_property(project_confs ${export_name} IMPORTED_CONFIGURATIONS)
-if(project_confs)
-    foreach(project_conf \${project_confs})
-        # Get shared
-        get_target_property(shared-path ${export_name} IMPORTED_LOCATION_\${project_conf})
-        get_filename_component(shared-name \${shared-path} NAME)
-        # Get static
-        get_target_property(static-path ${export_name}-static IMPORTED_LOCATION_\${project_conf})
-        get_filename_component(static-name \${static-path} NAME)
-        message(STATUS \"Found ${export_name} \${project_conf}: (found version \\\"${version}\\\"): \${shared-name} \${static-name}\")
-    endforeach()
-endif()
-")
-    endforeach()
-    file(APPEND ${package_config_file} ${content})
     generate_package_config_file_end(${package_config_file} ${package_name})
+    set(content "")
+    string(APPEND content "
+message(STATUS \"Found package ${package_name} ${version}\")
+
+")
+    file(APPEND ${package_config_file} ${content})
 endfunction()
 
 function(library_build_options library_name)
