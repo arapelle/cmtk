@@ -51,10 +51,10 @@ endfunction()
 function(install_cmake_uninstall_script install_cmake_package_dir)
     install(CODE
         "
-        message(STATUS \"Installing: ${install_cmake_package_dir}/cmake_uninstall.cmake\")
+        message(STATUS \"Installing: \${CMAKE_INSTALL_PREFIX}/${install_cmake_package_dir}/cmake_uninstall.cmake\")
         if(DEFINED CMAKE_INSTALL_MANIFEST_FILES)
-            set(files \${CMAKE_INSTALL_MANIFEST_FILES} ${install_cmake_package_dir}/cmake_uninstall.cmake)
-            file(APPEND ${install_cmake_package_dir}/cmake_uninstall.cmake
+            set(files \${CMAKE_INSTALL_MANIFEST_FILES} \${CMAKE_INSTALL_PREFIX}/${install_cmake_package_dir}/cmake_uninstall.cmake)
+            file(APPEND \${CMAKE_INSTALL_PREFIX}/${install_cmake_package_dir}/cmake_uninstall.cmake
             \"
             message(STATUS \\\"Uninstall ${PROJECT_NAME} v${PROJECT_VERSION} ${CMAKE_BUILD_TYPE}\\\")
             foreach(file \${files})

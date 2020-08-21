@@ -321,6 +321,6 @@ function(install_package package_name)
         DESTINATION ${relative_install_cmake_package_dir})
     # Uninstall script
     if(NOT NO_UNINSTALL_SCRIPT)
-        install_cmake_uninstall_script("${CMAKE_INSTALL_PREFIX}/${relative_install_cmake_package_dir}")
+        install_cmake_uninstall_script("${relative_install_cmake_package_dir}")
     endif()
 endfunction()
