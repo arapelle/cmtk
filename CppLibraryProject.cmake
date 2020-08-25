@@ -279,8 +279,8 @@ function(install_package package_name)
     include(GNUInstallDirs)
     include(CMakePackageConfigHelpers)
     # Args:
-    set(options "NO_UNINSTALL_SCRIPT;BASIC_PACKAGE_CONFIG_FILE;VERBOSE_PACKAGE_CONFIG_FILE;INPUT_PACKAGE_CONFIG_FILE")
-    set(params "VERSION;VERSION_COMPATIBILITY")
+    set(options "NO_UNINSTALL_SCRIPT;BASIC_PACKAGE_CONFIG_FILE;VERBOSE_PACKAGE_CONFIG_FILE")
+    set(params "VERSION;VERSION_COMPATIBILITY;INPUT_PACKAGE_CONFIG_FILE")
     set(lists "EXPORT_NAMES")
     # Parse args:
     cmake_parse_arguments(PARSE_ARGV 1 "ARG" "${options}" "${params}" "${lists}")
