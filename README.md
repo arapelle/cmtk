@@ -30,6 +30,8 @@ See [task board](https://app.gitkraken.com/glo/board/Xn4YJC5qdgApg_KM) for futur
   - ##### install_cmake_uninstall_script(install_cmake_package_dir)
 
     Add installation code which creates a uninstall CMake script of the project. 
+    
+    - [ALL] : A uninstall script of a project will remove only the installed project files. This option forces to include all installed files in the uninstall script. (It is generally used by a super project which has subprojects (like git submodules), calling themselves this CMake function, to uninstall all subprojects files.
 
 - ### CppProject
 
