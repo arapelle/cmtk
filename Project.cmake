@@ -49,43 +49,58 @@ function(generate_basic_package_config_file package_config_file package_name exp
 endfunction()
 
 function(install_cmake_uninstall_script install_cmake_package_dir)
-    install(CODE
-        "
+    # Args:
+    set(options "ALL")
+    set(params "")
+    set(lists "")
+    # Parse args:
+    cmake_parse_arguments(PARSE_ARGV 1 "ARG" "${options}" "${params}" "${lists}")
+    set(uninstall_script_code "
         message(STATUS \"Installing: \${CMAKE_INSTALL_PREFIX}/${install_cmake_package_dir}/cmake_uninstall.cmake\")
         if(DEFINED CMAKE_INSTALL_MANIFEST_FILES)
             set(uninstall_script \${CMAKE_INSTALL_PREFIX}/${install_cmake_package_dir}/cmake_uninstall.cmake)
-            set(files \${CMAKE_INSTALL_MANIFEST_FILES} ${uninstall_script})
+            set(files \${CMAKE_INSTALL_MANIFEST_FILES} \${uninstall_script})
+        ")
+    if(ARG_ALL)
+        string(APPEND uninstall_script_code "
+            set(CMTK_INSTALL_FILES \${files} \${uninstall_script})
+            ")
+    else()
+        string(APPEND uninstall_script_code "
             if(CMTK_INSTALL_FILES)
                 list(REMOVE_ITEM files \${CMTK_INSTALL_FILES})
             endif()
             list(APPEND CMTK_INSTALL_FILES \${files} \${uninstall_script})
-            list(APPEND CMAKE_INSTALL_MANIFEST_FILES \${uninstall_script})
-            file(APPEND \${CMAKE_INSTALL_PREFIX}/${install_cmake_package_dir}/cmake_uninstall.cmake
-            \"
-            message(STATUS \\\"Uninstall ${PROJECT_NAME} v${PROJECT_VERSION} ${CMAKE_BUILD_TYPE}\\\")
-            foreach(file \${files})
-                while(NOT \\\${file} STREQUAL \${CMAKE_INSTALL_PREFIX})
-                    if(EXISTS \\\${file} OR IS_SYMLINK \\\${file})
-                        if(IS_DIRECTORY \\\${file})
-                            file(GLOB dir_files \\\${file}/*)
-                            list(LENGTH dir_files number_of_files)
-                            if(\\\${number_of_files} EQUAL 0)
-                              message(STATUS \\\"Removing  dir: \\\${file}\\\")
-                              file(REMOVE_RECURSE \\\${file})
-                            endif()
-                        else()
-                            message(STATUS \\\"Removing file: \\\${file}\\\")
-                            file(REMOVE \\\${file})
+            ")
+    endif()
+    string(APPEND uninstall_script_code "
+        list(APPEND CMAKE_INSTALL_MANIFEST_FILES \${uninstall_script})
+        file(APPEND \${CMAKE_INSTALL_PREFIX}/${install_cmake_package_dir}/cmake_uninstall.cmake
+        \"
+        message(STATUS \\\"Uninstall ${PROJECT_NAME} v${PROJECT_VERSION} ${CMAKE_BUILD_TYPE}\\\")
+        foreach(file \${files})
+            while(NOT \\\${file} STREQUAL \${CMAKE_INSTALL_PREFIX})
+                if(EXISTS \\\${file} OR IS_SYMLINK \\\${file})
+                    if(IS_DIRECTORY \\\${file})
+                        file(GLOB dir_files \\\${file}/*)
+                        list(LENGTH dir_files number_of_files)
+                        if(\\\${number_of_files} EQUAL 0)
+                          message(STATUS \\\"Removing  dir: \\\${file}\\\")
+                          file(REMOVE_RECURSE \\\${file})
                         endif()
+                    else()
+                        message(STATUS \\\"Removing file: \\\${file}\\\")
+                        file(REMOVE \\\${file})
                     endif()
-                    get_filename_component(file \\\${file} DIRECTORY)
-                endwhile()
-            endforeach()
-            \"
-            )
-        else()
-            message(ERROR \"cmake_uninstall.cmake script cannot be created!\")
-        endif()
-     "
-    )
+                endif()
+                get_filename_component(file \\\${file} DIRECTORY)
+            endwhile()
+        endforeach()
+        \"
+        )
+    else()
+        message(ERROR \"cmake_uninstall.cmake script cannot be created!\")
+    endif()
+        ")
+    install(CODE ${uninstall_script_code})
 endfunction()
