@@ -123,7 +123,7 @@ function(add_cpp_library library_name build_shared build_static)
     # Args:
     set(options "")
     set(params "CXX_STANDARD;INCLUDE_DIRECTORIES;INPUT_VERSION_HEADER;OUTPUT_VERSION_HEADER;"
-                "OBJECT;SHARED;STATIC;BUILT_TARGETS;"
+                "OBJECT;SHARED;STATIC;BUILT_TARGETS;NAMESPACE;"
                 "LIBRARY_OUTPUT_DIRECTORY;ARCHIVE_OUTPUT_DIRECTORY")
     set(lists "HEADERS;SOURCES")
     # Parse args:
@@ -180,6 +180,9 @@ function(add_cpp_library library_name build_shared build_static)
         target_include_directories(${shared_target} INTERFACE $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/include>)
         set_target_properties(${shared_target} PROPERTIES DEBUG_POSTFIX "-d" SOVERSION ${PROJECT_VERSION})
         set(library_targets ${library_targets} ${shared_target})
+        if(ARG_NAMESPACE)
+            add_library(${ARG_NAMESPACE}${shared_target} ALIAS ${shared_target})
+        endif()
         if(ARG_LIBRARY_OUTPUT_DIRECTORY)
             set_target_properties(${shared_target} PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${ARG_LIBRARY_OUTPUT_DIRECTORY})
         endif()
@@ -195,6 +198,9 @@ function(add_cpp_library library_name build_shared build_static)
         target_include_directories(${static_target} INTERFACE $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/include>)
         set_target_properties(${static_target} PROPERTIES DEBUG_POSTFIX "-d")
         set(library_targets ${library_targets} ${static_target})
+        if(ARG_NAMESPACE)
+            add_library(${ARG_NAMESPACE}${static_target} ALIAS ${static_target})
+        endif()
         if(ARG_ARCHIVE_OUTPUT_DIRECTORY)
             set_target_properties(${static_target} PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${ARG_ARCHIVE_OUTPUT_DIRECTORY})
         endif()
