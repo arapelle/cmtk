@@ -215,7 +215,7 @@ function(add_cpp_honly_library library_name)
     include(GNUInstallDirs)
     # Args:
     set(options "")
-    set(params "INCLUDE_DIRECTORIES;INPUT_VERSION_HEADER;OUTPUT_VERSION_HEADER;")
+    set(params "INCLUDE_DIRECTORIES;INPUT_VERSION_HEADER;OUTPUT_VERSION_HEADER;NAMESPACE;")
     set(lists "")
     # Parse args:
     cmake_parse_arguments(PARSE_ARGV 1 "ARG" "${options}" "${params}" "${lists}")
@@ -233,6 +233,9 @@ function(add_cpp_honly_library library_name)
     target_include_directories(${library_name} INTERFACE $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/include>)
     if(ARG_CXX_STANDARD)
         target_compile_features(${library_name} INTERFACE cxx_std_${ARG_CXX_STANDARD})
+    endif()
+    if(ARG_NAMESPACE)
+        add_library(${ARG_NAMESPACE}${library_name} ALIAS ${library_name})
     endif()
 endfunction()
 
