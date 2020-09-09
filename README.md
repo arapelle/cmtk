@@ -1,10 +1,11 @@
 # Concept
 
 This CMake ToolKit (CMTK) provides helping CMake functions to manage simple C++ CMake projects easily.
-
 It is used by the [cmtkgen](https://github.com/arapelle/cmtkgen) tools which generate start-up C++ projects.
 
 See [task board](https://app.gitkraken.com/glo/board/Xn4YJC5qdgApg_KM) for future updates and features.
+
+<u>Current version</u>: 0.4.0
 
 # Requirements #
 - ### Binaries:
