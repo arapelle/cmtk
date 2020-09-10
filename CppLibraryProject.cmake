@@ -215,7 +215,7 @@ function(add_cpp_honly_library library_name)
     include(GNUInstallDirs)
     # Args:
     set(options "")
-    set(params "INCLUDE_DIRECTORIES;INPUT_VERSION_HEADER;OUTPUT_VERSION_HEADER;NAMESPACE;")
+    set(params "CXX_STANDARD;INCLUDE_DIRECTORIES;INPUT_VERSION_HEADER;OUTPUT_VERSION_HEADER;NAMESPACE;")
     set(lists "")
     # Parse args:
     cmake_parse_arguments(PARSE_ARGV 1 "ARG" "${options}" "${params}" "${lists}")
