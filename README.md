@@ -5,7 +5,7 @@ It is used by the [cmtkgen](https://github.com/arapelle/cmtkgen) tools which gen
 
 See [task board](https://app.gitkraken.com/glo/board/Xn4YJC5qdgApg_KM) for future updates and features.
 
-<u>Current version</u>: 0.4.1
+<u>Current version</u>: 0.4.2
 
 # Requirements #
 - ### Binaries:
@@ -87,58 +87,70 @@ See [task board](https://app.gitkraken.com/glo/board/Xn4YJC5qdgApg_KM) for futur
     - HEADERS *header_list*: 	List of input headers of the target.
     - SOURCES *source_list*: 	List of input sources of the target.
     
-    - ##### add_cpp_honly_library(library_name ...)
+  - ##### add_cpp_honly_library(library_name ...)
   
-      Create a C++ header only library target. 
+    Create a C++ header only library target. 
   
-      - INCLUDE_DIRECTORIES *include_dirs*: 	Include directories needed by the library.
-      - [INPUT_VERSION_HEADER *version_hpp_in*] : 	Input version file to configure with CMake variables.
-      - [OUTPUT_VERSION_HEADER *version_hpp*] : 	Output version file generated.
+    - INCLUDE_DIRECTORIES *include_dirs*: 	Include directories needed by the library.
+    - [INPUT_VERSION_HEADER *version_hpp_in*] : 	Input version file to configure with CMake variables.
+    - [OUTPUT_VERSION_HEADER *version_hpp*] : 	Output version file generated.
   
-    - ##### install_cpp_library_targets(library ...)
+  - **cpp_library_targets_link_libraries(library_name ...)**
   
-      Install C++ library targets.
+    Make targets of a C++ library link with dependency libraries.
   
-      - NAMESPACE *namespace*: 	Targets namespace.
-      - [EXPORT *export_name*] : 	Export name.
-      - [COMPONENT *component_name*] : 	Component name.
-      - TARGETS *targets*: 	List of targets.
+    	- [HEADER_ONLY] : 	Indicate that the library is header only. (There is only an *interface* target no *object*, *static* or *shared* target.)
+    	- [OBJECT *object_target_name*] : 	Name of the object library target. (default: *<library_name>*-object)
+    	- [STATIC *static_target_name*] : 	Name of the static library target. (default: *<library_name>*-static)
+    	- [SHARED *shared_target_name*] : 	Name of the shared library target. (default: *<library_name>*)
+    	- [PUBLIC *target_list*] : 	List of public targets.
+    	- [PROTECTED *target_list*] : 	List of protected targets.
+    	- [PRIVATE *target_list*] : 	List of private targets.
   
-      - INCLUDE_DIRECTORIES *include_dirs*: 	Include directories needed by the library.
+  - ##### install_cpp_library_targets(library ...)
   
-    - ##### install_package(package_name ...)
+    Install C++ library targets.
   
-      Install C++ package
+    - NAMESPACE *namespace*: 	Targets namespace.
+    - [EXPORT *export_name*] : 	Export name.
+    - [COMPONENT *component_name*] : 	Component name.
+    - TARGETS *targets*: 	List of targets.
   
-      - [NO_UNINSTALL_SCRIPT] : 	If this option is given, no uninstall CMake script will be installed.
-      - BASIC_PACKAGE_CONFIG_FILE: 	A basic package config file will be created by using *generate_basic_package_config_file()*.
-      - VERBOSE_PACKAGE_CONFIG_FILE: 	A verbose package config file will be created by using generate_verbose_library_config_file()*. (cf. below)
-      - INPUT_PACKAGE_CONFIG_FILE *package-config.cmake.in*: 	A package config file will be created by using configure_package_config_file() on the provided *package-config.cmake.in*.
-      - VERSION *version*: 	The version of the package.
-      - VERSION_COMPATIBILITY *compatibility*: 	The compatibility with previous versions. (cf. [write_basic_package_version_file](https://cmake.org/cmake/help/latest/module/CMakePackageConfigHelpers.html))
-      - EXPORT_NAMES *export_names*: 	The list of exports to install. (Only required when BASIC_PACKAGE_CONFIG_FILE or VERBOSE_PACKAGE_CONFIG_FILE is used.)
+    - INCLUDE_DIRECTORIES *include_dirs*: 	Include directories needed by the library.
   
-    - ##### generate_verbose_library_config_file(package_config_file  package_name  version  export_names)
+  - ##### install_package(package_name ...)
   
-      Generate a verbose config file which display information about the package when it is found by CMake.
+    Install C++ package
   
-    - ##### add_cpp_library_tests(...)
+    - [NO_UNINSTALL_SCRIPT] : 	If this option is given, no uninstall CMake script will be installed.
+    - BASIC_PACKAGE_CONFIG_FILE: 	A basic package config file will be created by using *generate_basic_package_config_file()*.
+    - VERBOSE_PACKAGE_CONFIG_FILE: 	A verbose package config file will be created by using generate_verbose_library_config_file()*. (cf. below)
+    - INPUT_PACKAGE_CONFIG_FILE *package-config.cmake.in*: 	A package config file will be created by using configure_package_config_file() on the provided *package-config.cmake.in*.
+    - VERSION *version*: 	The version of the package.
+    - VERSION_COMPATIBILITY *compatibility*: 	The compatibility with previous versions. (cf. [write_basic_package_version_file](https://cmake.org/cmake/help/latest/module/CMakePackageConfigHelpers.html))
+    - EXPORT_NAMES *export_names*: 	The list of exports to install. (Only required when BASIC_PACKAGE_CONFIG_FILE or VERBOSE_PACKAGE_CONFIG_FILE is used.)
   
-      Create C++ test targets for a library. (Uses [Google Tests](https://github.com/google/googletest))
+  - ##### generate_verbose_library_config_file(package_config_file  package_name  version  export_names)
   
-      - STATIC *static_target*: 	The static library target.
-      - SHARED *shared_target*: 	The shared library target.
-      - SOURCES *source_list*: 	The list of C++ sources to compile independently.
-      - DEPENDENCIES *dependency_list*: 	The list of dependency targets.
+    Generate a verbose config file which display information about the package when it is found by CMake.
   
-    - ##### add_cpp_library_examples(...)
+  - ##### add_cpp_library_tests(...)
   
-      Create C++ example targets for a library.
+    Create C++ test targets for a library. (Uses [Google Tests](https://github.com/google/googletest))
   
-      - STATIC *static_target*: 	The static library target.
-      - SHARED *shared_target*: 	The shared library target.
-      - SOURCES *source_list*: 	The list of C++ sources to compile independently.
-      - DEPENDENCIES *dependency_list*: 	The list of dependency targets.
+    - STATIC *static_target*: 	The static library target.
+    - SHARED *shared_target*: 	The shared library target.
+    - SOURCES *source_list*: 	The list of C++ sources to compile independently.
+    - DEPENDENCIES *dependency_list*: 	The list of dependency targets.
+  
+  - ##### add_cpp_library_examples(...)
+  
+    Create C++ example targets for a library.
+  
+    - STATIC *static_target*: 	The static library target.
+    - SHARED *shared_target*: 	The shared library target.
+    - SOURCES *source_list*: 	The list of C++ sources to compile independently.
+    - DEPENDENCIES *dependency_list*: 	The list of dependency targets.
 
 # License
 
