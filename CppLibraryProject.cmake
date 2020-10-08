@@ -112,7 +112,9 @@ function(library_build_options library_name)
     endif()
     # Check static or shared:
     if(NOT ARG_HEADER_ONLY)
-        if(NOT ${${library_name}_BUILD_SHARED_LIB} AND NOT ${${library_name}_BUILD_STATIC_LIB})
+        if((NOT ${library_name}_BUILD_SHARED_LIB OR NOT ${${library_name}_BUILD_SHARED_LIB})
+           AND
+           (NOT ${library_name}_BUILD_STATIC_LIB OR NOT ${${library_name}_BUILD_STATIC_LIB}))
             message(FATAL_ERROR "You did not choose which target(s) to build (SHARED, STATIC).")
         endif()
     endif()
