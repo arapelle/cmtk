@@ -55,7 +55,7 @@ function(add_cpp_library_tests)
         get_filename_component(test_prog ${filename} NAME_WE)
         add_executable(${test_prog} ${filename})
         target_link_libraries(${test_prog} PRIVATE ${library_name} ${ARG_DEPENDENCIES}
-            GTest::GTest)
+            GTest::gtest)
         gtest_discover_tests(${test_prog} TEST_PREFIX ${cpp_lib}::)
     endforeach()
 endfunction()
