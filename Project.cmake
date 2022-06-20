@@ -19,7 +19,7 @@ function(check_cmake_binary_dir)
     endwhile()
 endfunction()
 
-function(set_build_type_if_undefined)
+function(set_build_type_ifndef)
     if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
       message(STATUS "Setting build type to 'Release' as none was specified.")
       set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Choose the type of build." FORCE)

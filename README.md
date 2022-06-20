@@ -5,12 +5,12 @@ It is used by the [cmtkgen](https://github.com/arapelle/cmtkgen) tools which gen
 
 See [task board](https://app.gitkraken.com/glo/board/Xn4YJC5qdgApg_KM) for future updates and features.
 
-<u>Current version</u>: 0.4.4
+<u>Current version</u>: 0.5
 
 # Requirements #
 - ### Binaries:
 
-  - CMake 3.16 or later
+  - CMake 3.23 or later
 
 # Modules
 
@@ -30,8 +30,8 @@ See [task board](https://app.gitkraken.com/glo/board/Xn4YJC5qdgApg_KM) for futur
 
   - ##### install_cmake_uninstall_script(install_cmake_package_dir)
 
-    Add installation code which creates a uninstall CMake script of the project. 
-    
+    Add installation code which creates a uninstall CMake script of the project.
+
     - [ALL] : A uninstall script of a project will remove only the installed project files. This option forces to include all installed files in the uninstall script. (It is generally used by a super project which has subprojects (like git submodules), calling themselves this CMake function, to uninstall all subprojects files.
 
 - ### CppProject
@@ -42,7 +42,7 @@ See [task board](https://app.gitkraken.com/glo/board/Xn4YJC5qdgApg_KM) for futur
 
   - ##### generate_default_version_header(version_file)
 
-    Generates a C++ header file providing C-Macro giving the version of the project with default contents. 
+    Generates a C++ header file providing C-Macro giving the version of the project with default contents.
 
 - ### CppExecutableProject
 
@@ -50,7 +50,7 @@ See [task board](https://app.gitkraken.com/glo/board/Xn4YJC5qdgApg_KM) for futur
 
     Create a C++ executable target.
 
-    - [CXX_STANDARD *cxx_std*] : 	C++ version used (..., 11, 14, 17, 20, ...) 
+    - [CXX_STANDARD *cxx_std*] : 	C++ version used (..., 11, 14, 17, 20, ...)
     - [INPUT_VERSION_HEADER *version_hpp_in*] : 	Input version file to configure with CMake variables.
     - [OUTPUT_VERSION_HEADER *version_hpp*] : 	Output version file generated.
     - [RUNTIME_OUTPUT_DIRECTORY *output_dir*] : 	Output directory of the built executable.
@@ -86,19 +86,19 @@ See [task board](https://app.gitkraken.com/glo/board/Xn4YJC5qdgApg_KM) for futur
     - [BUILT_TARGETS *built_targets_var*] : 	Variable to set with the names of the built targets.
     - HEADERS *header_list*: 	List of input headers of the target.
     - SOURCES *source_list*: 	List of input sources of the target.
-    
+
   - ##### add_cpp_honly_library(library_name ...)
-  
-    Create a C++ header only library target. 
-  
+
+    Create a C++ header only library target.
+
     - INCLUDE_DIRECTORIES *include_dirs*: 	Include directories needed by the library.
     - [INPUT_VERSION_HEADER *version_hpp_in*] : 	Input version file to configure with CMake variables.
     - [OUTPUT_VERSION_HEADER *version_hpp*] : 	Output version file generated.
-  
+
   - **cpp_library_targets_link_libraries(library_name ...)**
-  
+
     Make targets of a C++ library link with dependency libraries.
-  
+
     	- [HEADER_ONLY] : 	Indicate that the library is header only. (There is only an *interface* target no *object*, *static* or *shared* target.)
     	- [OBJECT *object_target_name*] : 	Name of the object library target. (default: *<library_name>*-object)
     	- [STATIC *static_target_name*] : 	Name of the static library target. (default: *<library_name>*-static)
@@ -106,22 +106,22 @@ See [task board](https://app.gitkraken.com/glo/board/Xn4YJC5qdgApg_KM) for futur
     	- [PUBLIC *target_list*] : 	List of public targets.
     	- [PROTECTED *target_list*] : 	List of protected targets.
     	- [PRIVATE *target_list*] : 	List of private targets.
-  
+
   - ##### install_cpp_library_targets(library ...)
-  
+
     Install C++ library targets.
-  
+
     - NAMESPACE *namespace*: 	Targets namespace.
     - [EXPORT *export_name*] : 	Export name.
     - [COMPONENT *component_name*] : 	Component name.
     - TARGETS *targets*: 	List of targets.
-  
+
     - INCLUDE_DIRECTORIES *include_dirs*: 	Include directories needed by the library.
-  
+
   - ##### install_package(package_name ...)
-  
+
     Install C++ package
-  
+
     - [NO_UNINSTALL_SCRIPT] : 	If this option is given, no uninstall CMake script will be installed.
     - BASIC_PACKAGE_CONFIG_FILE: 	A basic package config file will be created by using *generate_basic_package_config_file()*.
     - VERBOSE_PACKAGE_CONFIG_FILE: 	A verbose package config file will be created by using generate_verbose_library_config_file()*. (cf. below)
@@ -129,24 +129,24 @@ See [task board](https://app.gitkraken.com/glo/board/Xn4YJC5qdgApg_KM) for futur
     - VERSION *version*: 	The version of the package.
     - VERSION_COMPATIBILITY *compatibility*: 	The compatibility with previous versions. (cf. [write_basic_package_version_file](https://cmake.org/cmake/help/latest/module/CMakePackageConfigHelpers.html))
     - EXPORT_NAMES *export_names*: 	The list of exports to install. (Only required when BASIC_PACKAGE_CONFIG_FILE or VERBOSE_PACKAGE_CONFIG_FILE is used.)
-  
+
   - ##### generate_verbose_library_config_file(package_config_file  package_name  version  export_names)
-  
+
     Generate a verbose config file which display information about the package when it is found by CMake.
-  
+
   - ##### add_cpp_library_tests(...)
-  
+
     Create C++ test targets for a library. (Uses [Google Tests](https://github.com/google/googletest))
-  
+
     - STATIC *static_target*: 	The static library target.
     - SHARED *shared_target*: 	The shared library target.
     - SOURCES *source_list*: 	The list of C++ sources to compile independently.
     - DEPENDENCIES *dependency_list*: 	The list of dependency targets.
-  
+
   - ##### add_cpp_library_examples(...)
-  
+
     Create C++ example targets for a library.
-  
+
     - STATIC *static_target*: 	The static library target.
     - SHARED *shared_target*: 	The shared library target.
     - SOURCES *source_list*: 	The list of C++ sources to compile independently.
