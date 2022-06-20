@@ -5,7 +5,7 @@ It is used by the [cmtkgen](https://github.com/arapelle/cmtkgen) tools which gen
 
 See [task board](https://app.gitkraken.com/glo/board/Xn4YJC5qdgApg_KM) for future updates and features.
 
-<u>Current version</u>: 0.5
+<u>Current version</u>: 0.6
 
 # Requirements #
 - ### Binaries:
