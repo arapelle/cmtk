@@ -112,7 +112,7 @@ function(add_cpp_library)
   endif()
 endfunction()
 
-function(add_cpp_honly_library library_name)
+function(add_honly_cpp_library library_name)
     include(GNUInstallDirs)
     # Args:
     set(options "")
