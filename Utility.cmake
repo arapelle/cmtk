@@ -1,4 +1,12 @@
 
+macro(fatal_ifdef msg)
+foreach(var IN ITEMS ${ARGN})
+  if(DEFINED ${var})
+    message(FATAL_ERROR "${msg}")
+  endif()
+endforeach()
+endmacro()
+
 macro(fatal_ifndef msg)
   foreach(var IN ITEMS ${ARGN})
     if(NOT DEFINED ${var})
