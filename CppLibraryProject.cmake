@@ -161,18 +161,15 @@ endfunction()
 #  HEADER_ONLY
 #  SHARED
 #  STATIC
-#  [NAMESPACE]
-#  [EXPORT=${PROJECT_NAME}-targets]
-#  [DESTINATION=${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}]
+#  [NAMESPACE <ns>]
+#  [EXPORT ${PROJECT_NAME}-targets]
+#  [DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}]
 function(install_cpp_library)
-  # https://cmake.org/cmake/help/latest/command/install.html#targets
   include(GNUInstallDirs)
   # Args:
-  set(options "")
   set(params "HEADER_ONLY;SHARED;STATIC;EXPORT;DESTINATION;NAMESPACE")
-  set(lists "")
   # Parse args:
-  cmake_parse_arguments(PARSE_ARGV 0 "ARG" "${options}" "${params}" "${lists}")
+  cmake_parse_arguments(PARSE_ARGV 0 "ARG" "" "${params}" "")
   # Check/Set args:
   fatal_if_none_is_def("You did not choose which target(s) to install (SHARED, STATIC, HEADER_ONLY)." ARG_SHARED ARG_STATIC ARG_HEADER_ONLY)
   set_ifndef(ARG_EXPORT "${PROJECT_NAME}-targets")
@@ -198,7 +195,15 @@ function(install_cpp_library)
       message(FATAL_ERROR "Library target ${ARG_HEADER_ONLY} has no HEADERS_BASE_DIRS (Did you forget to declare your cmtk library PUBLIC?).")
     endif()
     foreach(include_dir ${HBDS})
-      install(DIRECTORY ${include_dir}/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+      foreach(header ${HEADERS})
+        file(REAL_PATH ${header} abs_header EXPAND_TILDE)
+        file(RELATIVE_PATH rel_header ${include_dir} ${abs_header})
+        string(SUBSTRING ${rel_header} 0 1 path_start)
+        if(NOT ${path_start} STREQUAL ".")
+          get_filename_component(dest_dir ${rel_header} DIRECTORY)
+          install(FILES ${header} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${dest_dir})
+          endif()
+      endforeach()
     endforeach()
   endif()
   # Install export:
