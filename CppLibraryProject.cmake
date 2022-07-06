@@ -141,6 +141,38 @@ function(add_cpp_honly_library library_name)
     endif()
 endfunction()
 
+# params:
+#  SHARED
+#  STATIC
+#  [NAMESPACE]
+#  [EXPORT=${PROJECT_NAME}-targets]
+#  [DESTINATION=${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}]
+function(install_cpp_library)
+  # https://cmake.org/cmake/help/latest/command/install.html#targets
+  include(GNUInstallDirs)
+  # Args:
+  set(options "")
+  set(params "SHARED;STATIC;EXPORT;DESTINATION;NAMESPACE")
+  set(lists "")
+  # Parse args:
+  cmake_parse_arguments(PARSE_ARGV 0 "ARG" "${options}" "${params}" "${lists}")
+  # Check/Set args:
+  fatal_if_none_is_def("You did not choose which target(s) to build (build_shared, build_static)." ARG_SHARED ARG_STATIC)
+  set_ifndef(ARG_STATIC "")
+  set_ifndef(ARG_SHARED "")
+  set_ifndef(ARG_EXPORT "${PROJECT_NAME}-targets")
+  set_ifndef(ARG_DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}")
+  if(ARG_NAMESPACE)
+    set(NAMESPACE_OPT NAMESPACE ${ARG_NAMESPACE})
+  endif()
+  # install:
+  install(TARGETS ${ARG_SHARED} ${ARG_STATIC} EXPORT ${ARG_EXPORT}
+          FILE_SET HEADERS DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+          )
+  install(EXPORT ${ARG_EXPORT} DESTINATION ${ARG_DESTINATION} ${NAMESPACE_OPT})
+  export(EXPORT ${ARG_EXPORT} FILE ${CMAKE_CURRENT_BINARY_DIR}/${ARG_EXPORT}.cmake ${NAMESPACE_OPT})
+endfunction()
+
 function(install_cpp_library_targets library)
     include(GNUInstallDirs)
     # Args:
