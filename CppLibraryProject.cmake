@@ -162,41 +162,40 @@ function(install_cpp_library)
   set_ifndef(ARG_SHARED "")
   set_ifndef(ARG_EXPORT "${PROJECT_NAME}-targets")
   set_ifndef(ARG_DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}")
-  set_iftest(NAMESPACE_OPT IF ARG_NAMESPACE THEN NAMESPACE ${ARG_NAMESPACE})
-  # install:
+  set_iftest(namespace_opt IF ARG_NAMESPACE THEN NAMESPACE ${ARG_NAMESPACE})
+  # Install targets:
   install(TARGETS ${ARG_SHARED} ${ARG_STATIC} EXPORT ${ARG_EXPORT}
           FILE_SET HEADERS DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
           )
-  install(EXPORT ${ARG_EXPORT} DESTINATION ${ARG_DESTINATION} ${NAMESPACE_OPT})
-  export(EXPORT ${ARG_EXPORT} FILE ${CMAKE_CURRENT_BINARY_DIR}/${ARG_EXPORT}.cmake ${NAMESPACE_OPT})
+  # Install export:
+  install(EXPORT ${ARG_EXPORT} DESTINATION ${ARG_DESTINATION} ${namespace_opt})
+  export(EXPORT ${ARG_EXPORT} FILE ${CMAKE_CURRENT_BINARY_DIR}/${ARG_EXPORT}.cmake ${namespace_opt})
 endfunction()
 
-function(install_cpp_library_targets library)
-    include(GNUInstallDirs)
-    # Args:
-    set(options "")
-    set(params "NAMESPACE;EXPORT")
-    set(lists "TARGETS")
-    # Parse args:
-    cmake_parse_arguments(PARSE_ARGV 1 "ARG" "${options}" "${params}" "${lists}")
-    # Check and set args:
-    fatal_ifndef("You must provide TARGETS" ARG_TARGETS)
-    set_ifndef(ARG_EXPORT "${library}")
-    # Install targets:
-    install(TARGETS ${ARG_TARGETS} EXPORT ${ARG_EXPORT})
-    # Install includes:
-    foreach(target ${ARG_TARGETS})
-      target_include_directories(${library} INTERFACE $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
-    endforeach()
-    get_target_property(HBDS ${library} CMTK_HLIB_HEADERS_BASE_DIRS)
-    foreach(include_dir ${HBDS})
-        install(DIRECTORY ${include_dir}/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
-    endforeach()
-    # Install export:
-    if(ARG_NAMESPACE)
-        set(install_export_args NAMESPACE ${ARG_NAMESPACE})
-    endif()
-    install(EXPORT ${ARG_EXPORT} DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${library} ${install_export_args})
+function(install_honly_cpp_library)
+  include(GNUInstallDirs)
+  # Args:
+  set(options "")
+  set(params "HEADER_ONLY;EXPORT;DESTINATION;NAMESPACE")
+  set(lists "")
+  # Parse args:
+  cmake_parse_arguments(PARSE_ARGV 0 "ARG" "${options}" "${params}" "${lists}")
+  # Check and set args:
+  fatal_ifndef("You must provide a HEADER_ONLY target." ARG_HEADER_ONLY)
+  set_ifndef(ARG_EXPORT "${PROJECT_NAME}-targets")
+  set_ifndef(ARG_DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}")
+  set_iftest(namespace_opt IF ARG_NAMESPACE THEN NAMESPACE ${ARG_NAMESPACE})
+  # Install targets:
+  install(TARGETS ${ARG_HEADER_ONLY} EXPORT ${ARG_EXPORT})
+  # Install includes:
+  target_include_directories(${ARG_HEADER_ONLY} INTERFACE $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
+  get_target_property(HBDS ${ARG_HEADER_ONLY} CMTK_HLIB_HEADERS_BASE_DIRS)
+  foreach(include_dir ${HBDS})
+    install(DIRECTORY ${include_dir}/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+  endforeach()
+  # Install export:
+  install(EXPORT ${ARG_EXPORT} DESTINATION ${ARG_DESTINATION}  ${namespace_opt})
+  export(EXPORT ${ARG_EXPORT} FILE ${CMAKE_CURRENT_BINARY_DIR}/${ARG_EXPORT}.cmake ${NAMESPACE_OPT})
 endfunction()
 
 function(install_package package_name)
