@@ -14,8 +14,6 @@ message(STATUS \"Found package ${package_name} ${version}\")
     file(APPEND ${package_config_file} ${content})
 endfunction()
 
-
-
 function(target_default_warning_options target)
   if(MSVC)
       target_compile_options(${target} PRIVATE /Wall)
@@ -148,10 +146,10 @@ function(add_cpp_library)
     endif()
 endfunction()
 
-# params:
-#  HEADER_ONLY
-#  SHARED
-#  STATIC
+# args:
+#  HEADER_ONLY <target>
+#  SHARED <target>
+#  STATIC <target>
 #  EXPORT <export-name>
 #  [DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}]
 #  [NAMESPACE <ns>]
@@ -181,44 +179,23 @@ function(install_cpp_library)
   export(EXPORT ${ARG_EXPORT} FILE ${CMAKE_CURRENT_BINARY_DIR}/${ARG_EXPORT}.cmake ${namespace_opt})
 endfunction()
 
-function(install_package package_name) # Rename install_library_package(), but why _library_ ? 
-                                       #   because config.cmake & config-version.cmake make only sense  for library packages.
+function(install_library_package package_name)
     include(GNUInstallDirs)
     include(CMakePackageConfigHelpers)
     # Args:
-    #  new:
     set(options "")
-    set(params "NAME?;VERSION;VERSION_COMPATIBILITY;(INPUT_)PACKAGE_CONFIG_FILE") # set_ifndef(ARG_NAME ${PROJECT_NAME})
-    set(lists "EXPORT_NAMES;UNINSTALL_SCRIPT") # UNINSTALL_SCRIPT [ALL]   
-    #  old:
-    set(options "NO_UNINSTALL_SCRIPT;UNINSTALL_ALL;BASIC_PACKAGE_CONFIG_FILE;VERBOSE_PACKAGE_CONFIG_FILE")
     set(params "VERSION;VERSION_COMPATIBILITY;INPUT_PACKAGE_CONFIG_FILE")
-    set(lists "EXPORT_NAMES")
+    set(lists "UNINSTALL_SCRIPT") # UNINSTALL_SCRIPT [ALL]   
     # Parse args:
     cmake_parse_arguments(PARSE_ARGV 1 "ARG" "${options}" "${params}" "${lists}")
     # Check and set args:
+    fatal_ifndef("INPUT_PACKAGE_CONFIG_FILE is required (e.g. CMake-package-config.cmake.in)" ARG_INPUT_PACKAGE_CONFIG_FILE)
     set_ifndef(ARG_VERSION ${PROJECT_VERSION})
     set_ifndef(ARG_VERSION_COMPATIBILITY SameMajorVersion)
-    if(ARG_BASIC_PACKAGE_CONFIG_FILE OR ARG_VERBOSE_PACKAGE_CONFIG_FILE)
-        if(NOT ARG_EXPORT_NAMES)
-            message(FATAL_ERROR "You have to provide EXPORT_NAMES when you use BASIC_PACKAGE_CONFIG_FILE or VERBOSE_PACKAGE_CONFIG_FILE!")
-        endif()
-    endif()
-    if(ARG_NO_UNINSTALL_SCRIPT AND ARG_UNINSTALL_ALL)
-        message(FATAL_ERROR "Options NO_UNINSTALL_SCRIPT and UNINSTALL_ALL are not compatible!")
-    endif()
     # Set install directory paths:
     set(relative_install_cmake_package_dir "${CMAKE_INSTALL_LIBDIR}/cmake/${package_name}")
     # Create package config file:
-    set(config_cmake_in ${PROJECT_BINARY_DIR}/${package_name}-config.cmake.in)
-    if(ARG_BASIC_PACKAGE_CONFIG_FILE)
-        generate_basic_package_config_file(${PROJECT_BINARY_DIR}/${package_name}-config.cmake.in ${package_name} ${ARG_EXPORT_NAMES})
-    elseif(ARG_VERBOSE_PACKAGE_CONFIG_FILE)
-        generate_verbose_library_config_file(${PROJECT_BINARY_DIR}/${package_name}-config.cmake.in  ${package_name} ${ARG_VERSION} ${ARG_EXPORT_NAMES})
-    elseif(ARG_INPUT_PACKAGE_CONFIG_FILE)
-        set(config_cmake_in ${ARG_INPUT_PACKAGE_CONFIG_FILE})
-    endif()
-    configure_package_config_file(${config_cmake_in}
+    configure_package_config_file(${ARG_INPUT_PACKAGE_CONFIG_FILE}
         "${PROJECT_BINARY_DIR}/${package_name}-config.cmake"
         INSTALL_DESTINATION ${relative_install_cmake_package_dir})
     # Create package version file:
@@ -231,12 +208,8 @@ function(install_package package_name) # Rename install_library_package(), but w
         ${PROJECT_BINARY_DIR}/${package_name}-config-version.cmake
         DESTINATION ${relative_install_cmake_package_dir})
     # Uninstall script
-    if(NOT ARG_NO_UNINSTALL_SCRIPT)
-        set(uninstall_options "")
-        if(ARG_UNINSTALL_ALL)
-            list(APPEND uninstall_options "ALL")
-        endif()
-        install_cmake_uninstall_script("${relative_install_cmake_package_dir}" ${uninstall_options})
+    if(ARG_UNINSTALL_SCRIPT)
+        install_cmake_uninstall_script("${relative_install_cmake_package_dir}" ${ARG_UNINSTALL_SCRIPT})
     endif()
 endfunction()
 
