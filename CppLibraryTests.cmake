@@ -1,37 +1,101 @@
 
 include(${CMAKE_CURRENT_LIST_DIR}/Utility.cmake)
 
-function(add_cpp_library_tests)
+macro(find_or_fetch_GTest)
+    if(NOT TARGET GTest::gtest_main)
+        cmake_parse_arguments("ARG" "QUIET" "TAG" "" ${ARGN})
+        include(GoogleTest)
+        set(fp_args)
+        if(ARG_QUIET)
+            list(APPEND fp_args "QUIET")
+        endif()
+        find_package(GTest ${fp_args})
+        if(NOT GTest_FOUND)
+            if(NOT ARG_TAG)
+                set(ARG_TAG "v1.13.0")
+            endif()
+            include(FetchContent)
+            FetchContent_Declare(
+              googletest
+              URL https://github.com/google/googletest/archive/refs/tags/${ARG_TAG}.zip
+            )
+            set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+            FetchContent_MakeAvailable(googletest)
+        endif()
+    endif()
+endmacro()
+
+function(add_cpp_library_test test_name gtest_target)
     # Args:
     set(options "")
-    set(params "STATIC;SHARED")
-    set(lists "SOURCES;DEPENDENCIES")
+    set(params "STATIC;SHARED;HEADER_ONLY")
+    set(lists "HEADERS;SOURCES;LIBRARIES")
     # Parse args:
-    cmake_parse_arguments(PARSE_ARGV 0 "ARG" "${options}" "${params}" "${lists}")
+    cmake_parse_arguments(PARSE_ARGV 2 "ARG" "${options}" "${params}" "${lists}")
     # Check args:
-    if(NOT ARG_STATIC AND NOT ARG_SHARED)
-        message(FATAL_ERROR "Provide SHARED or STATIC library target!")
+    if(NOT ARG_STATIC AND NOT ARG_SHARED AND NOT ARG_HEADER_ONLY)
+        message(FATAL_ERROR "Provide SHARED, STATIC or HEADER_ONLY library target!")
     elseif(ARG_SHARED AND TARGET ${ARG_SHARED})
         set(library_name ${ARG_SHARED})
+        if(WIN32 AND NOT TARGET copy_dll_${library_name})
+            add_custom_target(copy_dll_${library_name} ALL
+                ${CMAKE_COMMAND} -E copy_if_different $<TARGET_FILE:${library_name}> ${CMAKE_CURRENT_BINARY_DIR})
+        endif()
     elseif(ARG_STATIC AND TARGET ${ARG_STATIC})
         set(library_name ${ARG_STATIC})
-    else()
-        message(FATAL_ERROR "No SHARED or STATIC library target found!")
+    elseif(ARG_HEADER_ONLY AND TARGET ${ARG_HEADER_ONLY})
+        set(library_name ${ARG_HEADER_ONLY})
     endif()
     if(NOT ARG_SOURCES)
         message(FATAL_ERROR "You must provide a list of test source files.")
     endif()
-    # Find GTest:
-    if(NOT GTest_FOUND)
-        include(GoogleTest)
-        find_package(GTest REQUIRED)
-    endif()
     #
+    add_executable(${test_name} ${ARG_SOURCES} ${ARG_HEADERS})
+    target_link_libraries(${test_name} PRIVATE ${library_name} ${ARG_DEPENDENCIES} ${gtest_target})
+    if(WIN32 AND TARGET copy_dll_${library_name})
+        add_dependencies(${test_name} copy_dll_${library_name})
+    endif()
+    gtest_discover_tests(${test_name} TEST_PREFIX ${test_prog}::)
+endfunction()
+
+function(add_cpp_library_basic_tests gtest_target)
+    # Args:
+    set(options "")
+    set(params "STATIC;SHARED;HEADER_ONLY")
+    set(lists "SOURCES;LIBRARIES")
+    # Parse args:
+    cmake_parse_arguments(PARSE_ARGV 1 "ARG" "${options}" "${params}" "${lists}")
+    # Check args:
+    if(NOT ARG_STATIC AND NOT ARG_SHARED AND NOT ARG_HEADER_ONLY)
+        message(FATAL_ERROR "Provide SHARED, STATIC or HEADER_ONLY library target!")
+    elseif(ARG_SHARED AND TARGET ${ARG_SHARED})
+        set(library_name ${ARG_SHARED})
+        if(WIN32 AND NOT TARGET copy_dll_${library_name})
+            add_custom_target(copy_dll_${library_name} ALL
+                ${CMAKE_COMMAND} -E copy_if_different $<TARGET_FILE:${library_name}> ${CMAKE_CURRENT_BINARY_DIR})
+        endif()
+    elseif(ARG_STATIC AND TARGET ${ARG_STATIC})
+        set(library_name ${ARG_STATIC})
+    elseif(ARG_HEADER_ONLY AND TARGET ${ARG_HEADER_ONLY})
+        set(library_name ${ARG_HEADER_ONLY})
+    endif()
+    if(NOT ARG_SOURCES)
+        message(FATAL_ERROR "You must provide a list of test source files.")
+    endif()
     foreach(filename ${ARG_SOURCES})
         get_filename_component(test_prog ${filename} NAME_WE)
         add_executable(${test_prog} ${filename})
-        target_link_libraries(${test_prog} PRIVATE ${library_name} ${ARG_DEPENDENCIES}
-            GTest::gtest)
-        gtest_discover_tests(${test_prog} TEST_PREFIX ${cpp_lib}::)
+        target_link_libraries(${test_prog} PRIVATE ${library_name} ${ARG_DEPENDENCIES} ${gtest_target})
+        if(WIN32 AND TARGET copy_dll_${library_name})
+            add_dependencies(${test_prog} copy_dll_${library_name})
+        endif()
+        gtest_discover_tests(${test_prog} TEST_PREFIX ${test_prog}::)
     endforeach()
 endfunction()
+#       if(WIN32 AND ARG_SHARED AND TARGET ${ARG_SHARED})
+#            add_custom_command(TARGET ${test_prog} POST_BUILD
+## If needed one day: COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_RUNTIME_DLLS:${test_prog}> $<TARGET_FILE_DIR:${test_prog}>
+#              COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_FILE:${library_name}> $<TARGET_FILE_DIR:${test_prog}>
+#              COMMAND_EXPAND_LISTS
+#            )
+#       endif()
