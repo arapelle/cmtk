@@ -1,7 +1,7 @@
 
 include(${CMAKE_CURRENT_LIST_DIR}/Project.cmake)
 
-function(generate_macro_version_header set_var macro_prefix output_file)
+function(generate_version_macro_header set_var macro_prefix output_file)
   include(GNUInstallDirs)
   set(output_dir "${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_INSTALL_INCLUDEDIR}")
   file(MAKE_DIRECTORY "${output_dir}")

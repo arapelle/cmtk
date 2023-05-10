@@ -40,7 +40,7 @@ This CMake ToolKit (CMTK) provides helping CMake functions to manage simple C++ 
 
 - ### CppProject
 
-  - ##### generate_macro_version_header(varname macro_prefix header_path)
+  - ##### generate_version_macro_header(varname macro_prefix header_path)
 
     Generate a C++ header file providing C-Macro giving the version of the project.
     - macro_prefix : 	Prefix for version macros (e.g. TURBO_FILESYSTEM will generate TURBO_FILESYSTEM_VERSION_MAJOR, ...).
