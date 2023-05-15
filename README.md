@@ -24,7 +24,7 @@ This CMake ToolKit (CMTK) provides helping CMake functions to manage simple C++ 
 
 - ### Project
 
-  - ##### check_cmake_binary_dir()
+  - ##### disable_in_source_build()
 
     Check if the build directory is not a subdirectory of the source directory. If it is the case, a message is printed, and the configure phase is stopped.
 
