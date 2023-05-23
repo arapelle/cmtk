@@ -169,9 +169,18 @@ function(install_cpp_library)
     fatal_ifdef("The library to install is either a SHARED/STATIC library or a HEADER_ONLY library, not both." ARG_HEADER_ONLY)
   endif()
   set_ifndef(ARG_HEADER_ONLY "")
-  set_ifndef(ARG_STATIC "")
   set_ifndef(ARG_SHARED "")
-  install(TARGETS ${ARG_HEADER_ONLY} ${ARG_SHARED} ${ARG_STATIC} EXPORT ${ARG_EXPORT}
+  set_ifndef(ARG_STATIC "")
+  if(TARGET "${ARG_HEADER_ONLY}")
+    list(APPEND targets ${ARG_HEADER_ONLY})
+  endif()
+  if(TARGET "${ARG_SHARED}")
+    list(APPEND targets ${ARG_SHARED})
+  endif()
+  if(TARGET "${ARG_STATIC}")
+    list(APPEND targets ${ARG_STATIC})
+  endif()
+  install(TARGETS ${targets} EXPORT ${ARG_EXPORT}
           FILE_SET HEADERS DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
           )
   # Install export:
