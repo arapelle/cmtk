@@ -69,8 +69,8 @@ This CMake ToolKit (CMTK) provides helping CMake functions to manage simple C++ 
     - [OBJECT *object_target_name*] : Name of the object library target.
     - [SHARED *shared_target_name*] : Name of the shared library target.
     - [STATIC *static_target_name*] : Name of the static library target.
-    - [BUILD_SHARED *val*] : Indicate if a SHARED library must be build. (ON, OFF or UNDEFINED). If UNDEFINED, it is determined by cached option value. (cf. PUBLIC)
-    - [BUILD_STATIC *val*] : Indicate if a STATIC library must be build. (ON, OFF or UNDEFINED). If UNDEFINED, it is determined by cached option value. (cf. PUBLIC)
+    - [BUILD_SHARED *val*] : Indicate if a SHARED library must be build. (ON, OFF or OPTION (<=> UNDEFINED)). If OPTION, it is determined by cached option value. (cf. PUBLIC)
+    - [BUILD_STATIC *val*] : Indicate if a STATIC library must be build. (ON, OFF or OPTION (<=> UNDEFINED)). If OPTION, it is determined by cached option value. (cf. PUBLIC)
     - [PUBLIC] : Create options for STATIC and SHARED buildings if necessary and depending on BUILD_SHARED and BUILD_STATIC. Option init values are ON.
     - [NAMESPACE *ns*] : Add an alias target with *ns* as prefix for each shared and static target.
 
