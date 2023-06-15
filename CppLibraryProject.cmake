@@ -3,17 +3,6 @@ include(${CMAKE_CURRENT_LIST_DIR}/CppProject.cmake)
 include(${CMAKE_CURRENT_LIST_DIR}/CppLibraryExamples.cmake)
 include(${CMAKE_CURRENT_LIST_DIR}/CppLibraryTests.cmake)
 
-function(generate_verbose_library_config_file package_config_file package_name version export_names)
-    generate_package_config_file_beginning(${package_config_file} ${export_names})
-    generate_package_config_file_end(${package_config_file} ${package_name})
-    set(content "")
-    string(APPEND content "
-message(STATUS \"Found package ${package_name} ${version}\")
-
-")
-    file(APPEND ${package_config_file} ${content})
-endfunction()
-
 function(_object_name_from_shared_static object_var shared_var static_var)
   if(${shared_var})
     set(object_name "${${shared_var}}")
