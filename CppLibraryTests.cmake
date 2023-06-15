@@ -10,9 +10,9 @@ function(add_cpp_library_test test_name gtest_target)
     # Parse args:
     cmake_parse_arguments(PARSE_ARGV 2 "ARG" "${options}" "${params}" "${lists}")
     # Check args:
-    if(NOT ARG_STATIC AND NOT ARG_SHARED AND NOT ARG_HEADER_ONLY)
-        message(FATAL_ERROR "Provide SHARED, STATIC or HEADER_ONLY library target!")
-    elseif(ARG_SHARED AND TARGET ${ARG_SHARED})
+    fatal_if_none_is_def("Provide SHARED, STATIC or HEADER_ONLY library target!" 
+                         ARG_STATIC ARG_SHARED ARG_HEADER_ONLY)
+    if(ARG_SHARED AND TARGET ${ARG_SHARED})
         set(library_name ${ARG_SHARED})
         if(WIN32 AND NOT TARGET copy_dll_${library_name})
             add_custom_target(copy_dll_${library_name} ALL
@@ -43,9 +43,9 @@ function(add_cpp_library_basic_tests gtest_target)
     # Parse args:
     cmake_parse_arguments(PARSE_ARGV 1 "ARG" "${options}" "${params}" "${lists}")
     # Check args:
-    if(NOT ARG_STATIC AND NOT ARG_SHARED AND NOT ARG_HEADER_ONLY)
-        message(FATAL_ERROR "Provide SHARED, STATIC or HEADER_ONLY library target!")
-    elseif(ARG_SHARED AND TARGET ${ARG_SHARED})
+    fatal_if_none_is_def("Provide SHARED, STATIC or HEADER_ONLY library target!" 
+                         ARG_STATIC ARG_SHARED ARG_HEADER_ONLY)
+    if(ARG_SHARED AND TARGET ${ARG_SHARED})
         set(library_name ${ARG_SHARED})
         if(WIN32 AND NOT TARGET copy_dll_${library_name})
             add_custom_target(copy_dll_${library_name} ALL
