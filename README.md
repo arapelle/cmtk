@@ -2,7 +2,7 @@
 
 This CMake ToolKit (CMTK) provides helping CMake functions to manage simple C++ CMake projects easily.
 
-<u>Current version</u>: 0.7
+<u>Current version</u>: <!--cmtk-version-->0.8<!--/cmtk-version-->
 
 # Requirements #
 - ### Binaries:
@@ -24,13 +24,16 @@ This CMake ToolKit (CMTK) provides helping CMake functions to manage simple C++ 
 
 - ### Project
 
-  - ##### check_cmake_binary_dir()
+  - ##### disable_in_source_build()
 
     Check if the build directory is not a subdirectory of the source directory. If it is the case, a message is printed, and the configure phase is stopped.
 
   - ##### set_build_type_ifndef()
 
     Set Release as value for BUILT_TYPE, if none was provided.
+
+    - [DEFAULT *default_type*]: 	The default build type if none is provided when CMake is invoked. It can be a name or the index in the BUILD_TYPES list.  (*0* used by default)
+    - [BUILD_TYPES *type_list*]:   The list of available build tpyes. (*Release, Debug, MinSizeRel, RelWithDebInfo* used by default)
 
   - ##### install_cmake_uninstall_script(install_cmake_package_dir)
 
@@ -40,7 +43,7 @@ This CMake ToolKit (CMTK) provides helping CMake functions to manage simple C++ 
 
 - ### CppProject
 
-  - ##### generate_macro_version_header(varname macro_prefix header_path)
+  - ##### generate_version_macro_header(varname macro_prefix header_path)
 
     Generate a C++ header file providing C-Macro giving the version of the project.
     - macro_prefix : 	Prefix for version macros (e.g. TURBO_FILESYSTEM will generate TURBO_FILESYSTEM_VERSION_MAJOR, ...).
@@ -48,16 +51,47 @@ This CMake ToolKit (CMTK) provides helping CMake functions to manage simple C++ 
 
 - ### CppExecutableProject
 
-  - ##### add_cpp_executable(...)
+  - ##### add_cpp_executable(executable_target ...)
 
     Create a C++ executable target.
 
-    - [CXX_STANDARD *cxx_std*] : 	C++ version used (..., 11, 14, 17, 20, ...)
-    - [INPUT_VERSION_HEADER *version_hpp_in*] : 	Input version file to configure with CMake variables.
-    - [OUTPUT_VERSION_HEADER *version_hpp*] : 	Output version file generated.
-    - [RUNTIME_OUTPUT_DIRECTORY *output_dir*] : 	Output directory of the built executable.
+    - executable_target: The executable target name.
+
+    Targets type arguments:
+    - [OBJECT *object_target_name*] : Name of the object target. (It can be used with test functions like add_cpp_executable_test().)
+
+    Targets options arguments:
+    - [CXX_STANDARD *cxx_std*]: 	C++ version used (..., 11, 14, 17, 20, ...)
+    - [RUNTIME_OUTPUT_DIRECTORY *output_dir*]: 	Output directory of the built executable.
+
+    Targets sources arguments:
     - HEADERS *header_list*: 	List of input headers of the target.
     - SOURCES *source_list*: 	List of input sources of the target.
+    - MAIN *main_cpp_file*: 	The main source file of the target.
+    - [HEADERS_BASE_DIRS *base_dirs*]:  List of base directories of source headers (used with FILE_SET).
+    - [BUILD_HEADERS_BASE_DIRS *base_dirs*]:  List of base directories of build headers like generated headers (e.g. version.hpp) (used with FILE_SET).
+
+- ### CppExecutableTests
+
+  - ##### add_cpp_executable_test(test_name gtest_target ...)
+
+    Create an identified C++ test target for an executable. (Uses [Google Tests](https://github.com/google/googletest))
+
+    - test_name:  The test target name.
+    - gtest_target:  The google test target to link with (gtest, gtest_main, gmock or gmock_main).
+    - OBJECT *object_target*: 	The object target.
+    - [HEADERS *header_list*]: 	The list of C++ headers to compile the test target.
+    - SOURCES *source_list*: 	The list of C++ sources to compile the test target.
+    - [LIBRARIES *dependency_list*]: 	The list of dependency library targets.
+
+  - ##### add_cpp_executable_basic_tests(gtest_target ...)
+
+    Create basic C++ test targets for an executable. (Uses [Google Tests](https://github.com/google/googletest))
+
+    - gtest_target:  The google test target to link with (gtest, gtest_main, gmock or gmock_main).
+    - OBJECT *object_target*: 	The object target.
+    - SOURCES *source_list*: 	The list of C++ sources to compile independently.
+    - [LIBRARIES *dependency_list*]: 	The list of dependency library targets.
 
 - ### CppLibraryProject
 
@@ -69,10 +103,8 @@ This CMake ToolKit (CMTK) provides helping CMake functions to manage simple C++ 
     - [OBJECT *object_target_name*] : Name of the object library target.
     - [SHARED *shared_target_name*] : Name of the shared library target.
     - [STATIC *static_target_name*] : Name of the static library target.
-    - [BUILD_SHARED *val*] : Indicate if a SHARED library must be build. (ON, OFF or UNDEFINED). If UNDEFINED, it is determined by cached option value. (cf. PUBLIC)
-    - [BUILD_STATIC *val*] : Indicate if a STATIC library must be build. (ON, OFF or UNDEFINED). If UNDEFINED, it is determined by cached option value. (cf. PUBLIC)
-    - [PUBLIC] : Create options for STATIC and SHARED buildings if necessary and depending on BUILD_SHARED and BUILD_STATIC. Option init values are ON.
-    - [NAMESPACE *ns*] : Add an alias target with *ns* as prefix for each shared and static target.
+    - [BUILD_SHARED *val*] : Indicate if a SHARED library must be build. (ON, OFF or OPTION (<=> UNDEFINED)). If OPTION, it is determined by cached option value. (cf. PUBLIC)
+    - [BUILD_STATIC *val*] : Indicate if a STATIC library must be build. (ON, OFF or OPTION (<=> UNDEFINED)). If OPTION, it is determined by cached option value. (cf. PUBLIC)
 
     Targets options arguments:
     - [CXX_STANDARD *cxx_std*] : 	C++ version used (..., 11, 14, 17, 20, 23, ...)
@@ -101,7 +133,7 @@ This CMake ToolKit (CMTK) provides helping CMake functions to manage simple C++ 
     - [HEADERS_BASE_DIRS *base_dirs*]:  List of base directories of source headers (used with FILE_SET).
     - [BUILD_HEADERS_BASE_DIRS *base_dirs*]:  List of base directories of build headers like generated headers (e.g. version.hpp) (used with FILE_SET).
 
-  - **cpp_library_targets_link_libraries(...)**
+  - ##### cpp_library_targets_link_libraries(...)
 
     Make shared and/or static targets of a C++ library link with dependency libraries.
 
@@ -131,23 +163,43 @@ This CMake ToolKit (CMTK) provides helping CMake functions to manage simple C++ 
     - [VERSION *version*]: 	The version of the package. (*PROJECT_VERSION* used by default)
     - [VERSION_COMPATIBILITY *compatibility*]: 	The compatibility with previous versions (cf. [write_basic_package_version_file](https://cmake.org/cmake/help/latest/module/CMakePackageConfigHelpers.html)). (*SameMajorVersion* used by default)
 
-  - ##### add_cpp_library_tests(...)
+- ### CppLibraryTests
 
-    Create C++ test targets for a library. (Uses [Google Tests](https://github.com/google/googletest))
+  - ##### add_cpp_library_test(test_name gtest_target ...)
 
-    - STATIC *static_target*: 	The static library target.
-    - SHARED *shared_target*: 	The shared library target.
+    Create an identified C++ test target for a library. (Uses [Google Tests](https://github.com/google/googletest))
+
+    - test_name:  The test target name.
+    - gtest_target:  The google test target to link with (gtest, gtest_main, gmock or gmock_main).
+    - [STATIC *static_target*]: 	The static library target.
+    - [SHARED *shared_target*]: 	The shared library target.
+    - [HEADER_ONLY *header_only_target*]:  The header-only library target.
+    - [HEADERS *header_list*]: 	The list of C++ headers to compile the test target.
+    - SOURCES *source_list*: 	The list of C++ sources to compile the test target.
+    - [LIBRARIES *dependency_list*]: 	The list of dependency library targets.
+
+  - ##### add_cpp_library_basic_tests(gtest_target ...)
+
+    Create basic C++ test targets for a library. (Uses [Google Tests](https://github.com/google/googletest))
+
+    - gtest_target:  The google test target to link with (gtest, gtest_main, gmock or gmock_main).
+    - [STATIC *static_target*]: 	The static library target.
+    - [SHARED *shared_target*]: 	The shared library target.
+    - [HEADER_ONLY *header_only_target*]:  The header-only library target.
     - SOURCES *source_list*: 	The list of C++ sources to compile independently.
-    - DEPENDENCIES *dependency_list*: 	The list of dependency targets.
+    - [LIBRARIES *dependency_list*]: 	The list of dependency library targets.
+
+- ### CppLibraryExamples
 
   - ##### add_cpp_library_examples(...)
 
     Create C++ example targets for a library.
 
-    - STATIC *static_target*: 	The static library target.
-    - SHARED *shared_target*: 	The shared library target.
+    - [STATIC *static_target*]: 	The static library target.
+    - [SHARED *shared_target*]: 	The shared library target.
+    - [HEADER_ONLY *header_only_target*]: 	The header-only library target.
     - SOURCES *source_list*: 	The list of C++ sources to compile independently.
-    - DEPENDENCIES *dependency_list*: 	The list of dependency targets.
+    - [LIBRARIES *dependency_list*]: 	The list of dependency library targets.
 
 # License
 
