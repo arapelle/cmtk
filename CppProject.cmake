@@ -1,13 +1,14 @@
 
 include(${CMAKE_CURRENT_LIST_DIR}/Project.cmake)
 
-function(generate_version_macro_header set_var macro_prefix output_file)
+function(generate_version_macro_header return_var macro_prefix header_path)
   include(GNUInstallDirs)
-  set(output_dir "${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_INSTALL_INCLUDEDIR}")
-  file(MAKE_DIRECTORY "${output_dir}")
-  set(${set_var} "${output_dir}/${output_file}" PARENT_SCOPE)
+  cmake_parse_arguments(PARSE_ARGV 1 "ARG" "" "BINARY_BASE_DIR" "")
+  set_ifndef(ARG_BINARY_BASE_DIR "${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_INSTALL_INCLUDEDIR}")
+  file(MAKE_DIRECTORY "${ARG_BINARY_BASE_DIR}")
+  set(${return_var} "${ARG_BINARY_BASE_DIR}/${header_path}" PARENT_SCOPE)
   to_upper_var_name(${macro_prefix} macro_prefix)
-  file(GENERATE OUTPUT "${output_dir}/${output_file}"
+  file(GENERATE OUTPUT "${ARG_BINARY_BASE_DIR}/${header_path}"
       CONTENT
        "#pragma once
 
