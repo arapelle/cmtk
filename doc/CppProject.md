@@ -26,3 +26,8 @@
 &ensp;&ensp;&ensp;&ensp;Set a cached variable SPDLOG_ACTIVE_LEVEL, if it is nod defined yet.
 - [DEBUG *build_type_list*] :  List of build types for which SPDLOG_ACTIVE_LEVEL must be set to DEBUG. (*Debug* used by default)
 - [INFO *build_type_list*] :  List of build types for which SPDLOG_ACTIVE_LEVEL must be set to INFO. (*Release* used by default)
+
+### `target_default_warning_options(target)`
+
+&ensp;&ensp;&ensp;&ensp;Add default warning compile options to a given target.
+`/Wall` mith Visual compiler, or `-Wall -Wextra -pedantic` with g++.
