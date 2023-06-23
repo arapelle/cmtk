@@ -18,52 +18,6 @@ function(generate_version_macro_header set_var macro_prefix output_file)
 ")
 endfunction()
 
-function(generate_default_version_header name output_header)
-  #----------------------------------------#
-  # Declare args
-  set(options "")
-  set(params "OUTPUT_BINARY_DIR")
-  set(lists "")
-  # Parse args
-  cmake_parse_arguments(PARSE_ARGV 0 "ARG" "${options}" "${params}" "${lists}")
-  # Check/Set args:
-  if(NOT ARG_OUTPUT_BINARY_DIR)
-    set(ARG_OUTPUT_BINARY_DIR "${CMAKE_CURRENT_BINARY_DIR}/include/")
-  endif()
-  #----------------------------------------#
-    to_upper_var_name(${name} upper_name)
-    file(MAKE_DIRECTORY "${ARG_OUTPUT_BINARY_DIR}")
-    file(GENERATE OUTPUT "${ARG_OUTPUT_BINARY_DIR}/${output_header}"
-        CONTENT
-         "#pragma once
-
-#define ${upper_name}_VERSION_MAJOR ${PROJECT_VERSION_MAJOR}
-#define ${upper_name}_VERSION_MINOR ${PROJECT_VERSION_MINOR}
-#define ${upper_name}_VERSION_PATCH ${PROJECT_VERSION_PATCH}
-#define ${upper_name}_VERSION \"${PROJECT_VERSION}\"
-")
-endfunction()
-
-function(configure_version_header input_header output_header)
-    #----------------------------------------#
-    # Declare args
-    set(options "")
-    set(params "OUTPUT_BINARY_DIR")
-    set(lists "")
-    # Parse args
-    cmake_parse_arguments(PARSE_ARGV 0 "ARG" "${options}" "${params}" "${lists}")
-    # Check/Set args:
-    if(NOT ARG_OUTPUT_BINARY_DIR)
-      set(ARG_OUTPUT_BINARY_DIR "${CMAKE_CURRENT_BINARY_DIR}/include/")
-    endif()
-    #----------------------------------------#
-    if(EXISTS ${input_header} AND NOT IS_DIRECTORY ${input_header})
-        configure_file(${input_header} "${ARG_OUTPUT_BINARY_DIR}/${output_header}")
-    else()
-        message(FATAL_ERROR "configure_version_header: ${ARG_INPUT_VERSION_HEADER} file does not exist.")
-    endif()
-endfunction()
-
 function(configure_headers set_var)
   include(GNUInstallDirs)
   cmake_parse_arguments(PARSE_ARGV 1 "ARG" "" "BASE_DIR" "FILES")
