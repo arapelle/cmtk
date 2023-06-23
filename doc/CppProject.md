@@ -20,3 +20,9 @@
 - FILES *headers* :  List of header files to configure.
 - [BASE_DIR *dir*] :  Directory from which the relative path of input header is computed. (*${CMAKE_INSTALL_INCLUDEDIR}* used by default)
 - [BINARY_BASE_DIR *dir*] :  Directory from which the hierachy of headers is generated. (*${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_INSTALL_INCLUDEDIR}* used by default)
+
+### `set_SPDLOG_ACTIVE_LEVEL_ifndef()`
+
+&ensp;&ensp;&ensp;&ensp;Set a cached variable SPDLOG_ACTIVE_LEVEL, if it is nod defined yet.
+- [DEBUG *build_type_list*] :  List of build types for which SPDLOG_ACTIVE_LEVEL must be set to DEBUG. (*Debug* used by default)
+- [INFO *build_type_list*] :  List of build types for which SPDLOG_ACTIVE_LEVEL must be set to INFO. (*Release* used by default)
