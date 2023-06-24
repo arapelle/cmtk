@@ -7,7 +7,7 @@ function(generate_version_macro_header return_var macro_prefix header_path)
   set_ifndef(ARG_BINARY_BASE_DIR "${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_INSTALL_INCLUDEDIR}")
   file(MAKE_DIRECTORY "${ARG_BINARY_BASE_DIR}")
   set(${return_var} "${ARG_BINARY_BASE_DIR}/${header_path}" PARENT_SCOPE)
-  to_upper_var_name(${macro_prefix} macro_prefix)
+  make_upper_c_identifier(${macro_prefix} macro_prefix)
   file(GENERATE OUTPUT "${ARG_BINARY_BASE_DIR}/${header_path}"
       CONTENT
        "#pragma once

@@ -65,12 +65,12 @@ function(trioption_or_set_ifdef variable help_text initial ascendant_variable)
 endfunction()
 
 
-macro(to_lower_var_name str output_var)
-  string(MAKE_C_IDENTIFIER ${str} ${output_var})
-  string(TOLOWER ${${output_var}} ${output_var})
+macro(make_lower_c_identifier str return_var)
+  string(MAKE_C_IDENTIFIER ${str} ${return_var})
+  string(TOLOWER ${${return_var}} ${return_var})
 endmacro()
 
-macro(to_upper_var_name str output_var)
-  string(MAKE_C_IDENTIFIER ${str} ${output_var})
-  string(TOUPPER ${${output_var}} ${output_var})
+macro(make_upper_c_identifier str return_var)
+  string(MAKE_C_IDENTIFIER ${str} ${return_var})
+  string(TOUPPER ${${return_var}} ${return_var})
 endmacro()
