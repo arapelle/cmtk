@@ -24,9 +24,9 @@ function(fatal_if_none_is_def msg)
   message(FATAL_ERROR "${msg}")
 endfunction()
 
-macro(set_ifndef var value)
-  if(NOT DEFINED ${var})
-    set(${var} ${value})
+macro(set_ifndef var_name value)
+  if(NOT DEFINED ${var_name})
+    set(${var_name} ${value})
   endif()
 endmacro()
 
