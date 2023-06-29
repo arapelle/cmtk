@@ -56,22 +56,22 @@ function(install_uninstall_script package_name)
         message(STATUS \"Installing: \${CMAKE_INSTALL_PREFIX}/${rel_uninstall_path}\")
         if(DEFINED CMAKE_INSTALL_MANIFEST_FILES)
             set(uninstall_script \${CMAKE_INSTALL_PREFIX}/${rel_uninstall_path})
-            set(files \${CMAKE_INSTALL_MANIFEST_FILES} \${uninstall_script})
+            list(APPEND CMAKE_INSTALL_MANIFEST_FILES \${uninstall_script})
+            set(files \${CMAKE_INSTALL_MANIFEST_FILES})
         ")
     if(ARG_ALL)
         string(APPEND uninstall_script_code "
-            set(CMTK_INSTALL_FILES \${files} \${uninstall_script})
+            set(CMTK_INSTALL_FILES \${files})
             ")
     else()
         string(APPEND uninstall_script_code "
             if(CMTK_INSTALL_FILES)
                 list(REMOVE_ITEM files \${CMTK_INSTALL_FILES})
             endif()
-            list(APPEND CMTK_INSTALL_FILES \${files} \${uninstall_script})
+            list(APPEND CMTK_INSTALL_FILES \${files})
             ")
     endif()
     string(APPEND uninstall_script_code "
-        list(APPEND CMAKE_INSTALL_MANIFEST_FILES \${uninstall_script})
         file(APPEND \${CMAKE_INSTALL_PREFIX}/${rel_uninstall_path}
         \"
         message(STATUS \\\"Uninstall ${package_name} v${ARG_VERSION} ${CMAKE_BUILD_TYPE}\\\")
