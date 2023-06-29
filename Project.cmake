@@ -38,17 +38,24 @@ function(set_build_type_ifndef)
     endif()
 endfunction()
 
-function(install_cmake_uninstall_script install_cmake_package_dir)
+function(install_uninstall_script package_name)
+    include(GNUInstallDirs)
     # Args:
     set(options "ALL")
-    set(params "")
+    set(params "FILENAME;PACKAGE_DIR;VERSION")
     set(lists "")
     # Parse args:
     cmake_parse_arguments(PARSE_ARGV 1 "ARG" "${options}" "${params}" "${lists}")
+    # Check args:
+    set_ifndef(ARG_FILENAME "cmake_uninstall.cmake")
+    set_ifndef(ARG_PACKAGE_DIR "${CMAKE_INSTALL_LIBDIR}/cmake/${package_name}")
+    set_ifndef(ARG_VERSION "${PROJECT_VERSION}")
+    set(rel_uninstall_path "${ARG_PACKAGE_DIR}/${ARG_FILENAME}")
+    #
     set(uninstall_script_code "
-        message(STATUS \"Installing: \${CMAKE_INSTALL_PREFIX}/${install_cmake_package_dir}/cmake_uninstall.cmake\")
+        message(STATUS \"Installing: \${CMAKE_INSTALL_PREFIX}/${rel_uninstall_path}\")
         if(DEFINED CMAKE_INSTALL_MANIFEST_FILES)
-            set(uninstall_script \${CMAKE_INSTALL_PREFIX}/${install_cmake_package_dir}/cmake_uninstall.cmake)
+            set(uninstall_script \${CMAKE_INSTALL_PREFIX}/${rel_uninstall_path})
             set(files \${CMAKE_INSTALL_MANIFEST_FILES} \${uninstall_script})
         ")
     if(ARG_ALL)
@@ -65,9 +72,9 @@ function(install_cmake_uninstall_script install_cmake_package_dir)
     endif()
     string(APPEND uninstall_script_code "
         list(APPEND CMAKE_INSTALL_MANIFEST_FILES \${uninstall_script})
-        file(APPEND \${CMAKE_INSTALL_PREFIX}/${install_cmake_package_dir}/cmake_uninstall.cmake
+        file(APPEND \${CMAKE_INSTALL_PREFIX}/${rel_uninstall_path}
         \"
-        message(STATUS \\\"Uninstall ${PROJECT_NAME} v${PROJECT_VERSION} ${CMAKE_BUILD_TYPE}\\\")
+        message(STATUS \\\"Uninstall ${package_name} v${ARG_VERSION} ${CMAKE_BUILD_TYPE}\\\")
         foreach(file \${files})
             while(NOT \\\${file} STREQUAL \${CMAKE_INSTALL_PREFIX})
                 if(EXISTS \\\${file} OR IS_SYMLINK \\\${file})

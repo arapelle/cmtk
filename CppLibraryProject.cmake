@@ -176,7 +176,7 @@ function(install_library_package package_name)
     # Args:
     set(options "")
     set(params "VERSION;VERSION_COMPATIBILITY;INPUT_PACKAGE_CONFIG_FILE")
-    set(lists "UNINSTALL_SCRIPT") # UNINSTALL_SCRIPT [ALL]   
+    set(lists "")
     # Parse args:
     cmake_parse_arguments(PARSE_ARGV 1 "ARG" "${options}" "${params}" "${lists}")
     # Check and set args:
@@ -198,10 +198,6 @@ function(install_library_package package_name)
         ${PROJECT_BINARY_DIR}/${package_name}-config.cmake
         ${PROJECT_BINARY_DIR}/${package_name}-config-version.cmake
         DESTINATION ${relative_install_cmake_package_dir})
-    # Uninstall script
-    if(ARG_UNINSTALL_SCRIPT)
-        install_cmake_uninstall_script("${relative_install_cmake_package_dir}" ${ARG_UNINSTALL_SCRIPT})
-    endif()
 endfunction()
 
 function(cpp_library_link_libraries)

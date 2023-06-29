@@ -68,7 +68,6 @@
 
 &ensp;&ensp;&ensp;&ensp;Install C++ package
 
-- [UNINSTALL_SCRIPT *opts*] : 	If this option is given, a uninstall CMake script will be installed. Arguments *opts* are passed to *install_cmake_uninstall_script()*.
 - INPUT_PACKAGE_CONFIG_FILE *package-config.cmake.in*: 	A package config file will be created by using configure_package_config_file() on the provided *package-config.cmake.in*.
 - [VERSION *version*]: 	The version of the package. (*PROJECT_VERSION* used by default)
 - [VERSION_COMPATIBILITY *compatibility*]: 	The compatibility with previous versions (cf. CMake function [write_basic_package_version_file](https://cmake.org/cmake/help/latest/module/CMakePackageConfigHelpers.html#command:write_basic_package_version_file)). (*SameMajorVersion* used by default)
