@@ -13,44 +13,36 @@ function(_add_ftoba_executable)
 endfunction()
 
 function(add_rsc_cpp_library rsc_lib_name)
+    include(GNUInstallDirs)
     # Args:
     set(options "STATIC;SHARED")
-    set(params "BASE_DIR;VIRTUAL_ROOT;NAMESPACE")
-    set(lists "")
+    set(params "VIRTUAL_ROOT;NAMESPACE;RESOURCES_BASE_DIR;BUILD_HEADERS_BASE_DIR")
+    set(lists "RESOURCES")
     # Parse args:
     cmake_parse_arguments(PARSE_ARGV 1 "ARG" "${options}" "${params}" "${lists}")
-    if(ARG_SHARED)
-        set(library_type SHARED)
-    elseif(ARG_STATIC)
-        set(library_type STATIC)
-    else()
-        message(FATAL_ERROR "Library type ('STATIC' or 'SHARED') must be provided!")
-    endif()
-    if(NOT ARG_BASE_DIR)
-        set(ARG_BASE_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
-    endif()
-    if(NOT ARG_NAMESPACE)
-        set(ARG_NAMESPACE "${rsc_lib_name}")
-    endif()
-    if(NOT ARG_UNPARSED_ARGUMENTS)
-        message(FATAL_ERROR "No resource file provided!")
-    endif()
-    # Check target cmtk_file_to_byte_array
+    # Check args:
+    fatal_if_none_is_def("Library type ('STATIC' or 'SHARED') must be provided!" ARG_SHARED ARG_STATIC)
+    fatal_ifndef("No resource file provided!" ARG_RESOURCES)
+    set_iftest(library_type IF ARG_SHARED THEN SHARED ELSE STATIC)
+    set_ifndef(ARG_RESOURCES_BASE_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
+    set_ifndef(ARG_BUILD_HEADERS_BASE_DIR ${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_INSTALL_INCLUDEDIR})
+    set_ifndef(ARG_NAMESPACE "${rsc_lib_name}")
+    # Ensure target cmtk_file_to_byte_array
     if(NOT TARGET cmtk_file_to_byte_array)
         _add_ftoba_executable()
     endif()
-    # Resource h/cpp 
-    set(rsc_lib_path "${CMAKE_CURRENT_BINARY_DIR}/${rsc_lib_name}")
+    # Resource h/cpp
+    set(rsc_lib_path "${ARG_BUILD_HEADERS_BASE_DIR}/${rsc_lib_name}")
     set(rsc_lib_hpp_path "${rsc_lib_path}/${rsc_lib_name}.hpp")
     set(rsc_lib_cpp_path "${rsc_lib_path}/${rsc_lib_name}.cpp")
     set(rsc_cpp_paths)
     set(rsc_targets)
-    foreach(rsc_path ${ARG_UNPARSED_ARGUMENTS})
+    foreach(rsc_path ${ARG_RESOURCES})
         file(TO_CMAKE_PATH "${rsc_path}" rsc_path)
         get_filename_component(rsc_stem "${rsc_path}" NAME_WE)
         string(MAKE_C_IDENTIFIER "${rsc_stem}" rsc_stem)
         cmake_path(GET rsc_path PARENT_PATH rsc_dir)
-        file(RELATIVE_PATH rsc_rel_dir ${ARG_BASE_DIR} ${rsc_dir})
+        file(RELATIVE_PATH rsc_rel_dir ${ARG_RESOURCES_BASE_DIR} ${rsc_dir})
         set(rsc_cpp_path "${rsc_lib_path}/${rsc_rel_dir}/${rsc_stem}.cpp")
         add_custom_command(OUTPUT ${rsc_cpp_path}
             COMMAND ${CMAKE_COMMAND} -P
@@ -66,8 +58,8 @@ function(add_rsc_cpp_library rsc_lib_name)
     endforeach()
     add_custom_command(OUTPUT ${rsc_lib_hpp_path} ${rsc_lib_cpp_path}
         COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/._script/cmtk_generate_rsc_lib_hcpp.cmake 
-            -- LIB_NAME ${rsc_lib_name} LIB_PATH ${rsc_lib_path} RESOURCES ${ARG_UNPARSED_ARGUMENTS} NAMESPACE ${ARG_NAMESPACE}
-               VIRTUAL_ROOT ${ARG_VIRTUAL_ROOT} BASE_DIR ${ARG_BASE_DIR}
+            -- LIB_NAME ${rsc_lib_name} LIB_PATH ${rsc_lib_path} RESOURCES ${ARG_RESOURCES} NAMESPACE ${ARG_NAMESPACE}
+               VIRTUAL_ROOT ${ARG_VIRTUAL_ROOT} BASE_DIR ${ARG_RESOURCES_BASE_DIR}
         DEPENDS ${rsc_cpp_paths}
     )
     add_custom_target(${rsc_stem}_rsc_hpp ALL DEPENDS ${rsc_lib_hpp_path})
@@ -78,7 +70,7 @@ function(add_rsc_cpp_library rsc_lib_name)
     target_compile_features(${rsc_lib_name} PUBLIC cxx_std_20)
     target_sources(${rsc_lib_name} PUBLIC
         FILE_SET HEADERS
-        BASE_DIRS ${CMAKE_CURRENT_BINARY_DIR}
+        BASE_DIRS ${ARG_BUILD_HEADERS_BASE_DIR}
         FILES ${rsc_lib_hpp_path}
     )
 endfunction()
