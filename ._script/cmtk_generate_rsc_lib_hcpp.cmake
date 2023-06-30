@@ -1,0 +1,80 @@
+
+include(CMakePrintHelpers)
+
+function(get_script_args script_args)
+    set(sc_args)
+    set(start_found False)
+    foreach(argi RANGE ${CMAKE_ARGC})
+        set(arg ${CMAKE_ARGV${argi}})
+        if(start_found)
+            list(APPEND sc_args ${arg})
+        endif()
+        if("${arg}" STREQUAL "--")
+            set(start_found True)
+        endif()
+    endforeach()
+    set(${script_args} ${sc_args} PARENT_SCOPE)
+endfunction()
+
+#--
+
+get_script_args(args)
+set(options "")
+set(params "LIB_NAME;LIB_PATH;NAMESPACE;BASE_DIR;VIRTUAL_ROOT")
+set(lists "RESOURCES")
+cmake_parse_arguments(ARG "${options}" "${params}" "${lists}" ${args})
+
+set(rsc_lib_hpp_path "${ARG_LIB_PATH}/${ARG_LIB_NAME}.hpp")
+set(rsc_lib_cpp_path "${ARG_LIB_PATH}/${ARG_LIB_NAME}.cpp")
+# Write resource lib hpp file.
+file(WRITE ${rsc_lib_hpp_path} "// ${rsc_lib_hpp_path}\n
+#pragma once
+
+#include <string_view>
+#include <span>
+#include <array>
+#include <optional>
+#include <cstdint>
+
+namespace ${ARG_NAMESPACE}\n{
+")
+# Write resource lib cpp file.
+file(WRITE ${rsc_lib_cpp_path} "#include \"${ARG_LIB_NAME}.hpp\"
+#include <unordered_map>
+
+namespace ${ARG_NAMESPACE}
+{
+std::optional<std::span<const uint8_t, std::dynamic_extent>> get_resource_bytes(const std::string_view& rsc_path)
+{
+    static const std::unordered_map<std::string_view, std::span<const uint8_t, std::dynamic_extent>> resources__ =
+    {
+")
+
+# Treat resource files.
+foreach(rsc_path ${ARG_RESOURCES})
+    # Get file size.
+    file(SIZE ${rsc_path} rsc_file_size)
+    # Get file stem.
+    get_filename_component(rsc_stem ${rsc_path} NAME_WE)
+    string(MAKE_C_IDENTIFIER ${rsc_stem} rsc_stem)
+    # Write resource var declaration.
+    file(RELATIVE_PATH rel_rsc_path ${ARG_BASE_DIR} ${rsc_path})
+    set(rel_rsc_path "${ARG_VIRTUAL_ROOT}${rel_rsc_path}")
+    file(APPEND ${rsc_lib_hpp_path} "constexpr std::string_view ${rsc_stem}_path = \"${rel_rsc_path}\";
+extern const std::array<uint8_t, ${rsc_file_size}> ${rsc_stem};\n
+")
+    file(APPEND ${rsc_lib_cpp_path} "        { ${rsc_stem}_path, ${rsc_stem} },\n")
+endforeach()
+
+# End resource lib h/cpp files.
+file(APPEND ${rsc_lib_hpp_path} "
+std::optional<std::span<const uint8_t, std::dynamic_extent>> get_resource_bytes(const std::string_view& rsc_path);
+}\n")
+file(APPEND ${rsc_lib_cpp_path} "    };
+
+    if (auto iter = resources__.find(rsc_path); iter != resources__.end()) [[likely]]
+        return iter->second;
+    return std::nullopt;
+}
+}
+")
