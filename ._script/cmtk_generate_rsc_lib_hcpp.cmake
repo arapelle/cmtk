@@ -72,13 +72,27 @@ foreach(rsc_path ${ARG_RESOURCES})
     # Get file stem.
     get_filename_component(rsc_stem ${rsc_path} NAME_WE)
     string(MAKE_C_IDENTIFIER ${rsc_stem} rsc_stem)
-    # Write resource var declaration.
+    # Determine sub-namespace:
     file(RELATIVE_PATH rel_rsc_path ${ARG_BASE_DIR} ${rsc_path})
-    set(rel_rsc_path "${ARG_VIRTUAL_ROOT}${rel_rsc_path}")
-    file(APPEND ${rsc_lib_hpp_path} "constexpr std::string_view ${rsc_stem}_path = \"${rel_rsc_path}\";
-
+    set(rel_rsc_vpath "${ARG_VIRTUAL_ROOT}${rel_rsc_path}")
+    cmake_path(REMOVE_FILENAME rel_rsc_path)
+    string(REPLACE "/" "::" sub_namespace_path "${rel_rsc_path}")
+    if(NOT "${sub_namespace_path}" STREQUAL "")
+        string(LENGTH "${sub_namespace_path}" sub_namespace_path_len)
+        math(EXPR sub_namespace_path_len "${sub_namespace_path_len}-2")
+        string(SUBSTRING "${sub_namespace_path}" 0 ${sub_namespace_path_len} sub_namespace_def)
+        set(sub_namespace_begin "namespace ${sub_namespace_def}\n{\n")
+        set(sub_namespace_end "\n}\n")
+    else()
+        set(sub_namespace_begin "")
+        set(sub_namespace_end "")
+    endif()
+    # Write resource var declaration.
+    #  in hpp
+    file(APPEND ${rsc_lib_hpp_path} "${sub_namespace_begin}constexpr std::string_view ${rsc_stem}_path = \"${rel_rsc_vpath}\";${sub_namespace_end}
 ")
-    file(APPEND ${rsc_lib_cpp_path} "        { ${rsc_stem}_path, ${rsc_stem}() },\n")
+    #  in cpp
+    file(APPEND ${rsc_lib_cpp_path} "        { ${sub_namespace_path}${rsc_stem}_path, ${sub_namespace_path}${rsc_stem}() },\n")
 endforeach()
 
 # End resource lib h/cpp files.
@@ -95,6 +109,5 @@ std::optional<std::span<const std::byte>> find_serialized_resource(const std::st
 }
 }
 ")
-file(APPEND ${rsc_lib_hpp_path} "
-}
+file(APPEND ${rsc_lib_hpp_path} "}
 ")

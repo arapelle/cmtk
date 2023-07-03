@@ -28,6 +28,13 @@ string(MAKE_C_IDENTIFIER ${rsc_stem} rsc_stem)
 # Get resource file size
 file(SIZE ${ARG_RESOURCE} rsc_file_size)
 
+# Determine sub-namespace:
+if(NOT "${ARG_RSC_RELATIVE_DIR}" STREQUAL "")
+    string(REPLACE "/" "::" sub_namespace_path "${ARG_RSC_RELATIVE_DIR}")
+    set(sub_namespace_begin "namespace ${sub_namespace_path} \n{")
+    set(sub_namespace_end "}\n")
+endif()
+
 # Write resource cpp file.
 set(rsc_cpp_path "${ARG_LIB_PATH}/${ARG_RSC_RELATIVE_DIR}/${rsc_stem}.cpp")
 file(WRITE ${rsc_cpp_path} "// ${rsc_cpp_path}
@@ -39,6 +46,7 @@ file(WRITE ${rsc_cpp_path} "// ${rsc_cpp_path}
 
 namespace ${ARG_NAMESPACE}
 {
+${sub_namespace_begin}
 const std::array<const uint8_t, ${rsc_file_size}>& ${rsc_stem}__()
 {
     static const std::array<const uint8_t, ${rsc_file_size}> bytes = 
@@ -50,6 +58,7 @@ file(APPEND ${rsc_cpp_path} "
 }
 
 std::span<const std::byte, ${rsc_file_size}> ${rsc_stem}() { return std::as_bytes(std::span( ${rsc_stem}__() )); }
+${sub_namespace_end}
 }
 ")
 
@@ -61,6 +70,8 @@ file(WRITE ${rsc_hpp_path} "#pragma once
 
 namespace ${ARG_NAMESPACE}
 {
+${sub_namespace_begin}
 std::span<const std::byte, ${rsc_file_size}> ${rsc_stem}();
+${sub_namespace_end}
 }
 ")
