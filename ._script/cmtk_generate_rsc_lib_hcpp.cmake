@@ -46,7 +46,15 @@ std::optional<std::span<const std::byte>> find_serialized_resource(const std::st
 # Write resource lib cpp file.
 file(WRITE ${rsc_lib_cpp_path} "#include \"${ARG_LIB_NAME}.hpp\"
 #include <unordered_map>
-
+")
+foreach(rsc_path ${ARG_RESOURCES})
+    file(RELATIVE_PATH rel_rsc_path ${ARG_BASE_DIR} ${rsc_path})
+    cmake_path(GET rel_rsc_path STEM rsc_stem)
+    string(MAKE_C_IDENTIFIER ${rsc_stem} rsc_stem)
+    cmake_path(REPLACE_FILENAME rel_rsc_path "${rsc_stem}.hpp")
+    file(APPEND ${rsc_lib_cpp_path} "#include \"${rel_rsc_path}\"\n")
+endforeach()
+file(APPEND ${rsc_lib_cpp_path} "
 namespace ${ARG_NAMESPACE}
 {
 using resource_map_t = std::unordered_map<std::string_view, std::span<const std::byte>>;
@@ -68,7 +76,7 @@ foreach(rsc_path ${ARG_RESOURCES})
     file(RELATIVE_PATH rel_rsc_path ${ARG_BASE_DIR} ${rsc_path})
     set(rel_rsc_path "${ARG_VIRTUAL_ROOT}${rel_rsc_path}")
     file(APPEND ${rsc_lib_hpp_path} "constexpr std::string_view ${rsc_stem}_path = \"${rel_rsc_path}\";
-std::span<const std::byte, ${rsc_file_size}> ${rsc_stem}();\n
+
 ")
     file(APPEND ${rsc_lib_cpp_path} "        { ${rsc_stem}_path, ${rsc_stem}() },\n")
 endforeach()

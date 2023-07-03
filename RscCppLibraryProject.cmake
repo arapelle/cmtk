@@ -35,6 +35,7 @@ function(add_rsc_cpp_library rsc_lib_name)
     set(rsc_lib_path "${ARG_BUILD_HEADERS_BASE_DIR}/${rsc_lib_name}")
     set(rsc_lib_hpp_path "${rsc_lib_path}/${rsc_lib_name}.hpp")
     set(rsc_lib_cpp_path "${rsc_lib_path}/${rsc_lib_name}.cpp")
+    set(rsc_hpp_paths)
     set(rsc_cpp_paths)
     set(rsc_targets)
     foreach(rsc_path ${ARG_RESOURCES})
@@ -44,26 +45,28 @@ function(add_rsc_cpp_library rsc_lib_name)
         cmake_path(GET rsc_path PARENT_PATH rsc_dir)
         file(RELATIVE_PATH rsc_rel_dir ${ARG_RESOURCES_BASE_DIR} ${rsc_dir})
         set(rsc_cpp_path "${rsc_lib_path}/${rsc_rel_dir}/${rsc_stem}.cpp")
-        add_custom_command(OUTPUT ${rsc_cpp_path}
+        set(rsc_hpp_path "${rsc_lib_path}/${rsc_rel_dir}/${rsc_stem}.hpp")
+        add_custom_command(OUTPUT ${rsc_hpp_path} ${rsc_cpp_path}
             COMMAND ${CMAKE_COMMAND} -P
-              ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/._script/cmtk_generate_rsc_cpp.cmake 
+              ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/._script/cmtk_generate_rsc_hcpp.cmake 
                 CMTK_FTOBA $<TARGET_FILE:cmtk_file_to_byte_array> LIB_PATH "${rsc_lib_path}" RSC_RELATIVE_DIR "${rsc_rel_dir}"
                 RESOURCE "${rsc_path}" NAMESPACE "${ARG_NAMESPACE}"
             DEPENDS ${rsc_path}
         )
-        add_custom_target(${rsc_stem}_rsc_cpp ALL DEPENDS ${rsc_cpp_path})
-        add_dependencies(${rsc_stem}_rsc_cpp cmtk_file_to_byte_array)
+        add_custom_target(${rsc_stem}_rsc_hcpp ALL DEPENDS ${rsc_hpp_path} ${rsc_cpp_path})
+        add_dependencies(${rsc_stem}_rsc_hcpp cmtk_file_to_byte_array)
+        list(APPEND rsc_hpp_paths ${rsc_hpp_path})
         list(APPEND rsc_cpp_paths ${rsc_cpp_path})
-        list(APPEND rsc_targets ${rsc_stem}_rsc_cpp)
+        list(APPEND rsc_targets ${rsc_stem}_rsc_hcpp)
     endforeach()
     add_custom_command(OUTPUT ${rsc_lib_hpp_path} ${rsc_lib_cpp_path}
         COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/._script/cmtk_generate_rsc_lib_hcpp.cmake 
             -- LIB_NAME ${rsc_lib_name} LIB_PATH ${rsc_lib_path} RESOURCES ${ARG_RESOURCES} NAMESPACE ${ARG_NAMESPACE}
                VIRTUAL_ROOT ${ARG_VIRTUAL_ROOT} BASE_DIR ${ARG_RESOURCES_BASE_DIR}
-        DEPENDS ${rsc_cpp_paths}
+        DEPENDS ${rsc_hpp_paths} ${rsc_cpp_paths}
     )
-    add_custom_target(${rsc_stem}_rsc_hpp ALL DEPENDS ${rsc_lib_hpp_path})
-    list(APPEND rsc_targets ${rsc_stem}_rsc_hpp)
+    add_custom_target(${rsc_lib_name}_rsc_lib_hcpp ALL DEPENDS ${rsc_lib_hpp_path} ${rsc_lib_cpp_path})
+    list(APPEND rsc_targets ${rsc_lib_name}_rsc_lib_hcpp)
     # Add library.
     add_library(${rsc_lib_name} ${library_type} ${rsc_cpp_paths} ${rsc_lib_cpp_path})
     add_dependencies(${rsc_lib_name} ${rsc_targets})
@@ -71,6 +74,6 @@ function(add_rsc_cpp_library rsc_lib_name)
     target_sources(${rsc_lib_name} PUBLIC
         FILE_SET HEADERS
         BASE_DIRS ${ARG_BUILD_HEADERS_BASE_DIR}
-        FILES ${rsc_lib_hpp_path}
+        FILES ${rsc_lib_hpp_path} ${rsc_hpp_paths}
     )
 endfunction()

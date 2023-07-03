@@ -21,15 +21,6 @@ cmake_parse_arguments(ARG "${options}" "${params}" "${lists}" ${args})
 file(TO_CMAKE_PATH "${ARG_LIB_PATH}" ARG_LIB_PATH)
 file(TO_CMAKE_PATH "${ARG_RSC_RELATIVE_DIR}" ARG_RSC_RELATIVE_DIR)
 
-# Get path to resource library header
-set(rsc_p_dir "${ARG_RSC_RELATIVE_DIR}")
-cmake_path(GET ARG_LIB_PATH FILENAME path_to_hpp)
-set(path_to_hpp "${path_to_hpp}.hpp")
-while(NOT "${rsc_p_dir}" STREQUAL "")
-    set(path_to_hpp "../${path_to_hpp}")
-    cmake_path(GET rsc_p_dir PARENT_PATH rsc_p_dir)
-endwhile()
-
 # Get resource file stem as c_identifier
 get_filename_component(rsc_stem ${ARG_RESOURCE} NAME_WE)
 string(MAKE_C_IDENTIFIER ${rsc_stem} rsc_stem)
@@ -42,9 +33,9 @@ set(rsc_cpp_path "${ARG_LIB_PATH}/${ARG_RSC_RELATIVE_DIR}/${rsc_stem}.cpp")
 file(WRITE ${rsc_cpp_path} "// ${rsc_cpp_path}
 // resource ${ARG_RESOURCE}
 
-#include \"${path_to_hpp}\"
-#include <span>
+#include \"${rsc_stem}.hpp\"
 #include <array>
+#include <cstdint>
 
 namespace ${ARG_NAMESPACE}
 {
@@ -59,5 +50,17 @@ file(APPEND ${rsc_cpp_path} "
 }
 
 std::span<const std::byte, ${rsc_file_size}> ${rsc_stem}() { return std::as_bytes(std::span( ${rsc_stem}__() )); }
+}
+")
+
+# Write resource hpp file.
+set(rsc_hpp_path "${ARG_LIB_PATH}/${ARG_RSC_RELATIVE_DIR}/${rsc_stem}.hpp")
+file(WRITE ${rsc_hpp_path} "#pragma once
+
+#include <span>
+
+namespace ${ARG_NAMESPACE}
+{
+std::span<const std::byte, ${rsc_file_size}> ${rsc_stem}();
 }
 ")
