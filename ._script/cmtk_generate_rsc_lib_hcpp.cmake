@@ -26,7 +26,6 @@ cmake_parse_arguments(ARG "${options}" "${params}" "${lists}" ${args})
 
 set(rsc_lib_hpp_path "${ARG_LIB_PATH}/${ARG_LIB_NAME}.hpp")
 set(rsc_lib_cpp_path "${ARG_LIB_PATH}/${ARG_LIB_NAME}.cpp")
-list(LENGTH ARG_RESOURCES nb_of_resources)
 
 # Write resource lib hpp file.
 file(WRITE ${rsc_lib_hpp_path} "// ${rsc_lib_hpp_path}\n
@@ -41,11 +40,7 @@ file(WRITE ${rsc_lib_hpp_path} "// ${rsc_lib_hpp_path}\n
 
 namespace ${ARG_NAMESPACE}
 {
-using resource_map_t = std::unordered_map<std::string_view, std::span<const std::byte>>;
-
-inline constexpr std::size_t number_of_resources() { return ${nb_of_resources}; }
-std::optional<std::span<const std::byte>> get_resource_bytes(const std::string_view& rsc_path);
-const resource_map_t& resource_map();
+std::optional<std::span<const std::byte>> find_serialized_resource(const std::string_view& rsc_path);
 
 ")
 # Write resource lib cpp file.
@@ -54,6 +49,8 @@ file(WRITE ${rsc_lib_cpp_path} "#include \"${ARG_LIB_NAME}.hpp\"
 
 namespace ${ARG_NAMESPACE}
 {
+using resource_map_t = std::unordered_map<std::string_view, std::span<const std::byte>>;
+
 static const resource_map_t resources__ =
 {
 ")
@@ -77,12 +74,7 @@ endforeach()
 # End resource lib h/cpp files.
 file(APPEND ${rsc_lib_cpp_path} "};
 
-const resource_map_t& resource_map()
-{
-    return resources__;
-}
-
-std::optional<std::span<const std::byte>> get_resource_bytes(const std::string_view& rsc_path)
+std::optional<std::span<const std::byte>> find_serialized_resource(const std::string_view& rsc_path)
 {
     if (auto iter = resources__.find(rsc_path); iter != resources__.end()) [[likely]]
         return iter->second;
