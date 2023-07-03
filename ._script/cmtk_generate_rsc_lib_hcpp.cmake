@@ -26,17 +26,27 @@ cmake_parse_arguments(ARG "${options}" "${params}" "${lists}" ${args})
 
 set(rsc_lib_hpp_path "${ARG_LIB_PATH}/${ARG_LIB_NAME}.hpp")
 set(rsc_lib_cpp_path "${ARG_LIB_PATH}/${ARG_LIB_NAME}.cpp")
+list(LENGTH ARG_RESOURCES nb_of_resources)
+
 # Write resource lib hpp file.
 file(WRITE ${rsc_lib_hpp_path} "// ${rsc_lib_hpp_path}\n
 #pragma once
 
 #include <string_view>
 #include <span>
+#include <unordered_map>
 #include <array>
 #include <optional>
 #include <cstdint>
 
-namespace ${ARG_NAMESPACE}\n{
+namespace ${ARG_NAMESPACE}
+{
+using resource_map_t = std::unordered_map<std::string_view, std::span<const uint8_t, std::dynamic_extent>>;
+
+inline constexpr std::size_t number_of_resources() { return ${nb_of_resources}; }
+std::optional<std::span<const uint8_t, std::dynamic_extent>> get_resource_bytes(const std::string_view& rsc_path);
+const resource_map_t& resource_map();
+
 ")
 # Write resource lib cpp file.
 file(WRITE ${rsc_lib_cpp_path} "#include \"${ARG_LIB_NAME}.hpp\"
@@ -44,10 +54,10 @@ file(WRITE ${rsc_lib_cpp_path} "#include \"${ARG_LIB_NAME}.hpp\"
 
 namespace ${ARG_NAMESPACE}
 {
-std::optional<std::span<const uint8_t, std::dynamic_extent>> get_resource_bytes(const std::string_view& rsc_path)
+namespace
 {
-    static const std::unordered_map<std::string_view, std::span<const uint8_t, std::dynamic_extent>> resources__ =
-    {
+static const resource_map_t resources__ =
+{
 ")
 
 # Treat resource files.
@@ -67,14 +77,22 @@ extern const std::array<uint8_t, ${rsc_file_size}> ${rsc_stem};\n
 endforeach()
 
 # End resource lib h/cpp files.
-file(APPEND ${rsc_lib_hpp_path} "
-std::optional<std::span<const uint8_t, std::dynamic_extent>> get_resource_bytes(const std::string_view& rsc_path);
-}\n")
-file(APPEND ${rsc_lib_cpp_path} "    };
+file(APPEND ${rsc_lib_cpp_path} "};
+}
 
+const resource_map_t& resource_map()
+{
+    return resources__;
+}
+
+std::optional<std::span<const uint8_t, std::dynamic_extent>> get_resource_bytes(const std::string_view& rsc_path)
+{
     if (auto iter = resources__.find(rsc_path); iter != resources__.end()) [[likely]]
         return iter->second;
     return std::nullopt;
 }
+}
+")
+file(APPEND ${rsc_lib_hpp_path} "
 }
 ")
