@@ -51,8 +51,10 @@ namespace ${ARG_NAMESPACE}
 {
 using resource_map_t = std::unordered_map<std::string_view, std::span<const std::byte>>;
 
-static const resource_map_t resources__ =
+const resource_map_t& resources__()
 {
+    static resource_map_t rsc_map =
+    {
 ")
 
 # Treat resource files.
@@ -66,17 +68,20 @@ foreach(rsc_path ${ARG_RESOURCES})
     file(RELATIVE_PATH rel_rsc_path ${ARG_BASE_DIR} ${rsc_path})
     set(rel_rsc_path "${ARG_VIRTUAL_ROOT}${rel_rsc_path}")
     file(APPEND ${rsc_lib_hpp_path} "constexpr std::string_view ${rsc_stem}_path = \"${rel_rsc_path}\";
-extern const std::span<const std::byte, ${rsc_file_size}> ${rsc_stem};\n
+std::span<const std::byte, ${rsc_file_size}> ${rsc_stem}();\n
 ")
-    file(APPEND ${rsc_lib_cpp_path} "        { ${rsc_stem}_path, ${rsc_stem} },\n")
+    file(APPEND ${rsc_lib_cpp_path} "        { ${rsc_stem}_path, ${rsc_stem}() },\n")
 endforeach()
 
 # End resource lib h/cpp files.
-file(APPEND ${rsc_lib_cpp_path} "};
+file(APPEND ${rsc_lib_cpp_path} "    };
+    return rsc_map;
+}
 
 std::optional<std::span<const std::byte>> find_serialized_resource(const std::string_view& rsc_path)
 {
-    if (auto iter = resources__.find(rsc_path); iter != resources__.end()) [[likely]]
+    const auto& rsc_map = resources__();
+    if (auto iter = rsc_map.find(rsc_path); iter != rsc_map.end()) [[likely]]
         return iter->second;
     return std::nullopt;
 }

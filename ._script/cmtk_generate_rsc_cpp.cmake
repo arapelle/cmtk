@@ -48,12 +48,16 @@ file(WRITE ${rsc_cpp_path} "// ${rsc_cpp_path}
 
 namespace ${ARG_NAMESPACE}
 {
-static const std::array<uint8_t, ${rsc_file_size}> ${rsc_stem}__ =
+const std::array<const uint8_t, ${rsc_file_size}>& ${rsc_stem}__()
+{
+    static const std::array<const uint8_t, ${rsc_file_size}> bytes = 
 ")
 # Write beginning of resource variable definition.
 execute_process(COMMAND ${ARG_CMTK_FTOBA} ${ARG_RESOURCE} ${rsc_cpp_path})
 file(APPEND ${rsc_cpp_path} "
+    return bytes;
+}
 
-const std::span<const std::byte, ${rsc_file_size}> ${rsc_stem} = std::as_bytes(std::span( ${rsc_stem}__ ));
+std::span<const std::byte, ${rsc_file_size}> ${rsc_stem}() { return std::as_bytes(std::span( ${rsc_stem}__() )); }
 }
 ")
