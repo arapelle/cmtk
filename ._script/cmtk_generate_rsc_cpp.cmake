@@ -43,11 +43,17 @@ file(WRITE ${rsc_cpp_path} "// ${rsc_cpp_path}
 // resource ${ARG_RESOURCE}
 
 #include \"${path_to_hpp}\"
+#include <span>
+#include <array>
 
 namespace ${ARG_NAMESPACE}
 {
-const std::array<uint8_t, ${rsc_file_size}> ${rsc_stem} =
+static const std::array<uint8_t, ${rsc_file_size}> ${rsc_stem}__ =
 ")
 # Write beginning of resource variable definition.
 execute_process(COMMAND ${ARG_CMTK_FTOBA} ${ARG_RESOURCE} ${rsc_cpp_path})
-file(APPEND ${rsc_cpp_path} "}\n")
+file(APPEND ${rsc_cpp_path} "
+
+const std::span<const std::byte, ${rsc_file_size}> ${rsc_stem} = std::as_bytes(std::span( ${rsc_stem}__ ));
+}
+")

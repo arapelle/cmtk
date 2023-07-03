@@ -41,10 +41,10 @@ file(WRITE ${rsc_lib_hpp_path} "// ${rsc_lib_hpp_path}\n
 
 namespace ${ARG_NAMESPACE}
 {
-using resource_map_t = std::unordered_map<std::string_view, std::span<const uint8_t, std::dynamic_extent>>;
+using resource_map_t = std::unordered_map<std::string_view, std::span<const std::byte>>;
 
 inline constexpr std::size_t number_of_resources() { return ${nb_of_resources}; }
-std::optional<std::span<const uint8_t, std::dynamic_extent>> get_resource_bytes(const std::string_view& rsc_path);
+std::optional<std::span<const std::byte>> get_resource_bytes(const std::string_view& rsc_path);
 const resource_map_t& resource_map();
 
 ")
@@ -53,8 +53,6 @@ file(WRITE ${rsc_lib_cpp_path} "#include \"${ARG_LIB_NAME}.hpp\"
 #include <unordered_map>
 
 namespace ${ARG_NAMESPACE}
-{
-namespace
 {
 static const resource_map_t resources__ =
 {
@@ -71,21 +69,20 @@ foreach(rsc_path ${ARG_RESOURCES})
     file(RELATIVE_PATH rel_rsc_path ${ARG_BASE_DIR} ${rsc_path})
     set(rel_rsc_path "${ARG_VIRTUAL_ROOT}${rel_rsc_path}")
     file(APPEND ${rsc_lib_hpp_path} "constexpr std::string_view ${rsc_stem}_path = \"${rel_rsc_path}\";
-extern const std::array<uint8_t, ${rsc_file_size}> ${rsc_stem};\n
+extern const std::span<const std::byte, ${rsc_file_size}> ${rsc_stem};\n
 ")
     file(APPEND ${rsc_lib_cpp_path} "        { ${rsc_stem}_path, ${rsc_stem} },\n")
 endforeach()
 
 # End resource lib h/cpp files.
 file(APPEND ${rsc_lib_cpp_path} "};
-}
 
 const resource_map_t& resource_map()
 {
     return resources__;
 }
 
-std::optional<std::span<const uint8_t, std::dynamic_extent>> get_resource_bytes(const std::string_view& rsc_path)
+std::optional<std::span<const std::byte>> get_resource_bytes(const std::string_view& rsc_path)
 {
     if (auto iter = resources__.find(rsc_path); iter != resources__.end()) [[likely]]
         return iter->second;
