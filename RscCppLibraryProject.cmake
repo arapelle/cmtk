@@ -15,9 +15,12 @@ endfunction()
 function(add_rsc_cpp_library rsc_lib_name)
     include(GNUInstallDirs)
     # Args:
-    set(options "STATIC;SHARED")
-    set(params "NAME;VIRTUAL_ROOT;RESOURCES_BASE_DIR;BUILD_HEADERS_BASE_DIR;PARENT_NAMESPACE;INLINE_PARENT_NAMESPACE")
-    set(lists "RESOURCES")
+    set(options "")
+    set(params "PARENT_NAMESPACE;INLINE_PARENT_NAMESPACE;NAME;VIRTUAL_ROOT;RESOURCES_BASE_DIR;BUILD_RSC_HEADERS_BASE_DIR"
+                     "SHARED;STATIC;OBJECT;BUILD_SHARED;BUILD_STATIC;"
+                     "CXX_STANDARD;HEADERS_BASE_DIRS;BUILD_HEADERS_BASE_DIRS;"
+                     "LIBRARY_OUTPUT_DIRECTORY;ARCHIVE_OUTPUT_DIRECTORY")
+    set(lists "RESOURCES;HEADERS;SOURCES")
     # Parse args:
     cmake_parse_arguments(PARSE_ARGV 0 "ARG" "${options}" "${params}" "${lists}")
     # Check args:
@@ -26,7 +29,7 @@ function(add_rsc_cpp_library rsc_lib_name)
     fatal_ifndef("No resource file provided!" ARG_RESOURCES)
     set_iftest(library_type IF ARG_SHARED THEN SHARED ELSE STATIC)
     set_ifndef(ARG_RESOURCES_BASE_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
-    set_ifndef(ARG_BUILD_HEADERS_BASE_DIR ${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_INSTALL_INCLUDEDIR})
+    set_ifndef(ARG_BUILD_RSC_HEADERS_BASE_DIR ${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_INSTALL_INCLUDEDIR})
     if(ARG_INLINE_PARENT_NAMESPACE)
         fatal_ifdef("INLINE_PARENT_NAMESPACE should not be provided if PARENT_NAMESPACE is given." ARG_PARENT_NAMESPACE)
         set(inline_parent_ns TRUE)
@@ -37,7 +40,7 @@ function(add_rsc_cpp_library rsc_lib_name)
         _add_ftoba_executable()
     endif()
     # Resource h/cpp
-    set(rsc_lib_path "${ARG_BUILD_HEADERS_BASE_DIR}/${ARG_PARENT_NAMESPACE}/${ARG_NAME}")
+    set(rsc_lib_path "${ARG_BUILD_RSC_HEADERS_BASE_DIR}/${ARG_PARENT_NAMESPACE}/${ARG_NAME}")
     set(rsc_lib_hpp_path "${rsc_lib_path}/${ARG_NAME}.hpp")
     set(rsc_lib_cpp_path "${rsc_lib_path}/${ARG_NAME}.cpp")
     set(rsc_hpp_paths)
@@ -74,12 +77,22 @@ function(add_rsc_cpp_library rsc_lib_name)
     add_custom_target(${ARG_NAME}_rsc_lib_hcpp ALL DEPENDS ${rsc_lib_hpp_path} ${rsc_lib_cpp_path})
     list(APPEND rsc_targets ${ARG_NAME}_rsc_lib_hcpp)
     # Add library.
-    add_library(${ARG_NAME} ${library_type} ${rsc_cpp_paths} ${rsc_lib_cpp_path})
-    add_dependencies(${ARG_NAME} ${rsc_targets})
-    target_compile_features(${ARG_NAME} PUBLIC cxx_std_20)
-    target_sources(${ARG_NAME} PUBLIC
-        FILE_SET HEADERS
-        BASE_DIRS ${ARG_BUILD_HEADERS_BASE_DIR}
-        FILES ${rsc_lib_hpp_path} ${rsc_hpp_paths}
+    if(NOT ARG_OBJECT)
+        _object_name_from_shared_static(ARG_OBJECT ARG_SHARED ARG_STATIC)
+    endif()
+    _add_classic_cpp_library(
+        SHARED ${ARG_SHARED}
+        STATIC ${ARG_STATIC}
+        OBJECT ${ARG_OBJECT}
+        BUILD_SHARED ${ARG_BUILD_SHARED}
+        BUILD_STATIC ${ARG_BUILD_STATIC}
+        HEADERS ${rsc_lib_hpp_path} ${rsc_hpp_paths} ${ARG_HEADERS}
+        SOURCES ${rsc_lib_cpp_path} ${rsc_cpp_paths} ${ARG_SOURCES}
+        CXX_STANDARD ${ARG_CXX_STANDARD}
+        HEADERS_BASE_DIRS ${ARG_HEADERS_BASE_DIRS}
+        BUILD_HEADERS_BASE_DIRS ${ARG_BUILD_HEADERS_BASE_DIRS} ${ARG_BUILD_RSC_HEADERS_BASE_DIR}
+        LIBRARY_OUTPUT_DIRECTORY ${ARG_LIBRARY_OUTPUT_DIRECTORY}
+        ARCHIVE_OUTPUT_DIRECTORY ${ARG_ARCHIVE_OUTPUT_DIRECTORY}
     )
+    add_dependencies(${ARG_OBJECT} ${rsc_targets})
 endfunction()
