@@ -20,12 +20,21 @@ endfunction()
 
 get_script_args(args)
 set(options "")
-set(params "LIB_NAME;LIB_PATH;NAMESPACE;BASE_DIR;VIRTUAL_ROOT")
+set(params "LIB_NAME;LIB_PATH;NAMESPACE;BASE_DIR;VIRTUAL_ROOT;PARENT_NAMESPACE;INLINE")
 set(lists "RESOURCES")
 cmake_parse_arguments(ARG "${options}" "${params}" "${lists}" ${args})
 
 set(rsc_lib_hpp_path "${ARG_LIB_PATH}/${ARG_LIB_NAME}.hpp")
 set(rsc_lib_cpp_path "${ARG_LIB_PATH}/${ARG_LIB_NAME}.cpp")
+
+# Determine parent namespace:
+if(ARG_PARENT_NAMESPACE)
+    if(ARG_INLINE)
+        set(inline_decl "inline ")
+    endif()
+    set(parent_namespace_begin "${inline_decl}namespace ${ARG_PARENT_NAMESPACE} \n{")
+    set(parent_namespace_end "}\n")
+endif()
 
 # Write resource lib hpp file.
 file(WRITE ${rsc_lib_hpp_path} "// ${rsc_lib_hpp_path}\n
@@ -38,6 +47,7 @@ file(WRITE ${rsc_lib_hpp_path} "// ${rsc_lib_hpp_path}\n
 #include <optional>
 #include <cstdint>
 
+${parent_namespace_begin}
 namespace ${ARG_NAMESPACE}
 {
 std::optional<std::span<const std::byte>> find_serialized_resource(const std::string_view& rsc_path);
@@ -55,6 +65,7 @@ foreach(rsc_path ${ARG_RESOURCES})
     file(APPEND ${rsc_lib_cpp_path} "#include \"${rel_rsc_path}\"\n")
 endforeach()
 file(APPEND ${rsc_lib_cpp_path} "
+${parent_namespace_begin}
 namespace ${ARG_NAMESPACE}
 {
 using resource_map_t = std::unordered_map<std::string_view, std::span<const std::byte>>;
@@ -108,6 +119,8 @@ std::optional<std::span<const std::byte>> find_serialized_resource(const std::st
     return std::nullopt;
 }
 }
+${parent_namespace_end}
 ")
 file(APPEND ${rsc_lib_hpp_path} "}
+${parent_namespace_end}
 ")

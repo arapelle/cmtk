@@ -14,7 +14,7 @@ endfunction()
 
 get_script_args(args)
 set(options "")
-set(params "CMTK_FTOBA;LIB_PATH;NAMESPACE;RSC_RELATIVE_DIR;RESOURCE")
+set(params "CMTK_FTOBA;LIB_PATH;NAMESPACE;RSC_RELATIVE_DIR;RESOURCE;PARENT_NAMESPACE;INLINE")
 set(lists "")
 cmake_parse_arguments(ARG "${options}" "${params}" "${lists}" ${args})
 
@@ -27,6 +27,15 @@ string(MAKE_C_IDENTIFIER ${rsc_stem} rsc_stem)
 
 # Get resource file size
 file(SIZE ${ARG_RESOURCE} rsc_file_size)
+
+# Determine parent namespace:
+if(ARG_PARENT_NAMESPACE)
+    if(ARG_INLINE)
+        set(inline_decl "inline")
+    endif()
+    set(parent_namespace_begin "${inline_decl} namespace ${ARG_PARENT_NAMESPACE} \n{")
+    set(parent_namespace_end "}\n")
+endif()
 
 # Determine sub-namespace:
 if(NOT "${ARG_RSC_RELATIVE_DIR}" STREQUAL "")
@@ -44,6 +53,7 @@ file(WRITE ${rsc_cpp_path} "// ${rsc_cpp_path}
 #include <array>
 #include <cstdint>
 
+${parent_namespace_begin}
 namespace ${ARG_NAMESPACE}
 {
 ${sub_namespace_begin}
@@ -60,6 +70,7 @@ file(APPEND ${rsc_cpp_path} "
 std::span<const std::byte, ${rsc_file_size}> ${rsc_stem}() { return std::as_bytes(std::span( ${rsc_stem}__() )); }
 ${sub_namespace_end}
 }
+${parent_namespace_end}
 ")
 
 # Write resource hpp file.
@@ -68,10 +79,12 @@ file(WRITE ${rsc_hpp_path} "#pragma once
 
 #include <span>
 
+${parent_namespace_begin}
 namespace ${ARG_NAMESPACE}
 {
 ${sub_namespace_begin}
 std::span<const std::byte, ${rsc_file_size}> ${rsc_stem}();
 ${sub_namespace_end}
 }
+${parent_namespace_end}
 ")
