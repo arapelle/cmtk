@@ -14,11 +14,12 @@ endfunction()
 
 get_script_args(args)
 set(options "")
-set(params "CMTK_FTOBA;LIB_PATH;NAMESPACE;RSC_RELATIVE_DIR;RESOURCE;PARENT_NAMESPACE;INLINE")
+set(params "CMTK_FTOBA;HEADER_LIB_PATH;SOURCE_LIB_PATH;NAMESPACE;RSC_RELATIVE_DIR;RESOURCE;PARENT_NAMESPACE;INLINE")
 set(lists "")
 cmake_parse_arguments(ARG "${options}" "${params}" "${lists}" ${args})
 
-file(TO_CMAKE_PATH "${ARG_LIB_PATH}" ARG_LIB_PATH)
+file(TO_CMAKE_PATH "${ARG_HEADER_LIB_PATH}" ARG_HEADER_LIB_PATH)
+file(TO_CMAKE_PATH "${ARG_SOURCE_LIB_PATH}" ARG_SOURCE_LIB_PATH)
 file(TO_CMAKE_PATH "${ARG_RSC_RELATIVE_DIR}" ARG_RSC_RELATIVE_DIR)
 
 # Get resource file stem as c_identifier
@@ -35,6 +36,7 @@ if(ARG_PARENT_NAMESPACE)
     endif()
     set(parent_namespace_begin "${inline_decl} namespace ${ARG_PARENT_NAMESPACE} \n{")
     set(parent_namespace_end "}\n")
+    set(parent_include_dir "${ARG_PARENT_NAMESPACE}/")
 endif()
 
 # Determine sub-namespace:
@@ -45,11 +47,11 @@ if(NOT "${ARG_RSC_RELATIVE_DIR}" STREQUAL "")
 endif()
 
 # Write resource cpp file.
-set(rsc_cpp_path "${ARG_LIB_PATH}/${ARG_RSC_RELATIVE_DIR}/${rsc_stem}.cpp")
+set(rsc_cpp_path "${ARG_SOURCE_LIB_PATH}/${ARG_RSC_RELATIVE_DIR}/${rsc_stem}.cpp")
 file(WRITE ${rsc_cpp_path} "// ${rsc_cpp_path}
 // resource ${ARG_RESOURCE}
 
-#include \"${rsc_stem}.hpp\"
+#include <${parent_include_dir}${ARG_NAMESPACE}/${ARG_RSC_RELATIVE_DIR}/${rsc_stem}.hpp>
 #include <array>
 #include <cstdint>
 
@@ -74,7 +76,7 @@ ${parent_namespace_end}
 ")
 
 # Write resource hpp file.
-set(rsc_hpp_path "${ARG_LIB_PATH}/${ARG_RSC_RELATIVE_DIR}/${rsc_stem}.hpp")
+set(rsc_hpp_path "${ARG_HEADER_LIB_PATH}/${ARG_RSC_RELATIVE_DIR}/${rsc_stem}.hpp")
 file(WRITE ${rsc_hpp_path} "#pragma once
 
 #include <span>

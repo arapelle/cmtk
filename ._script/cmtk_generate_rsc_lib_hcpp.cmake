@@ -20,12 +20,12 @@ endfunction()
 
 get_script_args(args)
 set(options "")
-set(params "LIB_NAME;LIB_PATH;NAMESPACE;BASE_DIR;VIRTUAL_ROOT;PARENT_NAMESPACE;INLINE")
+set(params "LIB_NAME;HEADER_LIB_PATH;SOURCE_LIB_PATH;NAMESPACE;BASE_DIR;VIRTUAL_ROOT;PARENT_NAMESPACE;INLINE")
 set(lists "RESOURCES")
 cmake_parse_arguments(ARG "${options}" "${params}" "${lists}" ${args})
 
-set(rsc_lib_hpp_path "${ARG_LIB_PATH}/${ARG_LIB_NAME}.hpp")
-set(rsc_lib_cpp_path "${ARG_LIB_PATH}/${ARG_LIB_NAME}.cpp")
+set(rsc_lib_hpp_path "${ARG_HEADER_LIB_PATH}/${ARG_LIB_NAME}.hpp")
+set(rsc_lib_cpp_path "${ARG_SOURCE_LIB_PATH}/${ARG_LIB_NAME}.cpp")
 
 # Determine parent namespace:
 if(ARG_PARENT_NAMESPACE)
@@ -34,6 +34,7 @@ if(ARG_PARENT_NAMESPACE)
     endif()
     set(parent_namespace_begin "${inline_decl}namespace ${ARG_PARENT_NAMESPACE} \n{")
     set(parent_namespace_end "}\n")
+    set(parent_include_dir "${ARG_PARENT_NAMESPACE}/")
 endif()
 
 # Write resource lib hpp file.
@@ -62,7 +63,7 @@ foreach(rsc_path ${ARG_RESOURCES})
     cmake_path(GET rel_rsc_path STEM rsc_stem)
     string(MAKE_C_IDENTIFIER ${rsc_stem} rsc_stem)
     cmake_path(REPLACE_FILENAME rel_rsc_path "${rsc_stem}.hpp")
-    file(APPEND ${rsc_lib_cpp_path} "#include \"${rel_rsc_path}\"\n")
+    file(APPEND ${rsc_lib_cpp_path} "#include <${parent_include_dir}${ARG_LIB_NAME}/${rel_rsc_path}>\n")
 endforeach()
 file(APPEND ${rsc_lib_cpp_path} "
 ${parent_namespace_begin}
