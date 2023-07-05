@@ -15,7 +15,7 @@ endfunction()
 function(add_rsc_cpp_library rsc_lib_name)
     include(GNUInstallDirs)
     # Args:
-    set(options "PRIVATE_RSC_HEADERS")
+    set(options "PRIVATE_RSC_HEADERS;PRIVATE_RSC_PATHS_HEADER")
     set(params "PARENT_NAMESPACE;INLINE_PARENT_NAMESPACE;NAME;VIRTUAL_ROOT;RESOURCES_BASE_DIR;"
                 "BUILD_RSC_HEADERS_BASE_DIR;PRIVATE_BUILD_RSC_HEADERS_BASE_DIR;BUILD_RSC_SOURCES_BASE_DIR;"
                      "SHARED;STATIC;OBJECT;BUILD_SHARED;BUILD_STATIC;"
@@ -72,11 +72,13 @@ function(add_rsc_cpp_library rsc_lib_name)
         list(APPEND rsc_targets ${rsc_stem}_rsc_hcpp)
     endforeach()
     set(rsc_lib_hpp_path "${rsc_lib_path}/${ARG_NAME}.hpp")
-    set(rsc_paths_hpp_path "${rsc_lib_path}/paths.hpp")
+    set_iftest(rsc_paths_hpp_dir IF ARG_PRIVATE_RSC_PATHS_HEADER THEN "${private_rsc_lib_path}" ELSE "${rsc_lib_path}")
+    set(rsc_paths_hpp_path "${rsc_paths_hpp_dir}/paths.hpp")
     set(rsc_lib_cpp_path "${src_rsc_lib_path}/${ARG_NAME}.cpp")
     add_custom_command(OUTPUT ${rsc_lib_hpp_path} ${rsc_paths_hpp_path} ${rsc_lib_cpp_path}
         COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/._script/cmtk_generate_rsc_lib_hcpp.cmake 
-            -- LIB_NAME ${ARG_NAME} HEADER_LIB_PATH ${rsc_lib_path} SOURCE_LIB_PATH ${src_rsc_lib_path} RESOURCES ${ARG_RESOURCES} NAMESPACE ${ARG_NAME}
+            -- LIB_NAME ${ARG_NAME} HEADER_LIB_PATH ${rsc_lib_path} SOURCE_LIB_PATH ${src_rsc_lib_path} PATHS_HEADER_PATH ${rsc_paths_hpp_dir} 
+               RESOURCES ${ARG_RESOURCES} NAMESPACE ${ARG_NAME}
                VIRTUAL_ROOT ${ARG_VIRTUAL_ROOT} BASE_DIR ${ARG_RESOURCES_BASE_DIR} PARENT_NAMESPACE ${ARG_PARENT_NAMESPACE}
                INLINE ${inline_parent_ns}
         DEPENDS ${rsc_hpp_paths} ${rsc_cpp_paths}
@@ -90,13 +92,16 @@ function(add_rsc_cpp_library rsc_lib_name)
     if(NOT ARG_PRIVATE_RSC_HEADERS)
         list(APPEND ARG_HEADERS ${rsc_hpp_paths})
     endif()
+    if(NOT ARG_PRIVATE_RSC_PATHS_HEADER)
+        list(APPEND ARG_HEADERS ${rsc_paths_hpp_path})
+    endif()
     _add_classic_cpp_library(
         SHARED ${ARG_SHARED}
         STATIC ${ARG_STATIC}
         OBJECT ${ARG_OBJECT}
         BUILD_SHARED ${ARG_BUILD_SHARED}
         BUILD_STATIC ${ARG_BUILD_STATIC}
-        HEADERS ${rsc_lib_hpp_path} ${ARG_HEADERS}                        ${rsc_paths_hpp_path} 
+        HEADERS ${rsc_lib_hpp_path} ${ARG_HEADERS} 
         SOURCES ${rsc_lib_cpp_path} ${rsc_cpp_paths} ${ARG_SOURCES}
         CXX_STANDARD ${ARG_CXX_STANDARD}
         HEADERS_BASE_DIRS ${ARG_HEADERS_BASE_DIRS}

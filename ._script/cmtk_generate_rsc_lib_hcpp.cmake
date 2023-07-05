@@ -20,13 +20,13 @@ endfunction()
 
 get_script_args(args)
 set(options "")
-set(params "LIB_NAME;HEADER_LIB_PATH;SOURCE_LIB_PATH;NAMESPACE;BASE_DIR;VIRTUAL_ROOT;PARENT_NAMESPACE;INLINE")
+set(params "LIB_NAME;HEADER_LIB_PATH;SOURCE_LIB_PATH;PATHS_HEADER_PATH;NAMESPACE;BASE_DIR;VIRTUAL_ROOT;PARENT_NAMESPACE;INLINE")
 set(lists "RESOURCES")
 cmake_parse_arguments(ARG "${options}" "${params}" "${lists}" ${args})
 
 set(rsc_lib_hpp_path "${ARG_HEADER_LIB_PATH}/${ARG_LIB_NAME}.hpp")
 set(rsc_lib_cpp_path "${ARG_SOURCE_LIB_PATH}/${ARG_LIB_NAME}.cpp")
-set(rsc_paths_hpp_path "${ARG_HEADER_LIB_PATH}/paths.hpp")
+set(rsc_paths_hpp_path "${ARG_PATHS_HEADER_PATH}/paths.hpp")
 
 # Determine parent namespace:
 if(ARG_PARENT_NAMESPACE)
