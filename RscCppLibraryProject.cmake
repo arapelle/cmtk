@@ -16,11 +16,15 @@ function(add_rsc_cpp_library rsc_lib_name)
     include(GNUInstallDirs)
     # Args:
     set(options "PRIVATE_RESOURCE_HEADERS;PRIVATE_RESOURCE_PATHS_HEADER")
-    set(params "PARENT_NAMESPACE;INLINE_PARENT_NAMESPACE;NAME;VIRTUAL_ROOT;RESOURCES_BASE_DIR;"
-                "BUILD_RSC_HEADERS_BASE_DIR;PRIVATE_BUILD_RSC_HEADERS_BASE_DIR;BUILD_RSC_SOURCES_BASE_DIR;"
-                     "SHARED;STATIC;OBJECT;BUILD_SHARED;BUILD_STATIC;"
-                     "CXX_STANDARD;HEADERS_BASE_DIRS;BUILD_HEADERS_BASE_DIRS;"
-                     "LIBRARY_OUTPUT_DIRECTORY;ARCHIVE_OUTPUT_DIRECTORY")
+    set(params "PARENT_NAMESPACE;INLINE_PARENT_NAMESPACE;NAME;VIRTUAL_ROOT;"
+                "RESOURCES_BASE_DIR;
+                 BUILD_RESOURCE_HEADERS_BASE_DIR;
+                 BUILD_RESOURCE_SOURCES_BASE_DIR;
+                 PRIVATE_BUILD_RESOURCE_HEADERS_BASE_DIR;"
+                # classic cpp parameters:
+                "SHARED;STATIC;OBJECT;BUILD_SHARED;BUILD_STATIC;"
+                "CXX_STANDARD;HEADERS_BASE_DIRS;BUILD_HEADERS_BASE_DIRS;"
+                "LIBRARY_OUTPUT_DIRECTORY;ARCHIVE_OUTPUT_DIRECTORY")
     set(lists "RESOURCES;HEADERS;SOURCES")
     # Parse args:
     cmake_parse_arguments(PARSE_ARGV 0 "ARG" "${options}" "${params}" "${lists}")
@@ -30,9 +34,9 @@ function(add_rsc_cpp_library rsc_lib_name)
     fatal_ifndef("No resource file provided!" ARG_RESOURCES)
     set_iftest(library_type IF ARG_SHARED THEN SHARED ELSE STATIC)
     set_ifndef(ARG_RESOURCES_BASE_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
-    set_ifndef(ARG_BUILD_RSC_HEADERS_BASE_DIR ${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_INSTALL_INCLUDEDIR})
-    set_ifndef(ARG_PRIVATE_BUILD_RSC_HEADERS_BASE_DIR ${CMAKE_CURRENT_BINARY_DIR}/private_${CMAKE_INSTALL_INCLUDEDIR})
-    set_ifndef(ARG_BUILD_RSC_SOURCES_BASE_DIR ${CMAKE_CURRENT_BINARY_DIR}/src)
+    set_ifndef(ARG_BUILD_RESOURCE_HEADERS_BASE_DIR ${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_INSTALL_INCLUDEDIR})
+    set_ifndef(ARG_PRIVATE_BUILD_RESOURCE_HEADERS_BASE_DIR ${CMAKE_CURRENT_BINARY_DIR}/private_${CMAKE_INSTALL_INCLUDEDIR})
+    set_ifndef(ARG_BUILD_RESOURCE_SOURCES_BASE_DIR ${CMAKE_CURRENT_BINARY_DIR}/src)
     if(ARG_INLINE_PARENT_NAMESPACE)
         fatal_ifdef("INLINE_PARENT_NAMESPACE should not be provided if PARENT_NAMESPACE is given." ARG_PARENT_NAMESPACE)
         set(inline_parent_ns TRUE)
@@ -43,10 +47,10 @@ function(add_rsc_cpp_library rsc_lib_name)
         _add_ftoba_executable()
     endif()
     # Resource h/cpp
-    set(rsc_lib_path "${ARG_BUILD_RSC_HEADERS_BASE_DIR}/${ARG_PARENT_NAMESPACE}/${ARG_NAME}")
-    set(private_rsc_lib_path "${ARG_PRIVATE_BUILD_RSC_HEADERS_BASE_DIR}/${ARG_PARENT_NAMESPACE}/${ARG_NAME}")
+    set(rsc_lib_path "${ARG_BUILD_RESOURCE_HEADERS_BASE_DIR}/${ARG_PARENT_NAMESPACE}/${ARG_NAME}")
+    set(private_rsc_lib_path "${ARG_PRIVATE_BUILD_RESOURCE_HEADERS_BASE_DIR}/${ARG_PARENT_NAMESPACE}/${ARG_NAME}")
     set_iftest(hdr_rsc_lib_path IF ARG_PRIVATE_RESOURCE_HEADERS THEN ${private_rsc_lib_path} ELSE ${rsc_lib_path})
-    set(src_rsc_lib_path "${ARG_BUILD_RSC_SOURCES_BASE_DIR}/${ARG_PARENT_NAMESPACE}/${ARG_NAME}")
+    set(src_rsc_lib_path "${ARG_BUILD_RESOURCE_SOURCES_BASE_DIR}/${ARG_PARENT_NAMESPACE}/${ARG_NAME}")
     set(rsc_hpp_paths)
     set(rsc_cpp_paths)
     set(rsc_targets)
@@ -105,12 +109,12 @@ function(add_rsc_cpp_library rsc_lib_name)
         SOURCES ${rsc_lib_cpp_path} ${rsc_cpp_paths} ${ARG_SOURCES}
         CXX_STANDARD ${ARG_CXX_STANDARD}
         HEADERS_BASE_DIRS ${ARG_HEADERS_BASE_DIRS}
-        BUILD_HEADERS_BASE_DIRS ${ARG_BUILD_HEADERS_BASE_DIRS} ${ARG_BUILD_RSC_HEADERS_BASE_DIR}
+        BUILD_HEADERS_BASE_DIRS ${ARG_BUILD_HEADERS_BASE_DIRS} ${ARG_BUILD_RESOURCE_HEADERS_BASE_DIR}
         LIBRARY_OUTPUT_DIRECTORY ${ARG_LIBRARY_OUTPUT_DIRECTORY}
         ARCHIVE_OUTPUT_DIRECTORY ${ARG_ARCHIVE_OUTPUT_DIRECTORY}
     )
     add_dependencies(${ARG_OBJECT} ${rsc_targets})
     if(ARG_PRIVATE_RESOURCE_HEADERS)
-        target_include_directories(${ARG_OBJECT} PRIVATE ${ARG_PRIVATE_BUILD_RSC_HEADERS_BASE_DIR})
+        target_include_directories(${ARG_OBJECT} PRIVATE ${ARG_PRIVATE_BUILD_RESOURCE_HEADERS_BASE_DIR})
     endif()
 endfunction()
