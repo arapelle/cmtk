@@ -72,8 +72,9 @@ function(add_rsc_cpp_library rsc_lib_name)
         list(APPEND rsc_targets ${rsc_stem}_rsc_hcpp)
     endforeach()
     set(rsc_lib_hpp_path "${rsc_lib_path}/${ARG_NAME}.hpp")
+    set(rsc_paths_hpp_path "${rsc_lib_path}/paths.hpp")
     set(rsc_lib_cpp_path "${src_rsc_lib_path}/${ARG_NAME}.cpp")
-    add_custom_command(OUTPUT ${rsc_lib_hpp_path} ${rsc_lib_cpp_path}
+    add_custom_command(OUTPUT ${rsc_lib_hpp_path} ${rsc_paths_hpp_path} ${rsc_lib_cpp_path}
         COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/._script/cmtk_generate_rsc_lib_hcpp.cmake 
             -- LIB_NAME ${ARG_NAME} HEADER_LIB_PATH ${rsc_lib_path} SOURCE_LIB_PATH ${src_rsc_lib_path} RESOURCES ${ARG_RESOURCES} NAMESPACE ${ARG_NAME}
                VIRTUAL_ROOT ${ARG_VIRTUAL_ROOT} BASE_DIR ${ARG_RESOURCES_BASE_DIR} PARENT_NAMESPACE ${ARG_PARENT_NAMESPACE}
@@ -95,7 +96,7 @@ function(add_rsc_cpp_library rsc_lib_name)
         OBJECT ${ARG_OBJECT}
         BUILD_SHARED ${ARG_BUILD_SHARED}
         BUILD_STATIC ${ARG_BUILD_STATIC}
-        HEADERS ${rsc_lib_hpp_path} ${ARG_HEADERS}
+        HEADERS ${rsc_lib_hpp_path} ${ARG_HEADERS}                        ${rsc_paths_hpp_path} 
         SOURCES ${rsc_lib_cpp_path} ${rsc_cpp_paths} ${ARG_SOURCES}
         CXX_STANDARD ${ARG_CXX_STANDARD}
         HEADERS_BASE_DIRS ${ARG_HEADERS_BASE_DIRS}

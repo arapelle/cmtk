@@ -26,6 +26,7 @@ cmake_parse_arguments(ARG "${options}" "${params}" "${lists}" ${args})
 
 set(rsc_lib_hpp_path "${ARG_HEADER_LIB_PATH}/${ARG_LIB_NAME}.hpp")
 set(rsc_lib_cpp_path "${ARG_SOURCE_LIB_PATH}/${ARG_LIB_NAME}.cpp")
+set(rsc_paths_hpp_path "${ARG_HEADER_LIB_PATH}/paths.hpp")
 
 # Determine parent namespace:
 if(ARG_PARENT_NAMESPACE)
@@ -37,16 +38,22 @@ if(ARG_PARENT_NAMESPACE)
     set(parent_include_dir "${ARG_PARENT_NAMESPACE}/")
 endif()
 
-# Write resource lib hpp file.
-file(WRITE ${rsc_lib_hpp_path} "// ${rsc_lib_hpp_path}\n
-#pragma once
+# Write resource paths hpp file.
+file(WRITE ${rsc_paths_hpp_path} "#pragma once
 
 #include <string_view>
+
+${parent_namespace_begin}
+namespace ${ARG_NAMESPACE}
+{
+")
+
+# Write resource lib hpp file.
+file(WRITE ${rsc_lib_hpp_path} "#pragma once
+
 #include <span>
-#include <unordered_map>
-#include <array>
 #include <optional>
-#include <cstdint>
+#include <string_view>
 
 ${parent_namespace_begin}
 namespace ${ARG_NAMESPACE}
@@ -56,6 +63,7 @@ std::optional<std::span<const std::byte>> find_serialized_resource(const std::st
 ")
 # Write resource lib cpp file.
 file(WRITE ${rsc_lib_cpp_path} "#include <${parent_include_dir}${ARG_LIB_NAME}/${ARG_LIB_NAME}.hpp>
+#include <${parent_include_dir}${ARG_LIB_NAME}/paths.hpp>
 #include <unordered_map>
 ")
 foreach(rsc_path ${ARG_RESOURCES})
@@ -101,7 +109,7 @@ foreach(rsc_path ${ARG_RESOURCES})
     endif()
     # Write resource var declaration.
     #  in hpp
-    file(APPEND ${rsc_lib_hpp_path} "${sub_namespace_begin}constexpr std::string_view ${rsc_stem}_path = \"${rel_rsc_vpath}\";${sub_namespace_end}
+    file(APPEND ${rsc_paths_hpp_path} "${sub_namespace_begin}constexpr std::string_view ${rsc_stem}_path = \"${rel_rsc_vpath}\";${sub_namespace_end}
 ")
     #  in cpp
     file(APPEND ${rsc_lib_cpp_path} "        { ${sub_namespace_path}${rsc_stem}_path, ${sub_namespace_path}${rsc_stem}() },\n")
@@ -123,5 +131,8 @@ std::optional<std::span<const std::byte>> find_serialized_resource(const std::st
 ${parent_namespace_end}
 ")
 file(APPEND ${rsc_lib_hpp_path} "}
+${parent_namespace_end}
+")
+file(APPEND ${rsc_paths_hpp_path} "}
 ${parent_namespace_end}
 ")
