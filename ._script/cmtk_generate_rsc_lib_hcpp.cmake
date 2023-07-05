@@ -55,7 +55,7 @@ std::optional<std::span<const std::byte>> find_serialized_resource(const std::st
 
 ")
 # Write resource lib cpp file.
-file(WRITE ${rsc_lib_cpp_path} "#include \"${ARG_LIB_NAME}.hpp\"
+file(WRITE ${rsc_lib_cpp_path} "#include <${parent_include_dir}${ARG_LIB_NAME}/${ARG_LIB_NAME}.hpp>
 #include <unordered_map>
 ")
 foreach(rsc_path ${ARG_RESOURCES})
