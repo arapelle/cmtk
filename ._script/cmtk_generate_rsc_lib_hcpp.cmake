@@ -24,8 +24,8 @@ set(params "LIB_NAME;HEADER_LIB_PATH;SOURCE_LIB_PATH;PATHS_HEADER_PATH;NAMESPACE
 set(lists "RESOURCES")
 cmake_parse_arguments(ARG "${options}" "${params}" "${lists}" ${args})
 
-set(rsc_lib_hpp_path "${ARG_HEADER_LIB_PATH}/${ARG_LIB_NAME}.hpp")
-set(rsc_lib_cpp_path "${ARG_SOURCE_LIB_PATH}/${ARG_LIB_NAME}.cpp")
+set(rsc_lib_hpp_path "${ARG_HEADER_LIB_PATH}/find_serialized_resource.hpp")
+set(rsc_lib_cpp_path "${ARG_SOURCE_LIB_PATH}/find_serialized_resource.cpp")
 set(rsc_paths_hpp_path "${ARG_PATHS_HEADER_PATH}/paths.hpp")
 
 # Determine parent namespace:
@@ -62,7 +62,7 @@ std::optional<std::span<const std::byte>> find_serialized_resource(const std::st
 
 ")
 # Write resource lib cpp file.
-file(WRITE ${rsc_lib_cpp_path} "#include <${parent_include_dir}${ARG_LIB_NAME}/${ARG_LIB_NAME}.hpp>
+file(WRITE ${rsc_lib_cpp_path} "#include <${parent_include_dir}${ARG_LIB_NAME}/find_serialized_resource.hpp>
 #include <${parent_include_dir}${ARG_LIB_NAME}/paths.hpp>
 #include <unordered_map>
 ")

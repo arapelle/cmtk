@@ -75,10 +75,10 @@ function(add_rsc_cpp_library rsc_lib_name)
         list(APPEND rsc_cpp_paths ${rsc_cpp_path})
         list(APPEND rsc_targets ${rsc_stem}_rsc_hcpp)
     endforeach()
-    set(rsc_lib_hpp_path "${rsc_lib_path}/${ARG_NAME}.hpp")
+    set(rsc_lib_hpp_path "${rsc_lib_path}/find_serialized_resource.hpp")
     set_iftest(rsc_paths_hpp_dir IF ARG_PRIVATE_RESOURCE_PATHS_HEADER THEN "${private_rsc_lib_path}" ELSE "${rsc_lib_path}")
     set(rsc_paths_hpp_path "${rsc_paths_hpp_dir}/paths.hpp")
-    set(rsc_lib_cpp_path "${src_rsc_lib_path}/${ARG_NAME}.cpp")
+    set(rsc_lib_cpp_path "${src_rsc_lib_path}/find_serialized_resource.cpp")
     add_custom_command(OUTPUT ${rsc_lib_hpp_path} ${rsc_paths_hpp_path} ${rsc_lib_cpp_path}
         COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/._script/cmtk_generate_rsc_lib_hcpp.cmake 
             -- LIB_NAME ${ARG_NAME} HEADER_LIB_PATH ${rsc_lib_path} SOURCE_LIB_PATH ${src_rsc_lib_path} PATHS_HEADER_PATH ${rsc_paths_hpp_dir} 
