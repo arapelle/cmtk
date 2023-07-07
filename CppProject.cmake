@@ -1,13 +1,14 @@
 
 include(${CMAKE_CURRENT_LIST_DIR}/Project.cmake)
 
-function(generate_version_macro_header set_var macro_prefix output_file)
+function(generate_version_macro_header return_var macro_prefix header_path)
   include(GNUInstallDirs)
-  set(output_dir "${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_INSTALL_INCLUDEDIR}")
-  file(MAKE_DIRECTORY "${output_dir}")
-  set(${set_var} "${output_dir}/${output_file}" PARENT_SCOPE)
-  to_upper_var_name(${macro_prefix} macro_prefix)
-  file(GENERATE OUTPUT "${output_dir}/${output_file}"
+  cmake_parse_arguments(PARSE_ARGV 1 "ARG" "" "BINARY_BASE_DIR" "")
+  set_ifndef(ARG_BINARY_BASE_DIR "${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_INSTALL_INCLUDEDIR}")
+  file(MAKE_DIRECTORY "${ARG_BINARY_BASE_DIR}")
+  set(${return_var} "${ARG_BINARY_BASE_DIR}/${header_path}" PARENT_SCOPE)
+  make_upper_c_identifier(${macro_prefix} macro_prefix)
+  file(GENERATE OUTPUT "${ARG_BINARY_BASE_DIR}/${header_path}"
       CONTENT
        "#pragma once
 
@@ -18,57 +19,12 @@ function(generate_version_macro_header set_var macro_prefix output_file)
 ")
 endfunction()
 
-function(generate_default_version_header name output_header)
-  #----------------------------------------#
-  # Declare args
-  set(options "")
-  set(params "OUTPUT_BINARY_DIR")
-  set(lists "")
-  # Parse args
-  cmake_parse_arguments(PARSE_ARGV 0 "ARG" "${options}" "${params}" "${lists}")
-  # Check/Set args:
-  if(NOT ARG_OUTPUT_BINARY_DIR)
-    set(ARG_OUTPUT_BINARY_DIR "${CMAKE_CURRENT_BINARY_DIR}/include/")
-  endif()
-  #----------------------------------------#
-    to_upper_var_name(${name} upper_name)
-    file(MAKE_DIRECTORY "${ARG_OUTPUT_BINARY_DIR}")
-    file(GENERATE OUTPUT "${ARG_OUTPUT_BINARY_DIR}/${output_header}"
-        CONTENT
-         "#pragma once
-
-#define ${upper_name}_VERSION_MAJOR ${PROJECT_VERSION_MAJOR}
-#define ${upper_name}_VERSION_MINOR ${PROJECT_VERSION_MINOR}
-#define ${upper_name}_VERSION_PATCH ${PROJECT_VERSION_PATCH}
-#define ${upper_name}_VERSION \"${PROJECT_VERSION}\"
-")
-endfunction()
-
-function(configure_version_header input_header output_header)
-    #----------------------------------------#
-    # Declare args
-    set(options "")
-    set(params "OUTPUT_BINARY_DIR")
-    set(lists "")
-    # Parse args
-    cmake_parse_arguments(PARSE_ARGV 0 "ARG" "${options}" "${params}" "${lists}")
-    # Check/Set args:
-    if(NOT ARG_OUTPUT_BINARY_DIR)
-      set(ARG_OUTPUT_BINARY_DIR "${CMAKE_CURRENT_BINARY_DIR}/include/")
-    endif()
-    #----------------------------------------#
-    if(EXISTS ${input_header} AND NOT IS_DIRECTORY ${input_header})
-        configure_file(${input_header} "${ARG_OUTPUT_BINARY_DIR}/${output_header}")
-    else()
-        message(FATAL_ERROR "configure_version_header: ${ARG_INPUT_VERSION_HEADER} file does not exist.")
-    endif()
-endfunction()
-
-function(configure_headers set_var)
+function(configure_headers return_var)
   include(GNUInstallDirs)
-  cmake_parse_arguments(PARSE_ARGV 1 "ARG" "" "BASE_DIR" "FILES")
+  cmake_parse_arguments(PARSE_ARGV 1 "ARG" "" "BASE_DIR;BINARY_BASE_DIR" "FILES")
   fatal_ifndef("You must provide files to configure (FILES)." ARG_FILES)
   set_ifndef(ARG_BASE_DIR ${CMAKE_INSTALL_INCLUDEDIR})
+  set_ifndef(ARG_BINARY_BASE_DIR "${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_INSTALL_INCLUDEDIR}")
   file(REAL_PATH ${ARG_BASE_DIR} ARG_BASE_DIR)
   foreach(ihfile ${ARG_FILES})
     file(REAL_PATH ${ihfile} ihfile)
@@ -79,21 +35,24 @@ function(configure_headers set_var)
       get_filename_component(orhname ${orhpath} NAME_WLE)
       set(orhpath "${orhdir}/${orhname}")
     endif()
-    set(oahpath "${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_INSTALL_INCLUDEDIR}/${orhpath}")
+    set(oahpath "${ARG_BINARY_BASE_DIR}/${orhpath}")
     configure_file(${ihfile} ${oahpath})
     list(APPEND olist ${oahpath})
   endforeach()
-  set(${set_var} "${olist}" PARENT_SCOPE)
+  set(${return_var} "${olist}" PARENT_SCOPE)
 endfunction()
 
-# set_spdlog_active_level_ifndef()
-function(set_spdlog_active_level_ifndef)
-    if(NOT SPDLOG_ACTIVE_LEVEL)
+# set_SPDLOG_ACTIVE_LEVEL_ifndef()
+function(set_SPDLOG_ACTIVE_LEVEL_ifndef)
+  cmake_parse_arguments(PARSE_ARGV 1 "ARG" "" "" "DEBUG;INFO")
+  set_ifndef(ARG_DEBUG "Debug")
+  set_ifndef(ARG_INFO "Release")
+  if(NOT SPDLOG_ACTIVE_LEVEL)
         set(level "TRACE")
         if(CMAKE_BUILD_TYPE)
-            if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+            if(CMAKE_BUILD_TYPE IN_LIST ARG_DEBUG)
                 set(level "DEBUG")
-            elseif(CMAKE_BUILD_TYPE STREQUAL "Release")
+            elseif(CMAKE_BUILD_TYPE IN_LIST ARG_INFO)
                 set(level "INFO")
             endif()
         endif()

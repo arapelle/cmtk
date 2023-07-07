@@ -11,9 +11,7 @@ function(add_cpp_executable executable_target)
     # Parse args:
     cmake_parse_arguments(PARSE_ARGV 1 "ARG" "${options}" "${params}" "${lists}")
     # Check args:
-    if(NOT ARG_SOURCES)
-        message(FATAL_ERROR "You must provide source files (SOURCES).")
-    endif()
+    fatal_ifndef("You must provide source files (SOURCES)." ARG_SOURCES)
     fatal_ifndef("You must provide a main source file (MAIN)." ARG_MAIN)
     # Build executable:
     if(ARG_OBJECT)

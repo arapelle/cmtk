@@ -29,6 +29,9 @@ endmacro()
 macro(_add_cpp_library_shared)
   add_library(${ARG_SHARED} SHARED $<TARGET_OBJECTS:${ARG_OBJECT}>)
   target_sources(${ARG_SHARED} PUBLIC FILE_SET HEADERS BASE_DIRS ${ARG_HEADERS_BASE_DIRS} ${ARG_BUILD_HEADERS_BASE_DIRS} FILES ${ARG_HEADERS})
+  if(ARG_CXX_STANDARD)
+    target_compile_features(${ARG_SHARED} PUBLIC cxx_std_${ARG_CXX_STANDARD})
+  endif()
   set_target_properties(${ARG_SHARED} PROPERTIES DEBUG_POSTFIX "-d" SOVERSION ${PROJECT_VERSION})
   if(ARG_LIBRARY_OUTPUT_DIRECTORY)
       set_target_properties(${ARG_SHARED} PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${ARG_LIBRARY_OUTPUT_DIRECTORY})
@@ -38,6 +41,9 @@ endmacro()
 macro(_add_cpp_library_static)
   add_library(${ARG_STATIC} STATIC $<TARGET_OBJECTS:${ARG_OBJECT}>)
   target_sources(${ARG_STATIC} PUBLIC FILE_SET HEADERS BASE_DIRS ${ARG_HEADERS_BASE_DIRS} ${ARG_BUILD_HEADERS_BASE_DIRS} FILES ${ARG_HEADERS})
+  if(ARG_CXX_STANDARD)
+    target_compile_features(${ARG_STATIC} PUBLIC cxx_std_${ARG_CXX_STANDARD})
+  endif()
   set_target_properties(${ARG_STATIC} PROPERTIES DEBUG_POSTFIX "-d")
   if(ARG_ARCHIVE_OUTPUT_DIRECTORY)
       set_target_properties(${ARG_STATIC} PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${ARG_ARCHIVE_OUTPUT_DIRECTORY})
@@ -170,7 +176,7 @@ function(install_library_package package_name)
     # Args:
     set(options "")
     set(params "VERSION;VERSION_COMPATIBILITY;INPUT_PACKAGE_CONFIG_FILE")
-    set(lists "UNINSTALL_SCRIPT") # UNINSTALL_SCRIPT [ALL]   
+    set(lists "")
     # Parse args:
     cmake_parse_arguments(PARSE_ARGV 1 "ARG" "${options}" "${params}" "${lists}")
     # Check and set args:
@@ -192,10 +198,6 @@ function(install_library_package package_name)
         ${PROJECT_BINARY_DIR}/${package_name}-config.cmake
         ${PROJECT_BINARY_DIR}/${package_name}-config-version.cmake
         DESTINATION ${relative_install_cmake_package_dir})
-    # Uninstall script
-    if(ARG_UNINSTALL_SCRIPT)
-        install_cmake_uninstall_script("${relative_install_cmake_package_dir}" ${ARG_UNINSTALL_SCRIPT})
-    endif()
 endfunction()
 
 function(cpp_library_link_libraries)
