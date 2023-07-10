@@ -13,8 +13,14 @@
 - [OBJECT *object_target_name*] : Name of the object library target.
 - [SHARED *shared_target_name*] : Name of the shared library target.
 - [STATIC *static_target_name*] : Name of the static library target.
-- [BUILD_SHARED *val*] : Indicate if a SHARED library must be build. (ON, OFF or OPTION (<=> UNDEFINED)). If OPTION, it is determined by cached option value. (cf. PUBLIC)
-- [BUILD_STATIC *val*] : Indicate if a STATIC library must be build. (ON, OFF or OPTION (<=> UNDEFINED)). If OPTION, it is determined by cached option value. (cf. PUBLIC)
+- [BUILD_SHARED *val*] : Indicate if the SHARED library must be built. (ON, OFF or UNDEFINED).
+It is determined by a cache option value, if UNDEFINED is given. (OPTION is an alias of UNDEFINED)
+If a variable name is given, it is determined by the variable value if the variable is DEFINED.
+If it is not DEFINED, it is determined by an option value.
+- [BUILD_STATIC *val*] : Indicate if the STATIC library must be built. (ON, OFF or UNDEFINED).
+It is determined by a cache option value, if UNDEFINED is given. (OPTION is an alias of UNDEFINED)
+If a variable name is given, it is determined by the variable value if the variable is DEFINED.
+If it is not DEFINED, it is determined by an option value.
 
 &ensp;&ensp;&ensp;&ensp;Targets options arguments:
 - [CXX_STANDARD *cxx_std*] : 	C++ version used (..., 11, 14, 17, 20, 23, ...)
