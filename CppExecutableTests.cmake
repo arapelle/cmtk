@@ -15,6 +15,12 @@ function(add_cpp_executable_test test_name gtest_target)
     #
     add_executable(${test_name} ${ARG_SOURCES} ${ARG_HEADERS})
     target_link_libraries(${test_name} PRIVATE ${ARG_OBJECT} ${ARG_DEPENDENCIES} ${gtest_target})
+    if(WIN32)
+        set_target_properties(${test_name} PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/${test_name}")
+        add_custom_command(TARGET ${test_name} POST_BUILD 
+                           COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_RUNTIME_DLLS:${test_name}> $<TARGET_FILE_DIR:${test_name}>
+                           COMMAND_EXPAND_LISTS)
+    endif()
     gtest_discover_tests(${test_name} TEST_PREFIX ${test_prog}::)
 endfunction()
 
@@ -32,6 +38,12 @@ function(add_cpp_executable_basic_tests gtest_target)
         get_filename_component(test_prog ${filename} NAME_WE)
         add_executable(${test_prog} ${filename})
         target_link_libraries(${test_prog} PRIVATE ${ARG_OBJECT} ${ARG_DEPENDENCIES} ${gtest_target})
+        if(WIN32)
+            set_target_properties(${test_prog} PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/${test_prog}")
+            add_custom_command(TARGET ${test_prog} POST_BUILD 
+                               COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_RUNTIME_DLLS:${test_prog}> $<TARGET_FILE_DIR:${test_prog}>
+                               COMMAND_EXPAND_LISTS)
+        endif()
         gtest_discover_tests(${test_prog} TEST_PREFIX ${test_prog}::)
     endforeach()
 endfunction()

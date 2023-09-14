@@ -15,10 +15,6 @@ function(add_cpp_library_test test_name gtest_target)
                          ARG_STATIC ARG_SHARED ARG_HEADER_ONLY)
     if(ARG_SHARED AND TARGET ${ARG_SHARED})
         set(library_name ${ARG_SHARED})
-        if(WIN32 AND NOT TARGET copy_dll_${bdir_hash})
-            add_custom_target(copy_dll_${bdir_hash} ALL
-                ${CMAKE_COMMAND} -E copy_if_different $<TARGET_FILE:${library_name}> ${CMAKE_CURRENT_BINARY_DIR})
-        endif()
     elseif(ARG_STATIC AND TARGET ${ARG_STATIC})
         set(library_name ${ARG_STATIC})
     elseif(ARG_HEADER_ONLY AND TARGET ${ARG_HEADER_ONLY})
@@ -28,8 +24,11 @@ function(add_cpp_library_test test_name gtest_target)
     #
     add_executable(${test_name} ${ARG_SOURCES} ${ARG_HEADERS})
     target_link_libraries(${test_name} PRIVATE ${library_name} ${ARG_DEPENDENCIES} ${gtest_target})
-    if(WIN32 AND TARGET copy_dll_${bdir_hash})
-        add_dependencies(${test_name} copy_dll_${bdir_hash})
+    if(WIN32)
+        set_target_properties(${test_name} PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/${test_name}")
+        add_custom_command(TARGET ${test_name} POST_BUILD 
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_RUNTIME_DLLS:${test_name}> $<TARGET_FILE_DIR:${test_name}>
+            COMMAND_EXPAND_LISTS)
     endif()
     gtest_discover_tests(${test_name} TEST_PREFIX ${library_name}::)
 endfunction()
@@ -47,10 +46,6 @@ function(add_cpp_library_basic_tests gtest_target)
                          ARG_STATIC ARG_SHARED ARG_HEADER_ONLY)
     if(ARG_SHARED AND TARGET ${ARG_SHARED})
         set(library_name ${ARG_SHARED})
-        if(WIN32 AND NOT TARGET copy_dll_${bdir_hash})
-            add_custom_target(copy_dll_${bdir_hash} ALL
-                ${CMAKE_COMMAND} -E copy_if_different $<TARGET_FILE:${library_name}> ${CMAKE_CURRENT_BINARY_DIR})
-        endif()
     elseif(ARG_STATIC AND TARGET ${ARG_STATIC})
         set(library_name ${ARG_STATIC})
     elseif(ARG_HEADER_ONLY AND TARGET ${ARG_HEADER_ONLY})
@@ -63,16 +58,12 @@ function(add_cpp_library_basic_tests gtest_target)
         set(test_prog "${library_name}-${test_prog}")
         add_executable(${test_prog} ${filename})
         target_link_libraries(${test_prog} PRIVATE ${library_name} ${ARG_DEPENDENCIES} ${gtest_target})
-        if(WIN32 AND TARGET copy_dll_${bdir_hash})
-            add_dependencies(${test_prog} copy_dll_${bdir_hash})
+        if(WIN32)
+            set_target_properties(${test_prog} PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/${test_prog}")
+            add_custom_command(TARGET ${test_prog} POST_BUILD 
+                              COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_RUNTIME_DLLS:${test_prog}> $<TARGET_FILE_DIR:${test_prog}>
+                              COMMAND_EXPAND_LISTS)
         endif()
         gtest_discover_tests(${test_prog} TEST_PREFIX ${library_name}::)
     endforeach()
 endfunction()
-#       if(WIN32 AND ARG_SHARED AND TARGET ${ARG_SHARED})
-#            add_custom_command(TARGET ${test_prog} POST_BUILD
-## If needed one day: COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_RUNTIME_DLLS:${test_prog}> $<TARGET_FILE_DIR:${test_prog}>
-#              COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_FILE:${library_name}> $<TARGET_FILE_DIR:${test_prog}>
-#              COMMAND_EXPAND_LISTS
-#            )
-#       endif()
