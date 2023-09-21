@@ -5,7 +5,7 @@
 `cmtk/CppExecutableTests`
 
 ## Functions
-### `add_cpp_library_examples(...)`
+### Function `add_cpp_library_examples(...)`
 
 &ensp;&ensp;&ensp;&ensp;Create C++ example targets for a library.
 

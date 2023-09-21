@@ -5,7 +5,7 @@
 `cmtk/RscCppLibraryProject`
 
 ## Functions
-### `add_rsc_cpp_library(SHARED ... STATIC ...)`
+### Function `add_rsc_cpp_library(SHARED ... STATIC ...)`
 
 &ensp;&ensp;&ensp;&ensp;Create C++ library shared and/or static targets embedding serialized resource files.
 

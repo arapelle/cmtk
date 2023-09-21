@@ -5,7 +5,7 @@
 `cmtk/CppExecutableProject`
 
 ## Functions
-### `add_cpp_executable(executable_target ...)`
+### Function `add_cpp_executable(executable_target ...)`
 
 &ensp;&ensp;&ensp;&ensp;Create a C++ executable target.
 
