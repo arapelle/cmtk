@@ -5,7 +5,7 @@
 `cmtk/CppExecutableTests`
 
 ## Functions
-### `add_cpp_executable_test(test_name gtest_target ...)`
+### Function `add_cpp_executable_test(test_name gtest_target ...)`
 
 Create an identified C++ test target for an executable. (Uses [Google Tests](https://github.com/google/googletest))
 
@@ -16,7 +16,7 @@ Create an identified C++ test target for an executable. (Uses [Google Tests](htt
 - SOURCES *source_list*: 	The list of C++ sources to compile the test target.
 - [LIBRARIES *dependency_list*]: 	The list of dependency library targets.
 
-### `add_cpp_executable_basic_tests(gtest_target ...)`
+### Function `add_cpp_executable_basic_tests(gtest_target ...)`
 
 Create basic C++ test targets for an executable. (Uses [Google Tests](https://github.com/google/googletest))
 

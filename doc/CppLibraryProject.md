@@ -5,7 +5,7 @@
 `cmtk/CppLibraryProject`
 
 ## Functions
-### `add_cpp_library(SHARED ... STATIC ...)`
+### Function `add_cpp_library(SHARED ... STATIC ...)`
 
 &ensp;&ensp;&ensp;&ensp;Create C++ library shared and/or static targets.
 
@@ -33,7 +33,7 @@ If it is not DEFINED, it is determined by an option value.
 - [HEADERS_BASE_DIRS *base_dirs*]:  List of base directories of source headers (used with FILE_SET).
 - [BUILD_HEADERS_BASE_DIRS *base_dirs*]:  List of base directories of build headers like generated headers (e.g. version.hpp) (used with FILE_SET).
 
-### `add_cpp_library(HEADER_ONLY ...)`
+### Function `add_cpp_library(HEADER_ONLY ...)`
 
 &ensp;&ensp;&ensp;&ensp;Create a C++ header only library target.
 
@@ -49,7 +49,7 @@ If it is not DEFINED, it is determined by an option value.
 - [HEADERS_BASE_DIRS *base_dirs*]:  List of base directories of source headers (used with FILE_SET).
 - [BUILD_HEADERS_BASE_DIRS *base_dirs*]:  List of base directories of build headers like generated headers (e.g. version.hpp) (used with FILE_SET).
 
-### `cpp_library_targets_link_libraries(...)`
+### Function `cpp_library_targets_link_libraries(...)`
 
 &ensp;&ensp;&ensp;&ensp;Make shared and/or static targets of a C++ library link with dependency libraries.
 
@@ -60,7 +60,7 @@ If it is not DEFINED, it is determined by an option value.
 - [INTERFACE *target_list*] : 	List of interface targets.
 - [PRIVATE *target_list*] : 	List of private targets.
 
-### `install_cpp_library(...)`
+### Function `install_cpp_library(...)`
 
 &ensp;&ensp;&ensp;&ensp;Install C++ library targets.
 - [SHARED *shared_target_name*] : Name of the shared library target.
@@ -70,7 +70,7 @@ If it is not DEFINED, it is determined by an option value.
 - [NAMESPACE *namespace*]: 	Targets namespace.
 - [DESTINATION *destination*]: EXPORT destination.
 
-### `install_library_package(package_name ...)`
+### Function `install_library_package(package_name ...)`
 
 &ensp;&ensp;&ensp;&ensp;Install C++ package
 

@@ -6,7 +6,7 @@
 
 ## Functions
 
-### `add_cpp_library_test(test_name gtest_target ...)`
+### Function `add_cpp_library_test(test_name gtest_target ...)`
 
 &ensp;&ensp;&ensp;&ensp;Create an identified C++ test target for a library. (Uses [Google Tests](https://github.com/google/googletest))
 
@@ -19,7 +19,7 @@
 - SOURCES *source_list*: 	The list of C++ sources to compile the test target.
 - [LIBRARIES *dependency_list*]: 	The list of dependency library targets.
 
-### `add_cpp_library_basic_tests(gtest_target ...)`
+### Function `add_cpp_library_basic_tests(gtest_target ...)`
 
 &ensp;&ensp;&ensp;&ensp;Create basic C++ test targets for a library. (Uses [Google Tests](https://github.com/google/googletest))
 

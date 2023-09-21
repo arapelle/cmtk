@@ -24,6 +24,7 @@ function(fatal_if_none_is_def msg)
   message(FATAL_ERROR "${msg}")
 endfunction()
 
+
 macro(set_ifndef var_name value)
   if(NOT DEFINED ${var_name})
     set(${var_name} ${value})
@@ -41,6 +42,7 @@ macro(set_iftest var)
     set(${var} ${ARG_ELSE})
   endif()
 endmacro()
+
 
 function(trioption varname help_text initial)
   set(${varname} "${initial}" CACHE STRING "${help_text}")
@@ -75,4 +77,11 @@ endmacro()
 macro(make_upper_c_identifier str return_var)
   string(MAKE_C_IDENTIFIER ${str} ${return_var})
   string(TOUPPER ${${return_var}} ${return_var})
+endmacro()
+
+
+macro(find_package_if_not_target target package_name)
+    if(NOT TARGET ${target})
+        find_package(${package_name} ${ARGN})
+    endif()
 endmacro()

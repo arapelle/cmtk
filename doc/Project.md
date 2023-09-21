@@ -5,18 +5,18 @@
 `cmtk/Project`
 
 ## Functions
-### `disable_in_source_build()`
+### Function `disable_in_source_build()`
 
 &ensp;&ensp;&ensp;&ensp;Check if the build directory is not a subdirectory of the source directory. If it is the case, a message is printed, and the configure phase is stopped.
 
-### `set_build_type_ifndef()`
+### Function `set_build_type_ifndef()`
 
 &ensp;&ensp;&ensp;&ensp;Set Release as value for BUILT_TYPE, if none was provided.
 
 - [DEFAULT *default_type*]: 	The default build type if none is provided when CMake is invoked. It can be a name or the index in the BUILD_TYPES list.  (*0* used by default)
 - [BUILD_TYPES *type_list*]:   The list of available build tpyes. (*Release, Debug, MinSizeRel, RelWithDebInfo* used by default)
 
-### `install_uninstall_script(package_name)`
+### Function `install_uninstall_script(package_name)`
 
 &ensp;&ensp;&ensp;&ensp;Add installation code which creates a uninstall CMake script of the project.
 
