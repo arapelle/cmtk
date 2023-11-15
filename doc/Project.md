@@ -25,6 +25,18 @@ If NAMESPACE and BASE_NAME are used, PROJECT_NAME is set to `${PROJECT_NAMESPACE
 - [NAMESPACE *namespace*] :  Namespace of the project. (Set PROJECT_NAMESPACE.)
 - [BASE_NAME *base_name*] :  Base name of the project. (Set PROJECT_BASE_NAME.)
 
+### Function `set_project_semantic_version(tri_version)`
+
+&ensp;&ensp;&ensp;&ensp;Set project version variables : `PROJECT_SEMANTIC_VERSION`, `PROJECT_VERSION`, `PROJECT_VERSION_MAJOR`,
+ `PROJECT_VERSION_MINOR`, `PROJECT_VERSION_PATCH`, `PROJECT_VERSION_PRE_RELEASE`, `PROJECT_VERSION_BUILD_METADATA`.
+- `PROJECT_SEMANTIC_VERSION` is set to `${tri_version}-${pre_release}+${build_metadata}` if `${pre_release}` and `${build_metadata}` are not empty. 
+- `PROJECT_SEMANTIC_VERSION` is set to `${tri_version}-${pre_release}` if `${pre_release}` is not empty but `${build_metadata}` is. 
+- `PROJECT_SEMANTIC_VERSION` is set to `${tri_version}+${build_metadata}` if `${pre_release}` is empty but `${build_metadata}` is not.
+
+&ensp;&ensp;&ensp;&ensp;Arguments:
+- [PRE_RELEASE *pre_release*] :  Pre-release version of the project. (Set PROJECT_NAME.)
+- [BUILD_METADATA *build_metadata*] :  Build metadata of the project. (Set PROJECT_NAMESPACE.)
+
 ### Function `install_uninstall_script(package_name)`
 
 &ensp;&ensp;&ensp;&ensp;Add installation code which creates a uninstall CMake script of the project.
