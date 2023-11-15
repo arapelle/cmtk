@@ -38,6 +38,26 @@ function(set_build_type_ifndef)
     endif()
 endfunction()
 
+function(set_project_name)
+    # Args:
+    set(options "")
+    set(params "NAME;NAMESPACE;BASE_NAME")
+    set(lists "")
+    # Parse args:
+    cmake_parse_arguments(PARSE_ARGV 0 "ARG" "${options}" "${params}" "${lists}")
+    # Check args:
+    fatal_if_none_is_def("NAME or BASE_NAME is missing." ARG_NAME ARG_BASE_NAME)
+    if(DEFINED ARG_NAME)
+        fatal_ifdef("NAMESPACE and BASE_NAME must not be provided if NAME is provided." ARG_NAMESPACE ARG_BASE_NAME)
+        set(PROJECT_NAME "${ARG_NAME}" PARENT_SCOPE)
+    else()
+        fatal_ifndef("BASE_NAME is provided but NAMESPACE is missing." ARG_NAMESPACE)
+        set(PROJECT_NAMESPACE "${ARG_NAMESPACE}" PARENT_SCOPE)
+        set(PROJECT_BASE_NAME "${ARG_BASE_NAME}" PARENT_SCOPE)
+        set(PROJECT_NAME "${ARG_NAMESPACE}-${ARG_BASE_NAME}" PARENT_SCOPE)
+    endif()
+endfunction()
+
 function(install_uninstall_script package_name)
     include(GNUInstallDirs)
     # Args:

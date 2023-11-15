@@ -16,6 +16,15 @@
 - [DEFAULT *default_type*]: 	The default build type if none is provided when CMake is invoked. It can be a name or the index in the BUILD_TYPES list.  (*0* used by default)
 - [BUILD_TYPES *type_list*]:   The list of available build tpyes. (*Release, Debug, MinSizeRel, RelWithDebInfo* used by default)
 
+### Function `set_project_name()`
+
+&ensp;&ensp;&ensp;&ensp;Set project name variables : PROJECT_NAME, PROJECT_NAMESPACE and PROJECT_BASE_NAME.
+If NAMESPACE and BASE_NAME are used, PROJECT_NAME is set to `${PROJECT_NAMESPACE}-${PROJECT_BASE_NAME}`.
+
+- [NAME *name*] :  Name of the project. (Set PROJECT_NAME.)
+- [NAMESPACE *namespace*] :  Namespace of the project. (Set PROJECT_NAMESPACE.)
+- [BASE_NAME *base_name*] :  Base name of the project. (Set PROJECT_BASE_NAME.)
+
 ### Function `install_uninstall_script(package_name)`
 
 &ensp;&ensp;&ensp;&ensp;Add installation code which creates a uninstall CMake script of the project.
