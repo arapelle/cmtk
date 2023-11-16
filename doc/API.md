@@ -17,3 +17,4 @@
 - [Cpp Library Project](./CppLibraryProject.md)
 - [Cpp Library Tests](./CppLibraryTests.md)
 - [Cpp Library Examples](./CppLibraryExamples.md)
+- [Resource Cpp Library Project](./RscCppLibraryProject.md)
