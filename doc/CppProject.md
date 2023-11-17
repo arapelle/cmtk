@@ -5,7 +5,9 @@
 `cmtk/Project`
 
 ## Functions
-### Function `generate_version_macro_header(varname macro_prefix header_path)`
+### Function `generate_version_macro_header(varname macro_prefix header_path)` [*DEPRECATED*]
+
+&ensp;&ensp;**DEPRECATED: You should use configure_headers() instead.**
 
 &ensp;&ensp;&ensp;&ensp;Generate a C++ header file providing C-Macro giving the version of the project.
 - *return_var* :  Variable in the calling scope containing the path to the generated header.

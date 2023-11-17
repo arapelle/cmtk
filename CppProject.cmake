@@ -3,6 +3,7 @@ include(${CMAKE_CURRENT_LIST_DIR}/Project.cmake)
 
 function(generate_version_macro_header return_var macro_prefix header_path)
   include(GNUInstallDirs)
+  message(WARNING "generate_version_macro_header() is deprecated! Uou should use configure_headers() instead.")
   cmake_parse_arguments(PARSE_ARGV 1 "ARG" "" "BINARY_BASE_DIR" "")
   set_ifndef(ARG_BINARY_BASE_DIR "${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_INSTALL_INCLUDEDIR}")
   file(MAKE_DIRECTORY "${ARG_BINARY_BASE_DIR}")
