@@ -46,3 +46,8 @@ If NAMESPACE and BASE_NAME are used, PROJECT_NAME is set to `${PROJECT_NAMESPACE
 - [FILENAME] : File name of the generated uninstall script. (*cmake_uninstall.cmake* used by default)
 - [PACKAGE_DIR] : Directory, relative to the prefix install directory, where the generated script will be installed. (*`${CMAKE_INSTALL_LIBDIR}/cmake/${package_name}`* used by default)
 - [ALL] : A uninstall script of a project will remove only the installed project files. This option forces to include all installed files in the uninstall script. (It is generally used by a super project which has subprojects (like git submodules), calling themselves this CMake function, to uninstall all subprojects files.
+
+### Function `clear_install_file_list()`
+
+&ensp;&ensp;&ensp;&ensp;Clear the internal list of installed files used by CMTK. 
+This avoid adding files of installed external libraries (downloaded with FetchDeclare()) to the uninstall script of the project.

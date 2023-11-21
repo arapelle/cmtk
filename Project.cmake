@@ -85,7 +85,7 @@ function(set_project_semantic_version tri_version)
     set(PROJECT_VERSION_BUILD_METADATA "${ARG_BUILD_METADATA}" PARENT_SCOPE)
     set(PROJECT_SEMANTIC_VERSION "${semantic_version}" PARENT_SCOPE)
 endfunction()
-    
+
 function(install_uninstall_script package_name)
     include(GNUInstallDirs)
     # Args:
@@ -148,4 +148,8 @@ function(install_uninstall_script package_name)
     endif()
         ")
     install(CODE ${uninstall_script_code})
+endfunction()
+
+function(clear_install_file_list)
+    install(CODE "set(CMTK_INSTALL_FILES \${CMAKE_INSTALL_MANIFEST_FILES})")
 endfunction()
