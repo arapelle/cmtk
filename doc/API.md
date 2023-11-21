@@ -4,6 +4,7 @@
 ### Useful tools
 - [Utility](./Utility.md)
 - [Find Or Fetch GTest](./FindOrFetchGTest.md)
+- [Spdlog](./Spdlog.md)
 
 ### Project base
 - [Project](./Project.md)
@@ -17,3 +18,4 @@
 - [Cpp Library Project](./CppLibraryProject.md)
 - [Cpp Library Tests](./CppLibraryTests.md)
 - [Cpp Library Examples](./CppLibraryExamples.md)
+- [Resource Cpp Library Project](./RscCppLibraryProject.md)

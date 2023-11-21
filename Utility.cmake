@@ -43,6 +43,16 @@ macro(set_iftest var)
   endif()
 endmacro()
 
+function(list_nth_or_default list_var index default_value out_var)
+    list(LENGTH ${list_var} list_size)
+    if(index LESS list_size)
+        list(GET ${list_var} ${index} value)
+        set(${out_var} ${value} PARENT_SCOPE)
+    else()
+        set(${out_var} ${default_value} PARENT_SCOPE)
+    endif()
+endfunction()
+
 
 function(trioption varname help_text initial)
   set(${varname} "${initial}" CACHE STRING "${help_text}")
