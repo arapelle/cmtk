@@ -39,6 +39,15 @@
 - THEN *value* : The value to assign if the test is `true`.
 - [ELSE *value*] : The value to assign if the test is `false`.
 
+### Function `list_nth_or_default(list_var_name list_var index default_value out_var_name)`
+
+&ensp;&ensp;&ensp;&ensp;Get the nth element of a list or the default value if the list is not long enough.
+
+- *list_var_name* :  The name of the list to treat.
+- *index* :  The index of the element we want to get.
+- *default_value* :  The default value set to the output variable if the list is not long enough.
+- *out_var_name* :  The name of the output variable.
+
 ### Function `trioption(varname help_text initial)`
 
 &ensp;&ensp;&ensp;&ensp;Define a cached variable with three possible states : `ON`, `OFF` and `UNDEFINED`.
