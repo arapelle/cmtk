@@ -2,7 +2,7 @@
 
 This CMake ToolKit (CMTK) provides helping CMake functions to manage simple C++ CMake projects easily.
 
-<u>Current version</u>: <!--cmtk-version-->0.12.0<!--/cmtk-version-->
+<u>Current version</u>: <!--cmtk-version-->0.12.1<!--/cmtk-version-->
 
 # Requirements
 - ### Binaries:
