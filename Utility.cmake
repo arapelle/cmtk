@@ -65,31 +65,6 @@ function(list_nth_or_default list_var index default_value out_var)
 endfunction()
 
 
-function(trioption varname help_text initial)
-  set(${varname} "${initial}" CACHE STRING "${help_text}")
-  set_property(CACHE ${varname} PROPERTY STRINGS "ON" "OFF" "UNDEFINED")
-endfunction()
-
-function(option_or_set_ifdef variable help_text initial ascendant_variable)
-  if(NOT DEFINED ${ascendant_variable} OR "${${ascendant_variable}}" STREQUAL "UNDEFINED")
-    option(${variable} "${help_text}" ${initial})
-  else()
-    unset(${variable} CACHE)
-    set(${variable} ${${ascendant_variable}} PARENT_SCOPE)
-  endif()
-endfunction()
-
-function(trioption_or_set_ifdef variable help_text initial ascendant_variable)
-  if(NOT DEFINED ${ascendant_variable} OR "${${ascendant_variable}}" STREQUAL "UNDEFINED")
-    set(${variable} "${initial}" CACHE STRING "${help_text}")
-    set_property(CACHE ${variable} PROPERTY STRINGS "ON" "OFF" "UNDEFINED")
-  else()
-    unset(${variable} CACHE)
-    set(${variable} ${${ascendant_variable}} PARENT_SCOPE)
-  endif()
-endfunction()
-
-
 macro(make_lower_c_identifier str return_var)
   string(MAKE_C_IDENTIFIER ${str} ${return_var})
   string(TOLOWER ${${return_var}} ${return_var})
@@ -98,11 +73,4 @@ endmacro()
 macro(make_upper_c_identifier str return_var)
   string(MAKE_C_IDENTIFIER ${str} ${return_var})
   string(TOUPPER ${${return_var}} ${return_var})
-endmacro()
-
-
-macro(find_package_if_not_target target package_name)
-    if(NOT TARGET ${target})
-        find_package(${package_name} ${ARGN})
-    endif()
 endmacro()
