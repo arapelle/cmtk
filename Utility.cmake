@@ -24,6 +24,17 @@ function(fatal_if_none_is_def msg)
   message(FATAL_ERROR "${msg}")
 endfunction()
 
+function(fatal_if_none_of var_name)
+  if(NOT DEFINED "${var_name}")
+      message(FATAL_ERROR "Variable ${var_name} is not defined.")
+  endif()
+  set(expected_values ${ARGN})
+  list(FIND expected_values "${${var_name}}" index)
+  if(index EQUAL -1)
+      message(FATAL_ERROR "${var_name} has an unexpected value: ${${var_name}}. (expected: ${ARGN})")
+  endif()
+endfunction()
+
 
 macro(set_ifndef var_name value)
   if(NOT DEFINED ${var_name})
