@@ -101,7 +101,7 @@ function(install_uninstall_script package_name)
     # Parse args:
     cmake_parse_arguments(PARSE_ARGV 1 "ARG" "${options}" "${params}" "${lists}")
     # Check args:
-    set_ifndef(ARG_FILENAME "cmake_uninstall.cmake")
+    set_ifndef(ARG_FILENAME "uninstall.cmake")
     set_ifndef(ARG_PACKAGE_DIR "${CMAKE_INSTALL_LIBDIR}/cmake/${package_name}")
     set_ifndef(ARG_VERSION "${PROJECT_VERSION}")
     set(rel_uninstall_path "${ARG_PACKAGE_DIR}/${ARG_FILENAME}")
