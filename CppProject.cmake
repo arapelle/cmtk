@@ -67,3 +67,16 @@ macro(add_example_subdirectory_if_build dir_name)
     add_subdirectory(${dir_name})
   endif()
 endmacro()
+
+function(copy_runtime_dlls_if_win32 target_name)
+  if(WIN32)
+    cmake_parse_arguments("M_ARG" "" "RUNTIME_OUTPUT_SUBDIRECTORY" "" ${ARGN})
+    if(DEFINED M_ARG_RUNTIME_OUTPUT_SUBDIRECTORY)
+      set_target_properties(${target_name} PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/${M_ARG_RUNTIME_OUTPUT_SUBDIRECTORY}")
+    endif()
+    add_custom_command(TARGET ${target_name} POST_BUILD 
+        COMMAND ${CMAKE_COMMAND} -E touch $<TARGET_FILE_DIR:${target_name}>/.dummy.txt
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_RUNTIME_DLLS:${target_name}> $<TARGET_FILE_DIR:${target_name}>/.dummy.txt $<TARGET_FILE_DIR:${target_name}>
+        COMMAND_EXPAND_LISTS)
+  endif()
+endfunction()
