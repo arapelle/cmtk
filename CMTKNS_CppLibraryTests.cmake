@@ -20,13 +20,7 @@ function(CMTKNS_add_cpp_library_test test_name library_target gtest_target)
     if(ARG_CXX_STANDARD)
       target_compile_features(${test_name} PRIVATE cxx_std_${ARG_CXX_STANDARD})
     endif()
-    if(WIN32)
-        set_target_properties(${test_name} PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/${test_name}")
-        add_custom_command(TARGET ${test_name} POST_BUILD 
-            COMMAND ${CMAKE_COMMAND} -E touch $<TARGET_FILE_DIR:${test_name}>/.dummy.txt
-            COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_RUNTIME_DLLS:${test_name}> $<TARGET_FILE_DIR:${test_name}>/.dummy.txt $<TARGET_FILE_DIR:${test_name}>
-            COMMAND_EXPAND_LISTS)
-    endif()
+    copy_runtime_dlls_if_win32(${test_name} RUNTIME_OUTPUT_SUBDIRECTORY ${test_name})
     gtest_discover_tests(${test_name} TEST_PREFIX ${library_target}::)
 endfunction()
 
@@ -52,13 +46,7 @@ function(CMTKNS_add_cpp_library_basic_tests library_target gtest_target)
         if(ARG_CXX_STANDARD)
             target_compile_features(${test_prog} PRIVATE cxx_std_${ARG_CXX_STANDARD})
         endif()
-        if(WIN32)
-            set_target_properties(${test_prog} PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/${test_prog}")
-            add_custom_command(TARGET ${test_prog} POST_BUILD 
-                              COMMAND ${CMAKE_COMMAND} -E touch $<TARGET_FILE_DIR:${test_prog}>/.dummy.txt
-                              COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_RUNTIME_DLLS:${test_prog}> $<TARGET_FILE_DIR:${test_prog}>/.dummy.txt $<TARGET_FILE_DIR:${test_prog}>
-                              COMMAND_EXPAND_LISTS)
-        endif()
+        copy_runtime_dlls_if_win32(${test_prog} RUNTIME_OUTPUT_SUBDIRECTORY ${test_prog})
         gtest_discover_tests(${test_prog} TEST_PREFIX ${library_target}::)
     endforeach()
 endfunction()
