@@ -3,7 +3,6 @@
 
 ### Useful tools
 - [Utility](./Utility.md)
-- [Find Or Fetch GTest](./FindOrFetchGTest.md)
 - [Spdlog](./Spdlog.md)
 
 ### Project base
