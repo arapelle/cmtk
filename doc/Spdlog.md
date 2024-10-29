@@ -2,13 +2,14 @@
 # Spdlog
 
 ## Include
-`cmtk/Utility`
+`cmtk/Spdlog`
 
 ## Functions
 
 ### Function `set_SPDLOG_ACTIVE_LEVEL_ifndef()`
 
 &ensp;&ensp;&ensp;&ensp;Set a cached variable SPDLOG_ACTIVE_LEVEL, if it is nod defined yet.
+- [TRACE *build_type_list*] :  List of build types for which SPDLOG_ACTIVE_LEVEL must be set to SPDLOG_LEVEL_TRACE.
 - [DEBUG *build_type_list*] :  List of build types for which SPDLOG_ACTIVE_LEVEL must be set to SPDLOG_LEVEL_DEBUG. (*Debug* used by default)
 - [INFO *build_type_list*] :  List of build types for which SPDLOG_ACTIVE_LEVEL must be set to SPDLOG_LEVEL_INFO. (*Release* used by default)
 

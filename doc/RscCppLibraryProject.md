@@ -5,9 +5,9 @@
 `cmtk/RscCppLibraryProject`
 
 ## Functions
-### Function `add_rsc_cpp_library(SHARED ... STATIC ...)`
+### Function `add_rsc_cpp_library(target_name SHARED|STATIC ...)`
 
-&ensp;&ensp;&ensp;&ensp;Create C++ library shared and/or static targets embedding serialized resource files.
+&ensp;&ensp;&ensp;&ensp;Create a shared or static C++ library target embedding serialized resource files.
 
 &ensp;&ensp;&ensp;&ensp;The function takes a list of resource files and copy its content in a C++ library.
 For each resource file, a source file and a header file are generated. The header has the declaration of a
@@ -34,17 +34,20 @@ in the resource paths.
 &ensp;&ensp;&ensp;&ensp;To use the resource library, the paths to include must begin with the *main-directory/* 
 (or *parent-namespace/main-directory*/ if you provide a parent namespace).
 
+&ensp;&ensp;&ensp;&ensp;Target basic arguments:
+- *target_name* :  The name of the library target. It determines the main directory containing the generated code files, 
+and also the namespace containing all generated constants, types and functions.
+- SHARED|STATIC : Indicates if the target must be a shared or a static library.
+
 &ensp;&ensp;&ensp;&ensp;Resources arguments:
 - RESOURCES *resource_files* :  A list of absolute paths to the resource files.
 (You can use ${CMAKE_CURRENT_SOURCE_DIR} to provide absolute paths.)
 - [RESOURCES_BASE_DIR *base_dir*] :  The common root directory containing all the resources. (*${CMAKE_CURRENT_SOURCE_DIR}* used by default.)
 
 &ensp;&ensp;&ensp;&ensp;Generated code arguments:
-- NAME *name* :  The main name of the library. It determines the main directory containing the generated code files, 
-and also the namespace containing all generated constants, types and functions.
-- [PARENT_NAMESPACE *namespace*] :  A namespace containing the main namespace defined by *NAME*. It generates a directory parent to the main directory too.
-- [INLINE_PARENT_NAMESPACE *namespace*] :  An inline namespace containing the main namespace defined by *NAME*. The parent directory is created too.
-(Use INLINE_PARENT_NAMESPACE or PARENT_NAMESPACE, not both.)
+- [CONTEXT_NAMESPACE *namespace*] :  A namespace containing the main namespace defined by *NAME*. It generates a directory parent to the main directory too.
+- [INLINE_CONTEXT_NAMESPACE *namespace*] :  An inline namespace containing the main namespace defined by *NAME*. The parent directory is created too.
+(Use INLINE_CONTEXT_NAMESPACE or CONTEXT_NAMESPACE, not both.)
 - [VIRTUAL_ROOT *vroot*] :  A string prepending each generated resource path.
 - [PRIVATE_RESOURCE_HEADERS] :  An option argument indicating that all generated resource headers cannot be used by a user of the library. (So, it is not installed with the library too.)
 - [PRIVATE_RESOURCE_PATHS_HEADER] :  An option argument indicating that the generated headers providing resource paths cannot be used by a user of the library. (So, it is not installed with the library too.)
@@ -54,7 +57,15 @@ and also the namespace containing all generated constants, types and functions.
 - [BUILD_RESOURCE_SOURCES_BASE_DIR *base_dir*] :  The directory where the source file tree is generated. The main directory (or the parent directory if any) is a direct subdirectory of it. (*${CMAKE_CURRENT_BUILD_DIR}/src* used by default.)
 - [PRIVATE_BUILD_RESOURCE_HEADERS_BASE_DIR *base_dir*] :  The directory where the private header file tree is generated. The main directory (or the parent directory if any) is a direct subdirectory of it. (*${CMAKE_CURRENT_BUILD_DIR}/private_include* used by default.)
 
-&ensp;&ensp;&ensp;&ensp;(All arguments of [`add_cpp_library()`](CppLibraryProject.md) are compatible with this function.)
+&ensp;&ensp;&ensp;&ensp;The following arguments of [`add_cpp_library(target_name SHARED|STATIC ...)`](CppLibraryProject.md) are compatible with this function:
+- CXX_STANDARD
+- HEADERS
+- SOURCES
+- HEADERS_BASE_DIRS
+- BUILD_HEADERS_BASE_DIRS
+- LIBRARY_OUTPUT_DIRECTORY
+- ARCHIVE_OUTPUT_DIRECTORY
+- DEFAULT_WARNING_OPTIONS
 
 <u>Example:</u><br />
 Here, we have our source project tree:
@@ -73,11 +84,7 @@ myrsclib/
 The function `add_rsc_cpp_library()` is called with the following parameters:
 ```cmake
 add_rsc_cpp_library(
-    NAME myrsclib
-    SHARED myrsclib
-    STATIC myrsclib-static
-    BUILD_SHARED OPTION
-    BUILD_STATIC OPTION
+    myrsclib SHARED
     RESOURCES
         ${CMAKE_CURRENT_SOURCE_DIR}/rsc/background.png
         ${CMAKE_CURRENT_SOURCE_DIR}/rsc/animals/bird.png
@@ -104,7 +111,6 @@ local/
         `-- rose.hpp
         `-- daisy.hpp
 `-- lib/
-    `-- myrsclib.a
     `-- myrsclib.so
 ```
 Resource path to `bird.png` is `RSC:/animals/bird.png`.<br />

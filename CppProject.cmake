@@ -1,25 +1,6 @@
 
 include(${CMAKE_CURRENT_LIST_DIR}/Project.cmake)
 
-function(generate_version_macro_header return_var macro_prefix header_path)
-  include(GNUInstallDirs)
-  message(WARNING "generate_version_macro_header() is deprecated! Uou should use configure_headers() instead.")
-  cmake_parse_arguments(PARSE_ARGV 1 "ARG" "" "BINARY_BASE_DIR" "")
-  set_ifndef(ARG_BINARY_BASE_DIR "${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_INSTALL_INCLUDEDIR}")
-  file(MAKE_DIRECTORY "${ARG_BINARY_BASE_DIR}")
-  set(${return_var} "${ARG_BINARY_BASE_DIR}/${header_path}" PARENT_SCOPE)
-  make_upper_c_identifier(${macro_prefix} macro_prefix)
-  file(GENERATE OUTPUT "${ARG_BINARY_BASE_DIR}/${header_path}"
-      CONTENT
-       "#pragma once
-
-#define ${macro_prefix}_VERSION_MAJOR ${PROJECT_VERSION_MAJOR}
-#define ${macro_prefix}_VERSION_MINOR ${PROJECT_VERSION_MINOR}
-#define ${macro_prefix}_VERSION_PATCH ${PROJECT_VERSION_PATCH}
-#define ${macro_prefix}_VERSION \"${PROJECT_VERSION}\"
-")
-endfunction()
-
 function(configure_headers return_var)
   include(GNUInstallDirs)
   cmake_parse_arguments(PARSE_ARGV 1 "ARG" "" "BASE_DIR;BINARY_BASE_DIR" "FILES")
@@ -49,5 +30,53 @@ function(target_default_warning_options target)
       target_compile_options(${target} PRIVATE /Wall)
   elseif(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
       target_compile_options(${target} PRIVATE -Wall -Wextra -pedantic)
+  endif()
+endfunction()
+
+macro(add_test_subdirectory_if_build dir_name)
+  cmake_parse_arguments("M_ARG" "" "NAME;BUILD_OPTION_NAME;BUILD_OPTION_MSG;BUILD_OPTION_DEFAULT" "" ${ARGN})
+  set_ifndef(M_ARG_NAME "${PROJECT_NAME}")
+  if(NOT M_ARG_BUILD_OPTION_NAME)
+    make_upper_c_identifier("${M_ARG_NAME}" upper_var_name)
+    set(M_ARG_BUILD_OPTION_NAME "BUILD_${upper_var_name}_TESTS")
+  endif()
+  set_ifndef(M_ARG_BUILD_OPTION_MSG "Build ${M_ARG_NAME} tests or not.")
+  set_ifndef(M_ARG_BUILD_OPTION_DEFAULT OFF)
+  fatal_if_none_of(M_ARG_BUILD_OPTION_DEFAULT "ON" "OFF")
+  option(${M_ARG_BUILD_OPTION_NAME} ${M_ARG_BUILD_OPTION_MSG} ${M_ARG_BUILD_OPTION_DEFAULT})
+  if(${M_ARG_BUILD_OPTION_NAME})
+    include(CTest)
+    if(BUILD_TESTING)
+      add_subdirectory(${dir_name})
+    endif()
+  endif()
+endmacro()
+
+macro(add_example_subdirectory_if_build dir_name)
+  cmake_parse_arguments("M_ARG" "" "NAME;BUILD_OPTION_NAME;BUILD_OPTION_MSG;BUILD_OPTION_DEFAULT" "" ${ARGN})
+  set_ifndef(M_ARG_NAME "${PROJECT_NAME}")
+  if(NOT M_ARG_BUILD_OPTION_NAME)
+    make_upper_c_identifier("${M_ARG_NAME}" upper_var_name)
+    set(M_ARG_BUILD_OPTION_NAME "BUILD_${upper_var_name}_EXAMPLES")
+  endif()
+  set_ifndef(M_ARG_BUILD_OPTION_MSG "Build ${M_ARG_NAME} examples or not.")
+  set_ifndef(M_ARG_BUILD_OPTION_DEFAULT OFF)
+  fatal_if_none_of(M_ARG_BUILD_OPTION_DEFAULT "ON" "OFF")
+  option(${M_ARG_BUILD_OPTION_NAME} ${M_ARG_BUILD_OPTION_MSG} ${M_ARG_BUILD_OPTION_DEFAULT})
+  if(${M_ARG_BUILD_OPTION_NAME})
+    add_subdirectory(${dir_name})
+  endif()
+endmacro()
+
+function(copy_runtime_dlls_if_win32 target_name)
+  if(WIN32)
+    cmake_parse_arguments("M_ARG" "" "RUNTIME_OUTPUT_SUBDIRECTORY" "" ${ARGN})
+    if(DEFINED M_ARG_RUNTIME_OUTPUT_SUBDIRECTORY)
+      set_target_properties(${target_name} PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/${M_ARG_RUNTIME_OUTPUT_SUBDIRECTORY}")
+    endif()
+    add_custom_command(TARGET ${target_name} POST_BUILD 
+        COMMAND ${CMAKE_COMMAND} -E touch $<TARGET_FILE_DIR:${target_name}>/.dummy.txt
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_RUNTIME_DLLS:${target_name}> $<TARGET_FILE_DIR:${target_name}>/.dummy.txt $<TARGET_FILE_DIR:${target_name}>
+        COMMAND_EXPAND_LISTS)
   endif()
 endfunction()

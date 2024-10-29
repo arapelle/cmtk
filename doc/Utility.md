@@ -11,17 +11,23 @@
 
 - *msg* :  The error message to display if needed.
 
-### Macro `fatal_ifndef()`
+### Macro `fatal_ifndef(msg ...)`
 
 &ensp;&ensp;&ensp;&ensp;Raise a fatal error if one of the given names is NOT a defined variable. (e.g. `fatal_ifndef("FATAL ERROR!" ID_VAR BUILD_TYPE)`)
 
 - *msg* :  The error message to display if needed.
 
-### Function `fatal_if_none_is_def()`
+### Function `fatal_if_none_is_def(msg ...)`
 
-&ensp;&ensp;&ensp;&ensp;Raise a fatal error if none of the given names is a defined variable. (e.g. `fatal_ifndef("FATAL ERROR!" EXPECTED)`)
+&ensp;&ensp;&ensp;&ensp;Raise a fatal error if none of the given names is a defined variable. (e.g. `fatal_if_none_is_def("FATAL ERROR!" PUBLIC PRIVATE)`)
 
 - *msg* :  The error message to display if needed.
+
+### Function `fatal_if_none_of(var_name ...)`
+
+&ensp;&ensp;&ensp;&ensp;Raise a fatal error if var_name is undefined or if its value is none of the given ones. (e.g. `fatal_ifndef("FATAL ERROR!" EXPECTED)`)
+
+- *var_name* :  The name of the variable to test.
 
 ### Macro `set_ifndef(var_name value)`
 
@@ -48,36 +54,6 @@
 - *default_value* :  The default value set to the output variable if the list is not long enough.
 - *out_var_name* :  The name of the output variable.
 
-### Function `trioption(varname help_text initial)`
-
-&ensp;&ensp;&ensp;&ensp;Define a cached variable with three possible states : `ON`, `OFF` and `UNDEFINED`.
-
-- *varname* :  The name of the cached variable.
-- *help_text* :  The description of the cached variable.
-- *initial* :  The initial value of the cached variable.
-
-### Function `option_or_set_ifdef(variable help_text initial ascendant_variable)`
-
-&ensp;&ensp;&ensp;&ensp;Set a *variable* according to *ascendant variable*, or create an option. If the *ascendant 
-variable* is not defined or if its value is `UNDEFINED` we create an option instead of setting the value of 
-this *ascendant variable* to *variable*.
-
-- *variable* :  The name of the variable/option to set/create.
-- *help_text* :  The description of the cached variable, if we create an option.
-- *initial* :  The initial value of the cached variable, if we create an option.
-- *ascendant_variable* :  The ascendant variable to evaluate.
-
-### Function `trioption_or_set_ifdef()`
-
-&ensp;&ensp;&ensp;&ensp;Set a *variable* according to *ascendant variable*, or create a trioption. If the *ascendant 
-variable* is not defined or if its value is `UNDEFINED` we create an trioption instead of setting the value of 
-this *ascendant variable* to *variable*.
-
-- *variable* :  The name of the variable/trioption to set/create.
-- *help_text* :  The description of the cached variable, if we create an trioption.
-- *initial* :  The initial value of the cached variable, if we create an trioption.
-- *ascendant_variable* :  The ascendant variable to evaluate.
-
 ### Macro `make_lower_c_identifier(str return_var)`
 
 &ensp;&ensp;&ensp;&ensp;Convert a string to a C identifier in lower case.
@@ -91,10 +67,3 @@ this *ascendant variable* to *variable*.
 
 - *str*: The string to convert.
 - *return_var* :  Variable in the calling scope containing the generated string.
-
-### Macro `find_package_if_not_target(target package_name)`
-
-&ensp;&ensp;&ensp;&ensp;Call `find_package(package_name ${ARGN})` if *target* is not a TARGET.
-
-- *target*: The target we are looking for.
-- *package_name* :  The package to find if *target* is not a TARGET.
