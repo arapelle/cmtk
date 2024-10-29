@@ -97,7 +97,7 @@ function(install_library_package package_name)
     include(CMakePackageConfigHelpers)
     # Args:
     set(options "")
-    set(params "VERSION;VERSION_COMPATIBILITY;INPUT_PACKAGE_CONFIG_FILE")
+    set(params "VERSION;VERSION_COMPATIBILITY;INPUT_PACKAGE_CONFIG_FILE;CMAKE_FILES_DESTINATION")
     set(lists "")
     # Parse args:
     cmake_parse_arguments(PARSE_ARGV 1 "ARG" "${options}" "${params}" "${lists}")
@@ -105,12 +105,11 @@ function(install_library_package package_name)
     fatal_ifndef("INPUT_PACKAGE_CONFIG_FILE is required (e.g. CMake-package-config.cmake.in)" ARG_INPUT_PACKAGE_CONFIG_FILE)
     set_ifndef(ARG_VERSION ${PROJECT_VERSION})
     set_ifndef(ARG_VERSION_COMPATIBILITY SameMajorVersion)
-    # Set install directory paths:
-    set(relative_install_cmake_package_dir "${CMAKE_INSTALL_LIBDIR}/cmake/${package_name}")
+    set_ifndef(ARG_CMAKE_FILES_DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/${package_name}")
     # Create package config file:
     configure_package_config_file(${ARG_INPUT_PACKAGE_CONFIG_FILE}
         "${PROJECT_BINARY_DIR}/${package_name}-config.cmake"
-        INSTALL_DESTINATION ${relative_install_cmake_package_dir})
+        INSTALL_DESTINATION ${ARG_CMAKE_FILES_DESTINATION})
     # Create package version file:
     write_basic_package_version_file("${PROJECT_BINARY_DIR}/${package_name}-config-version.cmake"
         VERSION ${ARG_VERSION}
@@ -119,5 +118,5 @@ function(install_library_package package_name)
     install(FILES
         ${PROJECT_BINARY_DIR}/${package_name}-config.cmake
         ${PROJECT_BINARY_DIR}/${package_name}-config-version.cmake
-        DESTINATION ${relative_install_cmake_package_dir})
+        DESTINATION ${ARG_CMAKE_FILES_DESTINATION})
 endfunction()
