@@ -20,9 +20,8 @@
 - [RUNTIME_OUTPUT_DIRECTORY *output_dir*]: 	Output directory of the built executable.
 
 &ensp;&ensp;&ensp;&ensp;Targets sources arguments:
-- HEADERS *header_list*: 	List of input headers of the target.
+- [HEADERS *header_list*]: 	List of input headers of the target.
 - SOURCES *source_list*: 	List of input sources of the target.
 - MAIN *main_cpp_file*: 	The main source file of the target.
 - [HEADERS_BASE_DIRS *base_dirs*]:  List of base directories of source headers (used with FILE_SET).
 - [BUILD_HEADERS_BASE_DIRS *base_dirs*]:  List of base directories of build headers like generated headers (e.g. version.hpp) (used with FILE_SET).
-
