@@ -11,6 +11,13 @@ function(disable_in_source_build)
     endif()
 endfunction()
 
+function(check_in_source_build)
+    option(ENABLE_IN_SOURCE_BUILD "Enable (ON) or Disable (OFF) in source build." OFF)
+    if(NOT ${ENABLE_IN_SOURCE_BUILD})
+        disable_in_source_build()
+    endif()
+endfunction()
+
 function(set_build_type_ifndef)
     # Args:
     set(options "")
