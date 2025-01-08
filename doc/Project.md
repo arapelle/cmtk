@@ -41,6 +41,14 @@ If NAMESPACE and BASE_NAME are used, PROJECT_NAME is set to `${PROJECT_NAMESPACE
 - [PRE_RELEASE *pre_release*] :  Pre-release version of the project. (Set PROJECT_NAME.)
 - [BUILD_METADATA *build_metadata*] :  Build metadata of the project. (Set PROJECT_NAMESPACE.)
 
+### Function `configure_files(return_var)`
+
+&ensp;&ensp;&ensp;&ensp;Apply `configure_file()` on a list of files. The file hierarchy is preserved based on the provided base directory.
+- *return_var* :  Variable in the calling scope containing the list of paths to the generated files.
+- FILES *files* :  List of files to configure.
+- BASE_DIR *dir* :  Directory from which the relative path of input file is computed.
+- BINARY_BASE_DIR *dir* :  Directory from which the hierarchy of files is generated.
+
 ### Function `install_uninstall_script(package_name)`
 
 &ensp;&ensp;&ensp;&ensp;Add installation code which creates a uninstall CMake script of the project.

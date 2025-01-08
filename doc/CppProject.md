@@ -7,11 +7,11 @@
 ## Functions & Macros
 ### Function `configure_headers(return_var)`
 
-&ensp;&ensp;&ensp;&ensp;Apply `configure_file()` on a list of headers. The header hierarchy is preserved based on header based directories.
+&ensp;&ensp;&ensp;&ensp;Apply `configure_file()` on a list of headers. The header hierarchy is preserved based on the provided header base directory.
 - *return_var* :  Variable in the calling scope containing the list of paths to the generated headers.
 - FILES *headers* :  List of header files to configure.
 - [BASE_DIR *dir*] :  Directory from which the relative path of input header is computed. (*${CMAKE_INSTALL_INCLUDEDIR}* used by default)
-- [BINARY_BASE_DIR *dir*] :  Directory from which the hierachy of headers is generated. (*${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_INSTALL_INCLUDEDIR}* used by default)
+- [BINARY_BASE_DIR *dir*] :  Directory from which the hierarchy of headers is generated. (*${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_INSTALL_INCLUDEDIR}* used by default)
 
 ### Function `target_default_warning_options(target)`
 
