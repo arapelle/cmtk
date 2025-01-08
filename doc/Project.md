@@ -9,6 +9,10 @@
 
 &ensp;&ensp;&ensp;&ensp;Check if the build directory is not a subdirectory of the source directory. If it is the case, a message is printed, and the configure phase is stopped.
 
+### Function `check_in_source_build()`
+
+&ensp;&ensp;&ensp;&ensp;Check if the build directory is not a subdirectory of the source directory, if the option ENABLE_IN_SOURCE_BUILD is ON. If it is the case, a message is printed, and the configure phase is stopped.
+
 ### Function `set_build_type_ifndef()`
 
 &ensp;&ensp;&ensp;&ensp;Set Release as value for BUILT_TYPE, if none was provided.
@@ -36,6 +40,14 @@ If NAMESPACE and BASE_NAME are used, PROJECT_NAME is set to `${PROJECT_NAMESPACE
 &ensp;&ensp;&ensp;&ensp;Arguments:
 - [PRE_RELEASE *pre_release*] :  Pre-release version of the project. (Set PROJECT_NAME.)
 - [BUILD_METADATA *build_metadata*] :  Build metadata of the project. (Set PROJECT_NAMESPACE.)
+
+### Function `configure_files(return_var)`
+
+&ensp;&ensp;&ensp;&ensp;Apply `configure_file()` on a list of files. The file hierarchy is preserved based on the provided base directory.
+- *return_var* :  Variable in the calling scope containing the list of paths to the generated files.
+- FILES *files* :  List of files to configure.
+- BASE_DIR *dir* :  Directory from which the relative path of input file is computed.
+- BINARY_BASE_DIR *dir* :  Directory from which the hierarchy of files is generated.
 
 ### Function `install_uninstall_script(package_name)`
 
