@@ -13,6 +13,14 @@
 - [BASE_DIR *dir*] :  Directory from which the relative path of input header is computed. (*${CMAKE_INSTALL_INCLUDEDIR}* used by default)
 - [BINARY_BASE_DIR *dir*] :  Directory from which the hierarchy of headers is generated. (*${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_INSTALL_INCLUDEDIR}* used by default)
 
+### Function `configure_sources(return_var)`
+
+&ensp;&ensp;&ensp;&ensp;Apply `configure_file()` on a list of sources. The source hierarchy is preserved based on the provided source base directory.
+- *return_var* :  Variable in the calling scope containing the list of paths to the generated sources.
+- FILES *sourcess* :  List of source files to configure.
+- [BASE_DIR *dir*] :  Directory from which the relative path of input header is computed. (*src* used by default)
+- [BINARY_BASE_DIR *dir*] :  Directory from which the hierarchy of sources is generated. (*${CMAKE_CURRENT_BINARY_DIR}/src* used by default)
+
 ### Function `target_default_warning_options(target)`
 
 &ensp;&ensp;&ensp;&ensp;Add default warning compile options to a given target.
