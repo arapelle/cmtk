@@ -27,7 +27,8 @@ If NAMESPACE and BASE_NAME are used, PROJECT_NAME is set to `${PROJECT_NAMESPACE
 
 - [NAME *name*] :  Name of the project. (Set PROJECT_NAME.)
 - [NAMESPACE *namespace*] :  Namespace of the project. (Set PROJECT_NAMESPACE.)
-- [BASE_NAME *base_name*] :  Base name of the project. (Set PROJECT_BASE_NAME.)
+- [FEATURE_NAME *feature_name*] :  Feature name of the project. (Set PROJECT_FEATURE_NAME.)
+- **deprecated** [BASE_NAME *base_name*] :  Base name of the project. (Set PROJECT_BASE_NAME.)
 
 ### Function `set_project_semantic_version(basicver)`
 
