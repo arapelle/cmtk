@@ -24,7 +24,12 @@
 ### Function `target_default_warning_options(target)`
 
 &ensp;&ensp;&ensp;&ensp;Add default warning compile options to a given target.
-`/Wall` mith Visual compiler, or `-Wall -Wextra -pedantic` with g++.
+`/Wall` mith Visual compiler, or `-Wall -Wextra -pedantic -Wshadow -Wmisleading-indentation -Wconversion -Wold-style-cast` with g++.
+
+### Function `target_default_error_options(target)`
+
+&ensp;&ensp;&ensp;&ensp;Add default error compile options to a given target.
+`-pedantic-errors -Werror=old-style-cast` with g++.
 
 ### macro `add_test_subdirectory_if_build(dir_name ...)`
 
