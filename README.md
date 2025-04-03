@@ -7,7 +7,7 @@ This CMake ToolKit (CMTK) provides helping CMake functions to manage simple C++ 
 # Requirements
 - ### Binaries:
 
-  - CMake 3.23 or later
+  - CMake 3.25 or later
 
 # API Documentation
 
