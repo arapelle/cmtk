@@ -21,6 +21,7 @@
 
 &ensp;&ensp;&ensp;&ensp;Target options arguments:
 - [DEFAULT_WARNING_OPTIONS] : 	Indicates if target_default_warning_options() must be called with the targtet, or not.
+- [DEFAULT_ERROR_OPTIONS] : 	Indicates if target_default_error_options() must be called with the targtet, or not.
 - [CXX_STANDARD *cxx_std*] : 	C++ version used (..., 11, 14, 17, 20, 23, 26, ...)
 - [LIBRARY_OUTPUT_DIRECTORY *output_dir*] : 	Output directory of the built shared library.
 - [ARCHIVE_OUTPUT_DIRECTORY *output_dir*] : 	Output directory of the built static library.

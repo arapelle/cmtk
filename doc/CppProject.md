@@ -21,10 +21,23 @@
 - [BASE_DIR *dir*] :  Directory from which the relative path of input header is computed. (*src* used by default)
 - [BINARY_BASE_DIR *dir*] :  Directory from which the hierarchy of sources is generated. (*${CMAKE_CURRENT_BINARY_DIR}/src* used by default)
 
+### Function `cxx_standard_option(cxx_std_var_name)`
+
+&ensp;&ensp;&ensp;&ensp;Create a cache option which indicates the C++ standard to use.
+- *cxx_std_var_name* :  The name of the cache option to create.
+- [MIN *cxx_std*] :  The lowest C++ standard version which can be used.  (*98* used by default)
+- [MAX *cxx_std*] :  The greatest C++ standard version which can be used.  (*26* used by default)
+- [DEFAULT *cxx_std*] :  The default value for the cache variable.  (*CMAKE_CXX_STANDARD* used by default if valid, *MIN* otherwise)
+
 ### Function `target_default_warning_options(target)`
 
 &ensp;&ensp;&ensp;&ensp;Add default warning compile options to a given target.
-`/Wall` mith Visual compiler, or `-Wall -Wextra -pedantic` with g++.
+`/Wall` mith Visual compiler, or `-Wall -Wextra -pedantic -Wshadow -Wmisleading-indentation -Wconversion -Wold-style-cast` with g++.
+
+### Function `target_default_error_options(target)`
+
+&ensp;&ensp;&ensp;&ensp;Add default error compile options to a given target.
+`-pedantic-errors -Werror=old-style-cast` with g++.
 
 ### macro `add_test_subdirectory_if_build(dir_name ...)`
 
