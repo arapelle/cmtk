@@ -66,6 +66,7 @@ and also the namespace containing all generated constants, types and functions.
 - LIBRARY_OUTPUT_DIRECTORY
 - ARCHIVE_OUTPUT_DIRECTORY
 - DEFAULT_WARNING_OPTIONS
+- DEFAULT_ERROR_OPTIONS
 
 <u>Example:</u><br />
 Here, we have our source project tree:
