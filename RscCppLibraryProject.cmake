@@ -15,7 +15,7 @@ endfunction()
 function(add_rsc_cpp_library target_name library_type)
     include(GNUInstallDirs)
     # Args:
-    set(options "PRIVATE_RESOURCE_HEADERS;PRIVATE_RESOURCE_PATHS_HEADER;DEFAULT_WARNING_OPTIONS")
+    set(options "PRIVATE_RESOURCE_HEADERS;PRIVATE_RESOURCE_PATHS_HEADER;DEFAULT_WARNING_OPTIONS;DEFAULT_ERROR_OPTIONS")
     set(params "CONTEXT_NAMESPACE;INLINE_CONTEXT_NAMESPACE;NAMESPACE;VIRTUAL_ROOT;"
                 "RESOURCES_BASE_DIR;
                  BUILD_RESOURCE_HEADERS_BASE_DIR;
@@ -30,10 +30,18 @@ function(add_rsc_cpp_library target_name library_type)
     # Check args:
     fatal_ifndef("No NAMESPACE provided!" ARG_NAMESPACE)
     fatal_ifndef("No resource file provided!" ARG_RESOURCES)
+    set(optional_args "")
     if(ARG_DEFAULT_WARNING_OPTIONS)
-        set(ARG_DEFAULT_WARNING_OPTIONS "DEFAULT_WARNING_OPTIONS")
-    else()
-        set(ARG_DEFAULT_WARNING_OPTIONS "")
+        set(optional_args "${optional_args} DEFAULT_WARNING_OPTIONS")
+    endif()
+    if(ARG_DEFAULT_ERROR_OPTIONS)
+        set(optional_args "${optional_args} DEFAULT_ERROR_OPTIONS")
+    endif()
+    if(ARG_LIBRARY_OUTPUT_DIRECTORY)
+        set(optional_args "${optional_args} LIBRARY_OUTPUT_DIRECTORY ${ARG_LIBRARY_OUTPUT_DIRECTORY}")
+    endif()
+    if(ARG_ARCHIVE_OUTPUT_DIRECTORY)
+        set(optional_args "${optional_args} ARCHIVE_OUTPUT_DIRECTORY ${ARG_ARCHIVE_OUTPUT_DIRECTORY}")
     endif()
     set_ifndef(ARG_RESOURCES_BASE_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
     set_ifndef(ARG_BUILD_RESOURCE_HEADERS_BASE_DIR ${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_INSTALL_INCLUDEDIR})
@@ -105,9 +113,7 @@ function(add_rsc_cpp_library target_name library_type)
         CXX_STANDARD ${ARG_CXX_STANDARD}
         HEADERS_BASE_DIRS ${ARG_HEADERS_BASE_DIRS}
         BUILD_HEADERS_BASE_DIRS ${ARG_BUILD_HEADERS_BASE_DIRS} ${ARG_BUILD_RESOURCE_HEADERS_BASE_DIR}
-        LIBRARY_OUTPUT_DIRECTORY ${ARG_LIBRARY_OUTPUT_DIRECTORY}
-        ARCHIVE_OUTPUT_DIRECTORY ${ARG_ARCHIVE_OUTPUT_DIRECTORY}
-        ${ARG_DEFAULT_WARNING_OPTIONS}
+        ${optional_args}
     )
     add_dependencies(${target_name} ${rsc_targets})
     if(ARG_PRIVATE_RESOURCE_HEADERS)
