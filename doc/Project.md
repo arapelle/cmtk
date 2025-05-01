@@ -18,7 +18,7 @@
 &ensp;&ensp;&ensp;&ensp;Set Release as value for BUILT_TYPE, if none was provided.
 
 - [DEFAULT *default_type*]: 	The default build type if none is provided when CMake is invoked. It can be a name or the index in the BUILD_TYPES list.  (*0* used by default)
-- [BUILD_TYPES *type_list*]:   The list of available build tpyes. (*Release, Debug, MinSizeRel, RelWithDebInfo* used by default)
+- [BUILD_TYPES *type_list*]:   The list of available build types. (*Release, Debug, MinSizeRel, RelWithDebInfo* used by default)
 
 ### Function `set_project_name()`
 
@@ -27,7 +27,11 @@ If NAMESPACE and BASE_NAME are used, PROJECT_NAME is set to `${PROJECT_NAMESPACE
 
 - [NAME *name*] :  Name of the project. (Set PROJECT_NAME.)
 - [NAMESPACE *namespace*] :  Namespace of the project. (Set PROJECT_NAMESPACE.)
-- [BASE_NAME *base_name*] :  Base name of the project. (Set PROJECT_BASE_NAME.)
+- [FEATURE_NAME *feature_name*] :  Feature name of the project. (Set PROJECT_FEATURE_NAME.)
+- **deprecated** [BASE_NAME *base_name*] :  Base name of the project. (Set PROJECT_BASE_NAME.)
+- [CODE_NAME *code_name*] :  Name of the project used in code sources. (Set PROJECT_CODE_NAME which is set to *${PROJECT_NAME}* by default.)
+- [CODE_NAMESPACE *code_namespace*] :  Namespace of the project used in code sources. (Set PROJECT_CODE_NAMESPACE which is set to *${PROJECT_NAMESPACE}* by default.)
+- [CODE_FEATURE_NAME *code_feature_name*] :  Feature name of the project used in code sources. (Set PROJECT_CODE_FEATURE_NAME which is set to *${PROJECT_FEATURE_NAME}* by default.)
 
 ### Function `set_project_semantic_version(basicver)`
 

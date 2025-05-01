@@ -18,6 +18,7 @@
 - [DEPENDENCIES *dependency_list*]: 	The list of dependency targets.
 - [CXX_STANDARD *cxx_std*] : 	C++ version used (..., 11, 14, 17, 20, 23, 26, ...)
 - [DEFAULT_WARNING_OPTIONS ON|OFF] : 	Indicates if target_default_warning_options() must be called with the test target, or not. (*ON* used by default.)
+- [DEFAULT_ERROR_OPTIONS ON|OFF] : 	Indicates if target_default_error_options() must be called with the test target, or not. (*ON* used by default.)
 
 ### Function `add_cpp_library_basic_tests(library_target gtest_target ...)`
 
@@ -29,3 +30,4 @@
 - [DEPENDENCIES *dependency_list*]: 	The list of dependency targets.
 - [CXX_STANDARD *cxx_std*] : 	C++ version used (..., 11, 14, 17, 20, 23, 26, ...)
 - [DEFAULT_WARNING_OPTIONS ON|OFF] : 	Indicates if target_default_warning_options() must be called with the test target, or not. (*ON* used by default.)
+- [DEFAULT_ERROR_OPTIONS ON|OFF] : 	Indicates if target_default_error_options() must be called with the test target, or not. (*ON* used by default.)
