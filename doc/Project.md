@@ -22,8 +22,8 @@
 
 ### Function `set_project_name()`
 
-&ensp;&ensp;&ensp;&ensp;Set project name variables : PROJECT_NAME, PROJECT_NAMESPACE and PROJECT_BASE_NAME.
-If NAMESPACE and BASE_NAME are used, PROJECT_NAME is set to `${PROJECT_NAMESPACE}-${PROJECT_BASE_NAME}`.
+&ensp;&ensp;&ensp;&ensp;Set project name variables : PROJECT_NAME, PROJECT_NAMESPACE and PACKAGE_SUBJECT_NAME.
+If NAMESPACE and SUBJECT_NAME are used, PROJECT_NAME is set to `${PROJECT_NAMESPACE}-${PACKAGE_SUBJECT_NAME}`.
 
 - [NAME *name*] :  Name of the project. (Set PROJECT_NAME.)
 - [NAMESPACE *namespace*] :  Namespace of the project. (Set PROJECT_NAMESPACE.)
@@ -31,6 +31,18 @@ If NAMESPACE and BASE_NAME are used, PROJECT_NAME is set to `${PROJECT_NAMESPACE
 - [CODE_NAME *code_name*] :  Name of the project used in code sources. (Set PROJECT_CODE_NAME which is set to *${PROJECT_NAME}* by default.)
 - [CODE_NAMESPACE *code_namespace*] :  Namespace of the project used in code sources. (Set PROJECT_CODE_NAMESPACE which is set to *${PROJECT_NAMESPACE}* by default.)
 - [CODE_SUBJECT_NAME *code_subject_name*] :  Subject name of the project used in code sources. (Set PROJECT_CODE_SUBJECT_NAME which is set to *${PROJECT_SUBJECT_NAME}* by default.)
+
+### Function `set_package_name()`
+
+&ensp;&ensp;&ensp;&ensp;Set package name variables: PACKAGE_NAME, PACKAGE_NAMESPACE and PACKAGE_SUBJECT_NAME.
+If NAMESPACE and SUBJECT_NAME are used, PACKAGE_NAME is set to `${PACKAGE_NAMESPACE}-${PACKAGE_SUBJECT_NAME}`.
+
+- [NAME *name*] :  Name of the package. (Set PACKAGE_NAME.)
+- [NAMESPACE *namespace*] :  Namespace of the package. (Set PACKAGE_NAMESPACE.)
+- [SUBJECT_NAME *subject_name*] :  Subject name of the package. (Set PACKAGE_SUBJECT_NAME.)
+- [CODE_NAME *code_name*] :  Name of the package used in code sources. (Set PACKAGE_CODE_NAME which is set to *${PACKAGE_NAME}* by default.)
+- [CODE_NAMESPACE *code_namespace*] :  Namespace of the package used in code sources. (Set PACKAGE_CODE_NAMESPACE which is set to *${PACKAGE_NAMESPACE}* by default.)
+- [CODE_SUBJECT_NAME *code_subject_name*] :  Subject name of the package used in code sources. (Set PACKAGE_CODE_SUBJECT_NAME which is set to *${PACKAGE_SUBJECT_NAME}* by default.)
 
 ### Function `set_project_semantic_version(basicver)`
 
@@ -41,8 +53,20 @@ If NAMESPACE and BASE_NAME are used, PROJECT_NAME is set to `${PROJECT_NAMESPACE
 - `PROJECT_SEMANTIC_VERSION` is set to `${basicver}+${build_metadata}` if `${pre_release}` is empty but `${build_metadata}` is not.
 
 &ensp;&ensp;&ensp;&ensp;Arguments:
-- [PRE_RELEASE *pre_release*] :  Pre-release version of the project. (Set PROJECT_NAME.)
-- [BUILD_METADATA *build_metadata*] :  Build metadata of the project. (Set PROJECT_NAMESPACE.)
+- [PRE_RELEASE *pre_release*] :  Pre-release version of the project. (Set PROJECT_VERSION_PRE_RELEASE.)
+- [BUILD_METADATA *build_metadata*] :  Build metadata of the project. (Set PROJECT_VERSION_BUILD_METADATA.)
+
+### Function `set_package_semantic_version(basicver)`
+
+&ensp;&ensp;&ensp;&ensp;Set package version variables : `PACKAGE_SEMANTIC_VERSION`, `PACKAGE_VERSION`, `PACKAGE_VERSION_MAJOR`,
+ `PACKAGE_VERSION_MINOR`, `PACKAGE_VERSION_PATCH`, `PACKAGE_VERSION_PRE_RELEASE`, `PACKAGE_VERSION_BUILD_METADATA`.
+- `PACKAGE_SEMANTIC_VERSION` is set to `${basicver}-${pre_release}+${build_metadata}` if `${pre_release}` and `${build_metadata}` are not empty. 
+- `PACKAGE_SEMANTIC_VERSION` is set to `${basicver}-${pre_release}` if `${pre_release}` is not empty but `${build_metadata}` is. 
+- `PACKAGE_SEMANTIC_VERSION` is set to `${basicver}+${build_metadata}` if `${pre_release}` is empty but `${build_metadata}` is not.
+
+&ensp;&ensp;&ensp;&ensp;Arguments:
+- [PRE_RELEASE *pre_release*] :  Pre-release version of the package. (Set PACKAGE_VERSION_PRE_RELEASE.)
+- [BUILD_METADATA *build_metadata*] :  Build metadata of the package. (Set PACKAGE_VERSION_BUILD_METADATA.)
 
 ### Function `configure_files(return_var)`
 
