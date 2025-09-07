@@ -66,11 +66,11 @@ endfunction()
 
 
 macro(make_lower_c_identifier str return_var)
-  string(MAKE_C_IDENTIFIER ${str} ${return_var})
-  string(TOLOWER ${${return_var}} ${return_var})
+  string(MAKE_C_IDENTIFIER "${str}" ${return_var})
+  string(TOLOWER "${${return_var}}" ${return_var})
 endmacro()
 
 macro(make_upper_c_identifier str return_var)
-  string(MAKE_C_IDENTIFIER ${str} ${return_var})
-  string(TOUPPER ${${return_var}} ${return_var})
+  string(MAKE_C_IDENTIFIER "${str}" ${return_var})
+  string(TOUPPER "${${return_var}}" ${return_var})
 endmacro()
