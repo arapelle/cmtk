@@ -72,7 +72,7 @@
 - [OPTION_DEFAULT *ON|OFF*] :  The default value of the option (ON or OFF). (*OFF* used by default)
 - [OUT_VAR *out_var*] :  The name of the variable to set with the option value.
 
-### macro `add_test_subdirectory_if_build(dir_name ...)`
+### macro `add_test_subdirectory_if_built(dir_name ...)`
 
 &ensp;&ensp;&ensp;&ensp;Create a cached option indicating if the provided test subdirectory must be added or not. Then add this test subdirectory accordingly to the option.
 - *dir_name* :  The test subdirectory to treat.
@@ -81,7 +81,7 @@
 - [OPTION_MSG *msg*] :  The message of the option. (*Build ${NAME} tests or not.* used by default)
 - [OPTION_DEFAULT *ON|OFF*] :  The default value of the option (ON or OFF). (*OFF* used by default)
 
-### macro `add_example_subdirectory_if_build(dir_name ...)`
+### macro `add_example_subdirectory_if_built(dir_name ...)`
 
 &ensp;&ensp;&ensp;&ensp;Create a cached option indicating if the provided example subdirectory must be added or not. Then add this example subdirectory accordingly to the option.
 - *dir_name* :  The example subdirectory to treat.
