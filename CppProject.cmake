@@ -176,3 +176,29 @@ function(copy_runtime_dlls_if_win32 target_name)
         COMMAND_EXPAND_LISTS)
   endif()
 endfunction()
+
+# args:
+#  target_names
+#  EXPORT <export-name>
+#  [CMAKE_FILES_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}]
+#  [NAMESPACE <ns>]
+function(install_cpp_targets)
+  include(GNUInstallDirs)
+  # Args:
+  set(params "EXPORT;CMAKE_FILES_DESTINATION;NAMESPACE")
+  set(lists "TARGETS")
+  # Parse args:
+  cmake_parse_arguments(PARSE_ARGV 0 "ARG" "" "${params}" "${lists}")
+  # Check/Set args:
+  fatal_ifndef("A list of TARGETS is required." ARG_TARGETS)
+  fatal_ifndef("EXPORT name is required (e.g. \${PROJECT_NAME}-targets)" ARG_EXPORT)
+  set_ifndef(ARG_CMAKE_FILES_DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}")
+  set_iftest(namespace_opt IF ARG_NAMESPACE THEN NAMESPACE ${ARG_NAMESPACE})
+  # Install targets:
+  install(TARGETS ${ARG_TARGETS} EXPORT ${ARG_EXPORT}
+          FILE_SET HEADERS DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+          )
+  # Install export:
+  install(EXPORT ${ARG_EXPORT} DESTINATION ${ARG_CMAKE_FILES_DESTINATION} ${namespace_opt})
+#  export(EXPORT ${ARG_EXPORT} FILE ${CMAKE_CURRENT_BINARY_DIR}/${ARG_EXPORT}.cmake ${namespace_opt})
+endfunction()

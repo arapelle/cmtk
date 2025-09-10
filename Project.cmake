@@ -181,6 +181,35 @@ function(configure_files return_var)
   set(${return_var} "${olist}" PARENT_SCOPE)
 endfunction()
 
+function(install_package package_name)
+    include(GNUInstallDirs)
+    include(CMakePackageConfigHelpers)
+    # Args:
+    set(options "")
+    set(params "VERSION;VERSION_COMPATIBILITY;INPUT_PACKAGE_CONFIG_FILE;CMAKE_FILES_DESTINATION")
+    set(lists "")
+    # Parse args:
+    cmake_parse_arguments(PARSE_ARGV 1 "ARG" "${options}" "${params}" "${lists}")
+    # Check and set args:
+    fatal_ifndef("INPUT_PACKAGE_CONFIG_FILE is required (e.g. CMake-package-config.cmake.in)" ARG_INPUT_PACKAGE_CONFIG_FILE)
+    set_ifndef(ARG_VERSION ${PROJECT_VERSION})
+    set_ifndef(ARG_VERSION_COMPATIBILITY SameMajorVersion)
+    set_ifndef(ARG_CMAKE_FILES_DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/${package_name}")
+    # Create package config file:
+    configure_package_config_file(${ARG_INPUT_PACKAGE_CONFIG_FILE}
+        "${PROJECT_BINARY_DIR}/${package_name}-config.cmake"
+        INSTALL_DESTINATION ${ARG_CMAKE_FILES_DESTINATION})
+    # Create package version file:
+    write_basic_package_version_file("${PROJECT_BINARY_DIR}/${package_name}-config-version.cmake"
+        VERSION ${ARG_VERSION}
+        COMPATIBILITY ${ARG_VERSION_COMPATIBILITY})
+    # Install package files:
+    install(FILES
+        ${PROJECT_BINARY_DIR}/${package_name}-config.cmake
+        ${PROJECT_BINARY_DIR}/${package_name}-config-version.cmake
+        DESTINATION ${ARG_CMAKE_FILES_DESTINATION})
+endfunction()
+
 function(install_uninstall_script package_name)
     include(GNUInstallDirs)
     # Args:

@@ -96,3 +96,11 @@
 "${CMAKE_CURRENT_BINARY_DIR}/${RUNTIME_OUTPUT_SUBDIRECTORY}" (below).
 - *target_name* :  The name of the target.
 - [RUNTIME_OUTPUT_SUBDIRECTORY *dir*] :  The subdirectory path used to defined the RUNTIME_OUTPUT_DIRECTORY of the target. (Empty string used by default)
+
+### Function `install_cpp_targets(...)`
+
+&ensp;&ensp;&ensp;&ensp;Install C++ targets.
+- TARGETS *target_names* : Names of the targets to install.
+- EXPORT *export_name* : 	Export name.
+- [NAMESPACE *namespace*]: 	Targets namespace.
+- [CMAKE_FILES_DESTINATION *destination*]: Destination directory where to install the CMake files.

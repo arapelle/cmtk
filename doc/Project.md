@@ -89,6 +89,15 @@ If NAMESPACE and SUBJECT_NAME are used, PACKAGE_NAME is set to `${PACKAGE_NAMESP
 - BASE_DIR *dir* :  Directory from which the relative path of input file is computed.
 - BINARY_BASE_DIR *dir* :  Directory from which the hierarchy of files is generated.
 
+### Function `install_package(package_name ...)`
+
+&ensp;&ensp;&ensp;&ensp;Install C++ package
+
+- INPUT_PACKAGE_CONFIG_FILE *package-config.cmake.in*: 	A package config file will be created by using configure_package_config_file() on the provided *package-config.cmake.in*.
+- [VERSION *version*]: 	The version of the package. (*PROJECT_VERSION* used by default)
+- [VERSION_COMPATIBILITY *compatibility*]: 	The compatibility with previous versions (cf. CMake function [write_basic_package_version_file](https://cmake.org/cmake/help/latest/module/CMakePackageConfigHelpers.html#command:write_basic_package_version_file)). (*SameMajorVersion* used by default)
+- [CMAKE_FILES_DESTINATION *destination*]: Destination directory where to install the CMake files.
+
 ### Function `install_uninstall_script(package_name)`
 
 &ensp;&ensp;&ensp;&ensp;Add installation code which creates a uninstall CMake script of the project.
