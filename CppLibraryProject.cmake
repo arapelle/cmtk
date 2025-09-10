@@ -92,7 +92,7 @@ function(install_cpp_libraries)
           )
   # Install export:
   install(EXPORT ${ARG_EXPORT} DESTINATION ${ARG_CMAKE_FILES_DESTINATION} ${namespace_opt})
-  export(EXPORT ${ARG_EXPORT} FILE ${CMAKE_CURRENT_BINARY_DIR}/${ARG_EXPORT}.cmake ${namespace_opt})
+#  export(EXPORT ${ARG_EXPORT} FILE ${CMAKE_CURRENT_BINARY_DIR}/${ARG_EXPORT}.cmake ${namespace_opt})
 endfunction()
 
 function(install_library_package package_name)
