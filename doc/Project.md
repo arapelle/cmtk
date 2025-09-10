@@ -44,6 +44,19 @@ If NAMESPACE and SUBJECT_NAME are used, PACKAGE_NAME is set to `${PACKAGE_NAMESP
 - [CODE_NAMESPACE *code_namespace*] :  Namespace of the package used in code sources. (Set PACKAGE_CODE_NAMESPACE which is set to *${PACKAGE_NAMESPACE}* by default.)
 - [CODE_SUBJECT_NAME *code_subject_name*] :  Subject name of the package used in code sources. (Set PACKAGE_CODE_SUBJECT_NAME which is set to *${PACKAGE_SUBJECT_NAME}* by default.)
 
+### Macro `set_component_name_if_build(comp_name)`
+
+&ensp;&ensp;&ensp;&ensp;Create a cached option indicating if variables associated to a component must be set or not. Then set these variables accordingly to the option: COMPONENT_NAME, COMPONENT_CODE_NAME.
+
+- comp_name :  Name of the component. (Set COMPONENT_NAME.)
+- [NAMESPACE *namespace*] :  Namespace of the component, generally the package name. (*${PACKAGE_NAME}* used by default.)
+- [CODE_NAME *code_name*] :  Name of the component used in code sources. (Set COMPONENT_CODE_NAME which is set to *${comp_name}* by default.)
+- [OPTION_NAME *name*] :  The name of the option. (*BUILD_${UPPER_NAME}* used by default, where ${UPPER_NAME} is the upper value of ${comp_name} or ${NAMESPACE}_${PROJECT_NAME})
+- [OPTION_MSG *msg*] :  The message of the option. (*Build ${full_name} or not.* used by default, where ${full_name} is the value of ${comp_name} or ${NAMESPACE}::${PROJECT_NAME})
+- [OPTION_DEFAULT *ON|OFF*] :  The default value of the option (ON or OFF). (*ON* used by default)
+- [OUT_VAR *out_var*] :  The name of the variable to set with the option value.
+- [RETURN_IF_NOT_BUILT] :  Execute the *return()* command if the option value is *OFF*.
+
 ### Function `set_project_semantic_version(basicver)`
 
 &ensp;&ensp;&ensp;&ensp;Set project version variables : `PROJECT_SEMANTIC_VERSION`, `PROJECT_VERSION`, `PROJECT_VERSION_MAJOR`,
