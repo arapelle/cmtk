@@ -39,15 +39,15 @@
 &ensp;&ensp;&ensp;&ensp;Add default error compile options to a given target.
 `-pedantic-errors -Werror=old-style-cast` with g++.
 
-### macro `build_option(...)`
+### macro `build_component_option(...)`
 
-&ensp;&ensp;&ensp;&ensp;Create a cached option indicating if a project must be built or not.
+&ensp;&ensp;&ensp;&ensp;Create a cached option indicating if a component must be built or not.
 - [NAME *name*] :  The name to use to define the option name and its message (if they are not provided).
-- [PROJECT_NAME *project_name*] :  The project name to use to define the option name and its message (if they are not provided). (*${PROJECT_NAME}* used by default)
+- [COMPONENT_NAME *component_name*] :  The component name to use to define the option name and its message (if they are not provided). (*${COMPONENT_NAME}* used by default)
 - [NAMESPACE *namespace*] :  The namespace to use to define the option name and its message (if they are not provided). (*${PACKAGE_NAME}* used by default)
-- [OPTION_NAME *name*] :  The name of the option. (*BUILD_${UPPER_NAME}* used by default, where ${UPPER_NAME} is the upper value of ${NAME} or ${NAMESPACE}_${PROJECT_NAME})
-- [OPTION_MSG *msg*] :  The message of the option. (*Build ${full_name} or not.* used by default, where ${full_name} is the value of ${NAME} or ${NAMESPACE}::${PROJECT_NAME})
-- [OPTION_DEFAULT *ON|OFF*] :  The default value of the option (ON or OFF). (*OFF* used by default)
+- [OPTION_NAME *name*] :  The name of the option. (*BUILD_${UPPER_NAME}* used by default, where ${UPPER_NAME} is the upper value of ${NAME} or ${NAMESPACE}_${COMPONENT_NAME})
+- [OPTION_MSG *msg*] :  The message of the option. (*Build ${full_name} or not.* used by default, where ${full_name} is the value of ${NAME} or ${NAMESPACE}::${COMPONENT_NAME})
+- [OPTION_DEFAULT *ON|OFF*] :  The default value of the option (ON or OFF). (*ON* used by default)
 - [OUT_VAR *out_var*] :  The name of the variable to set with the option value.
 
 ### macro `build_tests_option(...)`
