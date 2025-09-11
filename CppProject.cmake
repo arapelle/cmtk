@@ -200,7 +200,7 @@ endfunction()
 # args:
 #  target_names
 #  EXPORT <export-name>
-#  [CMAKE_FILES_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}]
+#  [CMAKE_FILES_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PACKAGE_NAME}]
 #  [NAMESPACE <ns>]
 function(install_cpp_targets)
   include(GNUInstallDirs)
@@ -211,8 +211,8 @@ function(install_cpp_targets)
   cmake_parse_arguments(PARSE_ARGV 0 "ARG" "" "${params}" "${lists}")
   # Check/Set args:
   fatal_ifndef("A list of TARGETS is required." ARG_TARGETS)
-  fatal_ifndef("EXPORT name is required (e.g. \${PROJECT_NAME}-targets)" ARG_EXPORT)
-  set_ifndef(ARG_CMAKE_FILES_DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}")
+  fatal_ifndef("EXPORT name is required (e.g. \${PACKAGE_NAME}-targets)" ARG_EXPORT)
+  set_ifndef(ARG_CMAKE_FILES_DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/${PACKAGE_NAME}")
   set_iftest(namespace_opt IF ARG_NAMESPACE THEN NAMESPACE ${ARG_NAMESPACE})
   # Install targets:
   install(TARGETS ${ARG_TARGETS} EXPORT ${ARG_EXPORT}
