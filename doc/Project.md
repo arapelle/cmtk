@@ -22,26 +22,26 @@
 
 ### Function `set_project_name()`
 
-&ensp;&ensp;&ensp;&ensp;Set project name variables : PROJECT_NAME, PROJECT_NAMESPACE and PACKAGE_SUBJECT_NAME.
-If NAMESPACE and SUBJECT_NAME are used, PROJECT_NAME is set to `${PROJECT_NAMESPACE}-${PACKAGE_SUBJECT_NAME}`.
+&ensp;&ensp;&ensp;&ensp;Set project name variables : PROJECT_NAME, PROJECT_CONTEXT_NAME and PACKAGE_SUBJECT_NAME.
+If CONTEXT_NAME and SUBJECT_NAME are used, PROJECT_NAME is set to `${PROJECT_CONTEXT_NAME}-${PACKAGE_SUBJECT_NAME}`.
 
 - [NAME *name*] :  Name of the project. (Set PROJECT_NAME.)
-- [NAMESPACE *namespace*] :  Namespace of the project. (Set PROJECT_NAMESPACE.)
+- [CONTEXT_NAME *context_name*] :  Context name of the project. (Set PROJECT_CONTEXT_NAME.)
 - [SUBJECT_NAME *subject_name*] :  Subject name of the project. (Set PROJECT_SUBJECT_NAME.)
 - [CODE_NAME *code_name*] :  Name of the project used in code sources. (Set PROJECT_CODE_NAME which is set to *${PROJECT_NAME}* by default.)
-- [CODE_NAMESPACE *code_namespace*] :  Namespace of the project used in code sources. (Set PROJECT_CODE_NAMESPACE which is set to *${PROJECT_NAMESPACE}* by default.)
+- [CODE_CONTEXT_NAME *code_context_name*] :  Context name of the project used in code sources. (Set PROJECT_CODE_CONTEXT_NAME which is set to *${PROJECT_CONTEXT_NAME}* by default.)
 - [CODE_SUBJECT_NAME *code_subject_name*] :  Subject name of the project used in code sources. (Set PROJECT_CODE_SUBJECT_NAME which is set to *${PROJECT_SUBJECT_NAME}* by default.)
 
 ### Function `set_package_name()`
 
-&ensp;&ensp;&ensp;&ensp;Set package name variables: PACKAGE_NAME, PACKAGE_NAMESPACE and PACKAGE_SUBJECT_NAME.
-If NAMESPACE and SUBJECT_NAME are used, PACKAGE_NAME is set to `${PACKAGE_NAMESPACE}-${PACKAGE_SUBJECT_NAME}`.
+&ensp;&ensp;&ensp;&ensp;Set package name variables: PACKAGE_NAME, PACKAGE_CONTEXT_NAME and PACKAGE_SUBJECT_NAME.
+If CONTEXT_NAME and SUBJECT_NAME are used, PACKAGE_NAME is set to `${PACKAGE_CONTEXT_NAME}-${PACKAGE_SUBJECT_NAME}`.
 
 - [NAME *name*] :  Name of the package. (Set PACKAGE_NAME.)
-- [NAMESPACE *namespace*] :  Namespace of the package. (Set PACKAGE_NAMESPACE.)
+- [CONTEXT_NAME *context_name*] :  Context name of the package. (Set PACKAGE_CONTEXT_NAME.)
 - [SUBJECT_NAME *subject_name*] :  Subject name of the package. (Set PACKAGE_SUBJECT_NAME.)
 - [CODE_NAME *code_name*] :  Name of the package used in code sources. (Set PACKAGE_CODE_NAME which is set to *${PACKAGE_NAME}* by default.)
-- [CODE_NAMESPACE *code_namespace*] :  Namespace of the package used in code sources. (Set PACKAGE_CODE_NAMESPACE which is set to *${PACKAGE_NAMESPACE}* by default.)
+- [CODE_CONTEXT_NAME *code_context_name*] :  Context name of the package used in code sources. (Set PACKAGE_CODE_CONTEXT_NAME which is set to *${PACKAGE_CONTEXT_NAME}* by default.)
 - [CODE_SUBJECT_NAME *code_subject_name*] :  Subject name of the package used in code sources. (Set PACKAGE_CODE_SUBJECT_NAME which is set to *${PACKAGE_SUBJECT_NAME}* by default.)
 
 ### Function `set_project_semantic_version(basicver)`
