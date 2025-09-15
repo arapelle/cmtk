@@ -123,6 +123,26 @@ macro(set_package_semantic_version)
     _cmtk_set_semantic_version("PACKAGE" ${ARGV})
 endmacro()
 
+function(set_package_component_names)
+    # Args:
+    set(options "")
+    set(params "")
+    set(lists "REQUIRED;OPTIONAL")
+    # Parse args:
+    cmake_parse_arguments(PARSE_ARGV 0 "ARG" "${options}" "${params}" "${lists}")
+    #:
+    fatal_if_none_is_def("You must provide at least one of the two component lists: REQUIRED, OPTIONAL." ARG_REQUIRED ARG_OPTIONAL)
+    if(NOT DEFINED ARG_REQUIRED)
+        set(ARG_REQUIRED)
+    endif()
+    if(NOT DEFINED ARG_OPTIONAL)
+        set(ARG_OPTIONAL)
+    endif()
+    set(PACKAGE_REQUIRED_COMPONENTS ${ARG_REQUIRED} PARENT_SCOPE)
+    set(PACKAGE_OPTIONAL_COMPONENTS ${ARG_OPTIONAL} PARENT_SCOPE)
+    set(PACKAGE_COMPONENTS ${ARG_REQUIRED} ${ARG_OPTIONAL} PARENT_SCOPE)
+endfunction()
+
 function(configure_files return_var)
   cmake_parse_arguments(PARSE_ARGV 1 "ARG" "" "BASE_DIR;BINARY_BASE_DIR" "FILES")
   fatal_ifndef("You must provide files to configure (FILES)." ARG_FILES)

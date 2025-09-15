@@ -68,6 +68,13 @@ If CONTEXT_NAME and SUBJECT_NAME are used, PACKAGE_NAME is set to `${PACKAGE_CON
 - [PRE_RELEASE *pre_release*] :  Pre-release version of the package. (Set PACKAGE_VERSION_PRE_RELEASE.)
 - [BUILD_METADATA *build_metadata*] :  Build metadata of the package. (Set PACKAGE_VERSION_BUILD_METADATA.)
 
+### Function `set_package_component_names()`
+
+&ensp;&ensp;&ensp;&ensp;Set package component name variables: PACKAGE_REQUIRED_COMPONENTS, PACKAGE_OPTIONAL_COMPONENTS and PACKAGE_COMPONENTS.
+
+- [REQUIRED *component_list*] :  Names of the required package components. (Set PACKAGE_REQUIRED_COMPONENTS.)
+- [OPTIONAL *component_list*] :  Names of the optional package components. (Set PACKAGE_OPTIONAL_COMPONENTS.)
+
 ### Function `configure_files(return_var)`
 
 &ensp;&ensp;&ensp;&ensp;Apply `configure_file()` on a list of files. The file hierarchy is preserved based on the provided base directory.
