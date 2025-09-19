@@ -75,6 +75,57 @@ If CONTEXT_NAME and SUBJECT_NAME are used, PACKAGE_NAME is set to `${PACKAGE_CON
 - [REQUIRED *component_list*] :  Names of the required package components. (Set PACKAGE_REQUIRED_COMPONENTS.)
 - [OPTIONAL *component_list*] :  Names of the optional package components. (Set PACKAGE_OPTIONAL_COMPONENTS.)
 
+### macro `build_component_option(...)`
+
+&ensp;&ensp;&ensp;&ensp;Create a cached option indicating if a component must be built or not.
+- [NAME *name*] :  The name to use to define the option name and its message (if they are not provided).
+- [COMPONENT_NAME *component_name*] :  The component name to use to define the option name and its message (if they are not provided). (*${COMPONENT_NAME}* used by default)
+- [NAMESPACE *namespace*] :  The namespace to use to define the option name and its message (if they are not provided). (*${PACKAGE_NAME}* used by default)
+- [OPTION_NAME *name*] :  The name of the option. (*${UPPER_NAME}*_BUILD used by default, where ${UPPER_NAME} is the upper value of ${NAME} or ${NAMESPACE}_${COMPONENT_NAME})
+- [OPTION_MSG *msg*] :  The message of the option. (*Build ${full_name} or not.* used by default, where ${full_name} is the value of ${NAME} or ${NAMESPACE}::${COMPONENT_NAME})
+- [OPTION_DEFAULT *ON|OFF*] :  The default value of the option (ON or OFF). (*ON* used by default)
+- [OUT_VAR *out_var*] :  The name of the variable to set with the option value.
+
+### macro `build_tests_option(...)`
+
+&ensp;&ensp;&ensp;&ensp;Create a cached option indicating if tests of a project must be built or not.
+- [NAME *name*] :  The name to use to define the option name and its message (if they are not provided).
+- [PROJECT_NAME *project_name*] :  The project name to use to define the option name and its message (if they are not provided). (*${PROJECT_NAME}* used by default)
+- [NAMESPACE *namespace*] :  The namespace to use to define the option name and its message (if they are not provided). (*${PACKAGE_NAME}* used by default)
+- [OPTION_NAME *name*] :  The name of the option. (*${UPPER_NAME}_BUILD_TESTS* used by default, where ${UPPER_NAME} is the upper value of ${NAME} or ${NAMESPACE}_${PROJECT_NAME})
+- [OPTION_MSG *msg*] :  The message of the option. (*Build ${full_name} or not.* used by default, where ${full_name} is the value of ${NAME} or ${NAMESPACE}::${PROJECT_NAME})
+- [OPTION_DEFAULT *ON|OFF*] :  The default value of the option (ON or OFF). (*OFF* used by default)
+- [OUT_VAR *out_var*] :  The name of the variable to set with the option value.
+
+### macro `build_examples_option(...)`
+
+&ensp;&ensp;&ensp;&ensp;Create a cached option indicating if examples of a project must be built or not.
+- [NAME *name*] :  The name to use to define the option name and its message (if they are not provided).
+- [PROJECT_NAME *project_name*] :  The project name to use to define the option name and its message (if they are not provided). (*${PROJECT_NAME}* used by default)
+- [NAMESPACE *namespace*] :  The namespace to use to define the option name and its message (if they are not provided). (*${PACKAGE_NAME}* used by default)
+- [OPTION_NAME *name*] :  The name of the option. (*${UPPER_NAME}_BUILD_EXAMPLES* used by default, where ${UPPER_NAME} is the upper value of ${NAME} or ${NAMESPACE}_${PROJECT_NAME})
+- [OPTION_MSG *msg*] :  The message of the option. (*Build ${full_name} or not.* used by default, where ${full_name} is the value of ${NAME} or ${NAMESPACE}::${PROJECT_NAME})
+- [OPTION_DEFAULT *ON|OFF*] :  The default value of the option (ON or OFF). (*OFF* used by default)
+- [OUT_VAR *out_var*] :  The name of the variable to set with the option value.
+
+### macro `add_test_subdirectory_if_built(dir_name ...)`
+
+&ensp;&ensp;&ensp;&ensp;Create a cached option indicating if the provided test subdirectory must be added or not. Then add this test subdirectory accordingly to the option.
+- *dir_name* :  The test subdirectory to treat.
+- [NAME *name*] :  The name to use to define the option name and its message (if they are not provided). (*${PROJECT_NAME}* used by default)
+- [OPTION_NAME *name*] :  The name of the option. (*${UPPER_NAME}_BUILD_TESTS* used by default, where ${UPPER_NAME} is the upper value of ${NAME})
+- [OPTION_MSG *msg*] :  The message of the option. (*Build ${NAME} tests or not.* used by default)
+- [OPTION_DEFAULT *ON|OFF*] :  The default value of the option (ON or OFF). (*OFF* used by default)
+
+### macro `add_example_subdirectory_if_built(dir_name ...)`
+
+&ensp;&ensp;&ensp;&ensp;Create a cached option indicating if the provided example subdirectory must be added or not. Then add this example subdirectory accordingly to the option.
+- *dir_name* :  The example subdirectory to treat.
+- [NAME *name*] :  The name to use to define the option name and its message (if they are not provided). (*${PROJECT_NAME}* used by default)
+- [OPTION_NAME *name*] :  The name of the option. (*${UPPER_NAME}_BUILD_EXAMPLES* used by default, where ${UPPER_NAME} is the upper value of ${NAME})
+- [OPTION_MSG *msg*] :  The message of the option. (*Build ${NAME} examples or not.* used by default)
+- [OPTION_DEFAULT *ON|OFF*] :  The default value of the option (ON or OFF). (*OFF* used by default)
+
 ### Function `configure_files(return_var)`
 
 &ensp;&ensp;&ensp;&ensp;Apply `configure_file()` on a list of files. The file hierarchy is preserved based on the provided base directory.
