@@ -22,16 +22,27 @@
 
 ### Function `set_project_name()`
 
-&ensp;&ensp;&ensp;&ensp;Set project name variables : PROJECT_NAME, PROJECT_NAMESPACE and PROJECT_BASE_NAME.
-If NAMESPACE and BASE_NAME are used, PROJECT_NAME is set to `${PROJECT_NAMESPACE}-${PROJECT_BASE_NAME}`.
+&ensp;&ensp;&ensp;&ensp;Set project name variables : PROJECT_NAME, PROJECT_CONTEXT_NAME and PACKAGE_SUBJECT_NAME.
+If CONTEXT_NAME and SUBJECT_NAME are used, PROJECT_NAME is set to `${PROJECT_CONTEXT_NAME}-${PACKAGE_SUBJECT_NAME}`.
 
 - [NAME *name*] :  Name of the project. (Set PROJECT_NAME.)
-- [NAMESPACE *namespace*] :  Namespace of the project. (Set PROJECT_NAMESPACE.)
-- [FEATURE_NAME *feature_name*] :  Feature name of the project. (Set PROJECT_FEATURE_NAME.)
-- **deprecated** [BASE_NAME *base_name*] :  Base name of the project. (Set PROJECT_BASE_NAME.)
+- [CONTEXT_NAME *context_name*] :  Context name of the project. (Set PROJECT_CONTEXT_NAME.)
+- [SUBJECT_NAME *subject_name*] :  Subject name of the project. (Set PROJECT_SUBJECT_NAME.)
 - [CODE_NAME *code_name*] :  Name of the project used in code sources. (Set PROJECT_CODE_NAME which is set to *${PROJECT_NAME}* by default.)
-- [CODE_NAMESPACE *code_namespace*] :  Namespace of the project used in code sources. (Set PROJECT_CODE_NAMESPACE which is set to *${PROJECT_NAMESPACE}* by default.)
-- [CODE_FEATURE_NAME *code_feature_name*] :  Feature name of the project used in code sources. (Set PROJECT_CODE_FEATURE_NAME which is set to *${PROJECT_FEATURE_NAME}* by default.)
+- [CODE_CONTEXT_NAME *code_context_name*] :  Context name of the project used in code sources. (Set PROJECT_CODE_CONTEXT_NAME which is set to *${PROJECT_CONTEXT_NAME}* by default.)
+- [CODE_SUBJECT_NAME *code_subject_name*] :  Subject name of the project used in code sources. (Set PROJECT_CODE_SUBJECT_NAME which is set to *${PROJECT_SUBJECT_NAME}* by default.)
+
+### Function `set_package_name()`
+
+&ensp;&ensp;&ensp;&ensp;Set package name variables: PACKAGE_NAME, PACKAGE_CONTEXT_NAME and PACKAGE_SUBJECT_NAME.
+If CONTEXT_NAME and SUBJECT_NAME are used, PACKAGE_NAME is set to `${PACKAGE_CONTEXT_NAME}-${PACKAGE_SUBJECT_NAME}`.
+
+- [NAME *name*] :  Name of the package. (Set PACKAGE_NAME.)
+- [CONTEXT_NAME *context_name*] :  Context name of the package. (Set PACKAGE_CONTEXT_NAME.)
+- [SUBJECT_NAME *subject_name*] :  Subject name of the package. (Set PACKAGE_SUBJECT_NAME.)
+- [CODE_NAME *code_name*] :  Name of the package used in code sources. (Set PACKAGE_CODE_NAME which is set to *${PACKAGE_NAME}* by default.)
+- [CODE_CONTEXT_NAME *code_context_name*] :  Context name of the package used in code sources. (Set PACKAGE_CODE_CONTEXT_NAME which is set to *${PACKAGE_CONTEXT_NAME}* by default.)
+- [CODE_SUBJECT_NAME *code_subject_name*] :  Subject name of the package used in code sources. (Set PACKAGE_CODE_SUBJECT_NAME which is set to *${PACKAGE_SUBJECT_NAME}* by default.)
 
 ### Function `set_project_semantic_version(basicver)`
 
@@ -42,8 +53,78 @@ If NAMESPACE and BASE_NAME are used, PROJECT_NAME is set to `${PROJECT_NAMESPACE
 - `PROJECT_SEMANTIC_VERSION` is set to `${basicver}+${build_metadata}` if `${pre_release}` is empty but `${build_metadata}` is not.
 
 &ensp;&ensp;&ensp;&ensp;Arguments:
-- [PRE_RELEASE *pre_release*] :  Pre-release version of the project. (Set PROJECT_NAME.)
-- [BUILD_METADATA *build_metadata*] :  Build metadata of the project. (Set PROJECT_NAMESPACE.)
+- [PRE_RELEASE *pre_release*] :  Pre-release version of the project. (Set PROJECT_VERSION_PRE_RELEASE.)
+- [BUILD_METADATA *build_metadata*] :  Build metadata of the project. (Set PROJECT_VERSION_BUILD_METADATA.)
+
+### Function `set_package_semantic_version(basicver)`
+
+&ensp;&ensp;&ensp;&ensp;Set package version variables : `PACKAGE_SEMANTIC_VERSION`, `PACKAGE_VERSION`, `PACKAGE_VERSION_MAJOR`,
+ `PACKAGE_VERSION_MINOR`, `PACKAGE_VERSION_PATCH`, `PACKAGE_VERSION_PRE_RELEASE`, `PACKAGE_VERSION_BUILD_METADATA`.
+- `PACKAGE_SEMANTIC_VERSION` is set to `${basicver}-${pre_release}+${build_metadata}` if `${pre_release}` and `${build_metadata}` are not empty. 
+- `PACKAGE_SEMANTIC_VERSION` is set to `${basicver}-${pre_release}` if `${pre_release}` is not empty but `${build_metadata}` is. 
+- `PACKAGE_SEMANTIC_VERSION` is set to `${basicver}+${build_metadata}` if `${pre_release}` is empty but `${build_metadata}` is not.
+
+&ensp;&ensp;&ensp;&ensp;Arguments:
+- [PRE_RELEASE *pre_release*] :  Pre-release version of the package. (Set PACKAGE_VERSION_PRE_RELEASE.)
+- [BUILD_METADATA *build_metadata*] :  Build metadata of the package. (Set PACKAGE_VERSION_BUILD_METADATA.)
+
+### Function `set_package_component_names()`
+
+&ensp;&ensp;&ensp;&ensp;Set package component name variables: PACKAGE_REQUIRED_COMPONENTS, PACKAGE_OPTIONAL_COMPONENTS and PACKAGE_COMPONENTS.
+
+- [REQUIRED *component_list*] :  Names of the required package components. (Set PACKAGE_REQUIRED_COMPONENTS.)
+- [OPTIONAL *component_list*] :  Names of the optional package components. (Set PACKAGE_OPTIONAL_COMPONENTS.)
+
+### macro `build_component_option(...)`
+
+&ensp;&ensp;&ensp;&ensp;Create a cached option indicating if a component must be built or not.
+- [NAME *name*] :  The name to use to define the option name and its message (if they are not provided).
+- [COMPONENT_NAME *component_name*] :  The component name to use to define the option name and its message (if they are not provided). (*${COMPONENT_NAME}* used by default)
+- [NAMESPACE *namespace*] :  The namespace to use to define the option name and its message (if they are not provided). (*${PACKAGE_NAME}* used by default)
+- [OPTION_NAME *name*] :  The name of the option. (*${UPPER_NAME}*_BUILD used by default, where ${UPPER_NAME} is the upper value of ${NAME} or ${NAMESPACE}_${COMPONENT_NAME})
+- [OPTION_MSG *msg*] :  The message of the option. (*Build ${full_name} or not.* used by default, where ${full_name} is the value of ${NAME} or ${NAMESPACE}::${COMPONENT_NAME})
+- [OPTION_DEFAULT *ON|OFF*] :  The default value of the option (ON or OFF). (*ON* used by default)
+- [OUT_VAR *out_var*] :  The name of the variable to set with the option value.
+
+### macro `build_tests_option(...)`
+
+&ensp;&ensp;&ensp;&ensp;Create a cached option indicating if tests of a project must be built or not.
+- [NAME *name*] :  The name to use to define the option name and its message (if they are not provided).
+- [PROJECT_NAME *project_name*] :  The project name to use to define the option name and its message (if they are not provided). (*${PROJECT_NAME}* used by default)
+- [NAMESPACE *namespace*] :  The namespace to use to define the option name and its message (if they are not provided). (*${PACKAGE_NAME}* used by default)
+- [OPTION_NAME *name*] :  The name of the option. (*${UPPER_NAME}_BUILD_TESTS* used by default, where ${UPPER_NAME} is the upper value of ${NAME} or ${NAMESPACE}_${PROJECT_NAME})
+- [OPTION_MSG *msg*] :  The message of the option. (*Build ${full_name} or not.* used by default, where ${full_name} is the value of ${NAME} or ${NAMESPACE}::${PROJECT_NAME})
+- [OPTION_DEFAULT *ON|OFF*] :  The default value of the option (ON or OFF). (*OFF* used by default)
+- [OUT_VAR *out_var*] :  The name of the variable to set with the option value.
+
+### macro `build_examples_option(...)`
+
+&ensp;&ensp;&ensp;&ensp;Create a cached option indicating if examples of a project must be built or not.
+- [NAME *name*] :  The name to use to define the option name and its message (if they are not provided).
+- [PROJECT_NAME *project_name*] :  The project name to use to define the option name and its message (if they are not provided). (*${PROJECT_NAME}* used by default)
+- [NAMESPACE *namespace*] :  The namespace to use to define the option name and its message (if they are not provided). (*${PACKAGE_NAME}* used by default)
+- [OPTION_NAME *name*] :  The name of the option. (*${UPPER_NAME}_BUILD_EXAMPLES* used by default, where ${UPPER_NAME} is the upper value of ${NAME} or ${NAMESPACE}_${PROJECT_NAME})
+- [OPTION_MSG *msg*] :  The message of the option. (*Build ${full_name} or not.* used by default, where ${full_name} is the value of ${NAME} or ${NAMESPACE}::${PROJECT_NAME})
+- [OPTION_DEFAULT *ON|OFF*] :  The default value of the option (ON or OFF). (*OFF* used by default)
+- [OUT_VAR *out_var*] :  The name of the variable to set with the option value.
+
+### macro `add_test_subdirectory_if_built(dir_name ...)`
+
+&ensp;&ensp;&ensp;&ensp;Create a cached option indicating if the provided test subdirectory must be added or not. Then add this test subdirectory accordingly to the option.
+- *dir_name* :  The test subdirectory to treat.
+- [NAME *name*] :  The name to use to define the option name and its message (if they are not provided). (*${PROJECT_NAME}* used by default)
+- [OPTION_NAME *name*] :  The name of the option. (*${UPPER_NAME}_BUILD_TESTS* used by default, where ${UPPER_NAME} is the upper value of ${NAME})
+- [OPTION_MSG *msg*] :  The message of the option. (*Build ${NAME} tests or not.* used by default)
+- [OPTION_DEFAULT *ON|OFF*] :  The default value of the option (ON or OFF). (*OFF* used by default)
+
+### macro `add_example_subdirectory_if_built(dir_name ...)`
+
+&ensp;&ensp;&ensp;&ensp;Create a cached option indicating if the provided example subdirectory must be added or not. Then add this example subdirectory accordingly to the option.
+- *dir_name* :  The example subdirectory to treat.
+- [NAME *name*] :  The name to use to define the option name and its message (if they are not provided). (*${PROJECT_NAME}* used by default)
+- [OPTION_NAME *name*] :  The name of the option. (*${UPPER_NAME}_BUILD_EXAMPLES* used by default, where ${UPPER_NAME} is the upper value of ${NAME})
+- [OPTION_MSG *msg*] :  The message of the option. (*Build ${NAME} examples or not.* used by default)
+- [OPTION_DEFAULT *ON|OFF*] :  The default value of the option (ON or OFF). (*OFF* used by default)
 
 ### Function `configure_files(return_var)`
 
@@ -52,6 +133,15 @@ If NAMESPACE and BASE_NAME are used, PROJECT_NAME is set to `${PROJECT_NAMESPACE
 - FILES *files* :  List of files to configure.
 - BASE_DIR *dir* :  Directory from which the relative path of input file is computed.
 - BINARY_BASE_DIR *dir* :  Directory from which the hierarchy of files is generated.
+
+### Function `install_package(package_name ...)`
+
+&ensp;&ensp;&ensp;&ensp;Install C++ package
+
+- INPUT_PACKAGE_CONFIG_FILE *package-config.cmake.in*: 	A package config file will be created by using configure_package_config_file() on the provided *package-config.cmake.in*.
+- [VERSION *version*]: 	The version of the package. (*PROJECT_VERSION* used by default)
+- [VERSION_COMPATIBILITY *compatibility*]: 	The compatibility with previous versions (cf. CMake function [write_basic_package_version_file](https://cmake.org/cmake/help/latest/module/CMakePackageConfigHelpers.html#command:write_basic_package_version_file)). (*SameMajorVersion* used by default)
+- [CMAKE_FILES_DESTINATION *destination*]: Destination directory where to install the CMake files.
 
 ### Function `install_uninstall_script(package_name)`
 

@@ -39,27 +39,17 @@
 &ensp;&ensp;&ensp;&ensp;Add default error compile options to a given target.
 `-pedantic-errors -Werror=old-style-cast` with g++.
 
-### macro `add_test_subdirectory_if_build(dir_name ...)`
-
-&ensp;&ensp;&ensp;&ensp;Create a cached option indicating if the provided test subdirectory must be added or not. Then add this test subdirectory accordingly to the option.
-- *dir_name* :  The test subdirectory to treat.
-- [NAME *name*] :  The name to use to define the option name and its message (if they are not provided). (*${PROJECT_NAME}* used by default)
-- [BUILD_OPTION_NAME *name*] :  The name of the option. (*BUILD_${UPPER_NAME}_TESTS* used by default, where ${UPPER_NAME} is the upper value of ${NAME})
-- [BUILD_OPTION_MSG *msg*] :  The message of the option. (*Build ${NAME} tests or not.* used by default)
-- [BUILD_OPTION_DEFAULT *ON|OFF*] :  The default value of the option (ON or OFF). (*OFF* used by default)
-
-### macro `add_example_subdirectory_if_build(dir_name ...)`
-
-&ensp;&ensp;&ensp;&ensp;Create a cached option indicating if the provided example subdirectory must be added or not. Then add this example subdirectory accordingly to the option.
-- *dir_name* :  The example subdirectory to treat.
-- [NAME *name*] :  The name to use to define the option name and its message (if they are not provided). (*${PROJECT_NAME}* used by default)
-- [BUILD_OPTION_NAME *name*] :  The name of the option. (*BUILD_${UPPER_NAME}_EXAMPLES* used by default, where ${UPPER_NAME} is the upper value of ${NAME})
-- [BUILD_OPTION_MSG *msg*] :  The message of the option. (*Build ${NAME} examples or not.* used by default)
-- [BUILD_OPTION_DEFAULT *ON|OFF*] :  The default value of the option (ON or OFF). (*OFF* used by default)
-
 ### function `copy_runtime_dlls_if_win32(target_name)`
 
 &ensp;&ensp;&ensp;&ensp;Copy the runtime dlls of a valid target to its runtime directory. Set the RUNTIME_OUTPUT_DIRECTORY of the target to 
 "${CMAKE_CURRENT_BINARY_DIR}/${RUNTIME_OUTPUT_SUBDIRECTORY}" (below).
 - *target_name* :  The name of the target.
 - [RUNTIME_OUTPUT_SUBDIRECTORY *dir*] :  The subdirectory path used to defined the RUNTIME_OUTPUT_DIRECTORY of the target. (Empty string used by default)
+
+### Function `install_cpp_targets(...)`
+
+&ensp;&ensp;&ensp;&ensp;Install C++ targets.
+- TARGETS *target_names* : Names of the targets to install.
+- EXPORT *export_name* : 	Export name.
+- [NAMESPACE *namespace*]: 	Targets namespace.
+- [CMAKE_FILES_DESTINATION *destination*]: Destination directory where to install the CMake files.

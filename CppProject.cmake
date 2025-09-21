@@ -97,41 +97,6 @@ function(target_default_error_options target)
   endif()
 endfunction()
 
-macro(add_test_subdirectory_if_build dir_name)
-  cmake_parse_arguments("M_ARG" "" "NAME;BUILD_OPTION_NAME;BUILD_OPTION_MSG;BUILD_OPTION_DEFAULT" "" ${ARGN})
-  set_ifndef(M_ARG_NAME "${PROJECT_NAME}")
-  if(NOT M_ARG_BUILD_OPTION_NAME)
-    make_upper_c_identifier("${M_ARG_NAME}" upper_var_name)
-    set(M_ARG_BUILD_OPTION_NAME "BUILD_${upper_var_name}_TESTS")
-  endif()
-  set_ifndef(M_ARG_BUILD_OPTION_MSG "Build ${M_ARG_NAME} tests or not.")
-  set_ifndef(M_ARG_BUILD_OPTION_DEFAULT OFF)
-  fatal_if_none_of(M_ARG_BUILD_OPTION_DEFAULT "ON" "OFF")
-  option(${M_ARG_BUILD_OPTION_NAME} ${M_ARG_BUILD_OPTION_MSG} ${M_ARG_BUILD_OPTION_DEFAULT})
-  if(${M_ARG_BUILD_OPTION_NAME})
-    include(CTest)
-    if(BUILD_TESTING)
-      add_subdirectory(${dir_name})
-    endif()
-  endif()
-endmacro()
-
-macro(add_example_subdirectory_if_build dir_name)
-  cmake_parse_arguments("M_ARG" "" "NAME;BUILD_OPTION_NAME;BUILD_OPTION_MSG;BUILD_OPTION_DEFAULT" "" ${ARGN})
-  set_ifndef(M_ARG_NAME "${PROJECT_NAME}")
-  if(NOT M_ARG_BUILD_OPTION_NAME)
-    make_upper_c_identifier("${M_ARG_NAME}" upper_var_name)
-    set(M_ARG_BUILD_OPTION_NAME "BUILD_${upper_var_name}_EXAMPLES")
-  endif()
-  set_ifndef(M_ARG_BUILD_OPTION_MSG "Build ${M_ARG_NAME} examples or not.")
-  set_ifndef(M_ARG_BUILD_OPTION_DEFAULT OFF)
-  fatal_if_none_of(M_ARG_BUILD_OPTION_DEFAULT "ON" "OFF")
-  option(${M_ARG_BUILD_OPTION_NAME} ${M_ARG_BUILD_OPTION_MSG} ${M_ARG_BUILD_OPTION_DEFAULT})
-  if(${M_ARG_BUILD_OPTION_NAME})
-    add_subdirectory(${dir_name})
-  endif()
-endmacro()
-
 function(copy_runtime_dlls_if_win32 target_name)
   if(WIN32)
     cmake_parse_arguments("M_ARG" "" "RUNTIME_OUTPUT_SUBDIRECTORY" "" ${ARGN})
@@ -143,4 +108,30 @@ function(copy_runtime_dlls_if_win32 target_name)
         COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_RUNTIME_DLLS:${target_name}> $<TARGET_FILE_DIR:${target_name}>/.dummy.txt $<TARGET_FILE_DIR:${target_name}>
         COMMAND_EXPAND_LISTS)
   endif()
+endfunction()
+
+# args:
+#  target_names
+#  EXPORT <export-name>
+#  [CMAKE_FILES_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PACKAGE_NAME}]
+#  [NAMESPACE <ns>]
+function(install_cpp_targets)
+  include(GNUInstallDirs)
+  # Args:
+  set(params "EXPORT;CMAKE_FILES_DESTINATION;NAMESPACE")
+  set(lists "TARGETS")
+  # Parse args:
+  cmake_parse_arguments(PARSE_ARGV 0 "ARG" "" "${params}" "${lists}")
+  # Check/Set args:
+  fatal_ifndef("A list of TARGETS is required." ARG_TARGETS)
+  fatal_ifndef("EXPORT name is required (e.g. \${PACKAGE_NAME}-targets)" ARG_EXPORT)
+  set_ifndef(ARG_CMAKE_FILES_DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/${PACKAGE_NAME}")
+  set_iftest(namespace_opt IF ARG_NAMESPACE THEN NAMESPACE ${ARG_NAMESPACE})
+  # Install targets:
+  install(TARGETS ${ARG_TARGETS} EXPORT ${ARG_EXPORT}
+          FILE_SET HEADERS DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+          )
+  # Install export:
+  install(EXPORT ${ARG_EXPORT} DESTINATION ${ARG_CMAKE_FILES_DESTINATION} ${namespace_opt})
+#  export(EXPORT ${ARG_EXPORT} FILE ${CMAKE_CURRENT_BINARY_DIR}/${ARG_EXPORT}.cmake ${namespace_opt})
 endfunction()
